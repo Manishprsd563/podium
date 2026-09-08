@@ -1,6 +1,6 @@
 {
-  "session_id": "interrupt_probe",
-  "created_at": "2026-09-08T04:32:46Z",
+  "session_id": "fx5_4400ms",
+  "created_at": "2026-09-08T04:31:50Z",
   "config": {},
   "deck": null,
   "revisions": [
@@ -8,10 +8,10 @@
       "revision": 1,
       "scope": "full",
       "audio": "presentation_r1.wav",
-      "started_at": "2026-09-08T04:32:46Z",
-      "ended_at": "2026-09-08T04:32:55Z",
+      "started_at": "2026-09-08T04:31:50Z",
+      "ended_at": "2026-09-08T04:32:03Z",
       "transcript": {
-        "text": "Let's start with the core problem in sequence models. Every token needs a way to relate to distant tokens.",
+        "text": "Sparse attention is one option. Low rank approximation is another. Each trade some accuracy for a lot of speed.",
         "words": []
       },
       "slide_events": [

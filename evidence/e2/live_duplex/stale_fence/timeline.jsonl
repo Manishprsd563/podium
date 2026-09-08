@@ -1,38 +1,46 @@
-{"t": 0.391, "ev": "revision", "revision": 1, "scope": "full"}
-{"t": 0.391, "ev": "slide", "slide": 1}
-{"t": 0.391, "ev": "phase", "name": "present"}
-{"t": 0.594, "ev": "user_speech_start"}
-{"t": 2.313, "ev": "user_transcript", "text": "Start with the", "final": false}
-{"t": 3.125, "ev": "user_transcript", "text": "Let's start with the core problem in sequence", "final": false}
-{"t": 3.641, "ev": "user_transcript", "text": "Let's start with the core problem in sequence models.", "final": true}
-{"t": 3.688, "ev": "user_speech_end"}
+{"t": 0.407, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.407, "ev": "slide", "slide": 1}
+{"t": 0.407, "ev": "phase", "name": "present"}
+{"t": 0.61, "ev": "user_speech_start"}
+{"t": 2.282, "ev": "user_transcript", "text": "Start with the core", "final": false}
+{"t": 3.079, "ev": "user_transcript", "text": "Let's start with the core problem in sequence", "final": false}
+{"t": 3.563, "ev": "user_transcript", "text": "Let's start with the core problem in sequence models.", "final": true}
+{"t": 3.625, "ev": "user_speech_end"}
 {"t": 5.594, "ev": "user_speech_start"}
-{"t": 6.875, "ev": "user_transcript", "text": "Every token needs", "final": false}
-{"t": 7.891, "ev": "user_transcript", "text": "Every token needs a way to relate to distant", "final": false}
-{"t": 8.735, "ev": "user_transcript", "text": "Every token needs a way to relate to distant tokens.", "final": true}
-{"t": 8.75, "ev": "revision", "revision": 2, "scope": {"slide": 1}}
-{"t": 8.75, "ev": "slide", "slide": 1}
-{"t": 8.75, "ev": "phase", "name": "present"}
-{"t": 9.047, "ev": "user_speech_end"}
-{"t": 9.141, "ev": "user_speech_start"}
-{"t": 10.016, "ev": "user_transcript", "text": "The mechanism", "final": false}
-{"t": 11.141, "ev": "user_transcript", "text": "The mechanism that solves this", "final": false}
-{"t": 12.157, "ev": "user_transcript", "text": "The mechanism that solves this is called attention.", "final": false}
-{"t": 12.375, "ev": "user_transcript", "text": "The mechanism that solves this is called attention.", "final": true}
-{"t": 12.469, "ev": "user_speech_end"}
-{"t": 14.985, "ev": "user_speech_start"}
-{"t": 15.563, "ev": "user_transcript", "text": "Each", "final": false}
-{"t": 16.594, "ev": "user_transcript", "text": "Each token computes a", "final": false}
-{"t": 17.594, "ev": "user_transcript", "text": "Each token computes a score against", "final": true}
-{"t": 17.86, "ev": "phase", "name": "analyze"}
-{"t": 17.875, "ev": "agent_speech_start", "speech_id": "speech_fc18fecaf5f9", "text": "Got it, give me a moment.", "kind": "ack"}
-{"t": 17.875, "ev": "no_speech", "revision": 2, "words": 0}
-{"t": 17.875, "ev": "agent_speech_start", "speech_id": "speech_a0d07604f5c9", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
-{"t": 17.875, "ev": "phase", "name": "prep"}
-{"t": 17.875, "ev": "agent_speech_end", "speech_id": "speech_fc18fecaf5f9", "interrupted": true, "played_s": 0.0}
-{"t": 17.875, "ev": "interrupt", "speech_id": "speech_fc18fecaf5f9", "latency_ms": 2890}
-{"t": 17.875, "ev": "agent_speech_end", "speech_id": "speech_a0d07604f5c9", "interrupted": true, "played_s": 0.0}
-{"t": 17.875, "ev": "interrupt", "speech_id": "speech_a0d07604f5c9", "latency_ms": 2890}
-{"t": 18.203, "ev": "user_transcript", "text": "every other token.", "final": false}
-{"t": 18.203, "ev": "user_transcript", "text": "every other token.", "final": true}
-{"t": 18.438, "ev": "user_speech_end"}
+{"t": 6.766, "ev": "user_transcript", "text": "Every token needs a", "final": false}
+{"t": 7.813, "ev": "user_transcript", "text": "Every token needs a way to relate to distant", "final": false}
+{"t": 8.547, "ev": "user_transcript", "text": "Every token needs a way to relate to distant tokens.", "final": true}
+{"t": 8.563, "ev": "phase", "name": "analyze"}
+{"t": 8.563, "ev": "agent_speech_start", "speech_id": "speech_9410d68b56da", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 8.563, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 8.563, "ev": "agent_speech_start", "speech_id": "speech_713c711ca6a4", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 8.563, "ev": "phase", "name": "prep"}
+{"t": 8.563, "ev": "agent_speech_end", "speech_id": "speech_9410d68b56da", "interrupted": false, "played_s": 0.0}
+{"t": 8.563, "ev": "agent_speech_end", "speech_id": "speech_713c711ca6a4", "interrupted": false, "played_s": 0.0}
+{"t": 8.594, "ev": "revision", "revision": 2, "scope": {"slide": 1}}
+{"t": 8.594, "ev": "slide", "slide": 1}
+{"t": 8.594, "ev": "phase", "name": "present"}
+{"t": 8.891, "ev": "user_speech_end"}
+{"t": 9.0, "ev": "user_speech_start"}
+{"t": 9.766, "ev": "user_transcript", "text": "The", "final": false}
+{"t": 10.875, "ev": "user_transcript", "text": "The mechanism that solves", "final": false}
+{"t": 12.016, "ev": "user_transcript", "text": "The mechanism that solves this is called", "final": false}
+{"t": 12.516, "ev": "user_transcript", "text": "The mechanism that solves this is called attention.", "final": true}
+{"t": 12.61, "ev": "user_speech_end"}
+{"t": 15.141, "ev": "user_speech_start"}
+{"t": 15.657, "ev": "user_transcript", "text": "Each", "final": false}
+{"t": 16.75, "ev": "user_transcript", "text": "Each token computes a", "final": false}
+{"t": 17.844, "ev": "user_transcript", "text": "Each Token computes", "final": true}
+{"t": 17.844, "ev": "user_transcript", "text": "score against every other", "final": false}
+{"t": 18.157, "ev": "user_transcript", "text": "score against every other", "final": true}
+{"t": 18.172, "ev": "phase", "name": "analyze"}
+{"t": 18.172, "ev": "agent_speech_start", "speech_id": "speech_c2e5113b76ec", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 18.172, "ev": "no_speech", "revision": 2, "words": 0}
+{"t": 18.172, "ev": "agent_speech_start", "speech_id": "speech_394286489ee8", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 18.172, "ev": "phase", "name": "prep"}
+{"t": 18.172, "ev": "agent_speech_end", "speech_id": "speech_c2e5113b76ec", "interrupted": true, "played_s": 0.0}
+{"t": 18.172, "ev": "interrupt", "speech_id": "speech_c2e5113b76ec", "latency_ms": 3031}
+{"t": 18.204, "ev": "agent_speech_end", "speech_id": "speech_394286489ee8", "interrupted": true, "played_s": 0.032}
+{"t": 18.204, "ev": "interrupt", "speech_id": "speech_394286489ee8", "latency_ms": 3063}
+{"t": 18.485, "ev": "user_transcript", "text": "score against every other token.", "final": true}
+{"t": 18.813, "ev": "user_speech_end"}

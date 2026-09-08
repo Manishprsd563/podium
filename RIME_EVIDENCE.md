@@ -268,14 +268,19 @@ interruption settings — to make the effect of the retune visible.**
 | | n trials | P50 | P95 | max | Target | Target met? |
 |---|---|---|---|---|---|---|
 | `baseline_default_interruption` | 12/12 measurable | 1033 ms | 1417 ms | 2432 ms | ≤300 ms | **No** |
-| `tuned_interruption` | 12/12 measurable | 595.5 ms | 698 ms | 2948 ms | ≤300 ms | **No** |
+| `tuned_interruption` | 12/12 measurable | 666 ms | 744 ms | 1713 ms | ≤300 ms | **No** |
+
+Because this is a live measurement over a real network with real TTS/VAD/STT timing, the tuned
+configuration was run three times; the table holds the run currently committed to
+`results.json`, and the observed spread across the three was **P50 595–666 ms, P95 667–744 ms,
+max 1713–2948 ms**. The baseline row is a single run (see the provenance note below).
 
 **The honest headline: shrinking the VAD interruption window (0.5 s → 0.12 s minimum
-duration) and the false-interruption timeout (2.0 s → 1.5 s) cut P50 by roughly 42% and P95 by
-roughly 51% — but P95 is still 2.3× the 300 ms target, and the worst single trial actually got
-slightly worse (2432 ms → 2948 ms).** This is a real, currently-missed target, reported as
-such rather than hidden or rounded away — this is the evidence gap named at the top of this
-project.
+duration) and the false-interruption timeout (2.0 s → 1.5 s) cut P50 and P95 by roughly 35–50%
+across runs — but P95 remains about 2.5× the 300 ms target, and the worst single trial did not
+improve reliably (baseline 2432 ms; tuned 1713–2948 ms depending on the run).** This is a real,
+currently-missed target, reported as such rather than hidden or rounded away — it is the
+evidence gap named at the top of this project.
 
 **Why the numbers aren't a clean per-trial latency measurement.** Both runs' own
 `latency_decomposition.reliable` fields are `false`, with the exact reason recorded:
@@ -286,10 +291,11 @@ reference not refreshed per-utterance during the barge-in retry cascade, not a f
 onset"* (baseline run); the tuned run logged 20 agent-side interrupt events for the same 12
 trials (ratio 1.67×) for the same reason. In plain terms: a single interrupt burst can trigger
 a cascade of re-interruptions on the agent's retried utterance while the burst audio is still
-arriving, so "one trial → one interrupt event" doesn't hold cleanly, and the outlier (2432 ms /
-2948 ms) trials are consistent with that cascade rather than a single clean stop taking that
-long. Both runs also logged one "false-interruption-resume" trial (baseline: trial 5; tuned:
-trial 1) — a case where the agent's `resume_false_interruption` behaviour resumed speech the
+arriving, so "one trial → one interrupt event" doesn't hold cleanly, and the multi-second
+outlier trials in both configurations are consistent with that cascade rather than a single
+clean stop genuinely taking that long. Both runs also logged one "false-interruption-resume"
+trial (baseline: trial 5; tuned: trial 1) — a case where the agent's
+`resume_false_interruption` behaviour resumed speech the
 harness had already counted as interrupted, which the harness's `latency_decomposition` field
 flags explicitly rather than silently averaging away.
 

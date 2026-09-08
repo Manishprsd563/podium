@@ -1,0 +1,19 @@
+{"t": 0.484, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.484, "ev": "slide", "slide": 1}
+{"t": 0.484, "ev": "phase", "name": "present"}
+{"t": 0.671, "ev": "user_speech_start"}
+{"t": 2.218, "ev": "user_transcript", "text": "That's the trade off as", "final": false}
+{"t": 3.015, "ev": "user_transcript", "text": "That's the trade off at the heart of efficient", "final": false}
+{"t": 3.89, "ev": "user_transcript", "text": "That's the trade off at the heart of efficient transformers.", "final": true}
+{"t": 4.156, "ev": "user_speech_end"}
+{"t": 9.281, "ev": "user_speech_start"}
+{"t": 10.453, "ev": "user_transcript", "text": "Thanks for listening. That's", "final": false}
+{"t": 11.546, "ev": "user_transcript", "text": "Thanks for listening. That's the whole idea.", "final": true}
+{"t": 11.546, "ev": "phase", "name": "analyze"}
+{"t": 11.546, "ev": "agent_speech_start", "speech_id": "speech_e858ad464876", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 11.562, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 11.562, "ev": "agent_speech_start", "speech_id": "speech_37629802e881", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 11.562, "ev": "phase", "name": "prep"}
+{"t": 11.562, "ev": "agent_speech_end", "speech_id": "speech_e858ad464876", "interrupted": false, "played_s": 0.016}
+{"t": 11.562, "ev": "agent_speech_end", "speech_id": "speech_37629802e881", "interrupted": false, "played_s": 0.0}
+{"t": 11.796, "ev": "user_speech_end"}

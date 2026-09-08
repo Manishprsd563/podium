@@ -1,20 +1,21 @@
-{"t": 0.406, "ev": "revision", "revision": 1, "scope": "full"}
-{"t": 0.406, "ev": "slide", "slide": 1}
-{"t": 0.406, "ev": "phase", "name": "present"}
-{"t": 0.672, "ev": "user_speech_start"}
-{"t": 2.219, "ev": "user_transcript", "text": "Start with the core", "final": false}
-{"t": 3.031, "ev": "user_transcript", "text": "Let's start with the core problem in sequence", "final": false}
-{"t": 3.625, "ev": "user_transcript", "text": "Let's start with the core problem in sequence models.", "final": true}
-{"t": 3.75, "ev": "user_speech_end"}
-{"t": 5.594, "ev": "user_speech_start"}
-{"t": 6.719, "ev": "user_transcript", "text": "Every token needs", "final": false}
-{"t": 7.844, "ev": "user_transcript", "text": "Every token needs a way to relate to", "final": false}
-{"t": 8.672, "ev": "user_transcript", "text": "Every token needs a way to relate to distant tokens.", "final": true}
-{"t": 8.828, "ev": "phase", "name": "analyze"}
-{"t": 8.828, "ev": "agent_speech_start", "speech_id": "speech_26c58f186528", "text": "Got it, give me a moment.", "kind": "ack"}
-{"t": 8.844, "ev": "no_speech", "revision": 1, "words": 0}
-{"t": 8.844, "ev": "agent_speech_start", "speech_id": "speech_c36b8302a8b3", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
-{"t": 8.844, "ev": "phase", "name": "prep"}
-{"t": 8.844, "ev": "agent_speech_end", "speech_id": "speech_26c58f186528", "interrupted": false, "played_s": 0.016}
-{"t": 8.844, "ev": "agent_speech_end", "speech_id": "speech_c36b8302a8b3", "interrupted": false, "played_s": 0.0}
-{"t": 9.062, "ev": "user_speech_end"}
+{"t": 0.407, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.407, "ev": "slide", "slide": 1}
+{"t": 0.407, "ev": "phase", "name": "present"}
+{"t": 0.625, "ev": "user_speech_start"}
+{"t": 2.297, "ev": "user_transcript", "text": "Start with the core", "final": false}
+{"t": 3.078, "ev": "user_transcript", "text": "Let's start with the core problem in sequence", "final": false}
+{"t": 3.641, "ev": "user_transcript", "text": "Let's start with the core problem in sequence models.", "final": true}
+{"t": 3.766, "ev": "user_speech_end"}
+{"t": 5.61, "ev": "user_speech_start"}
+{"t": 6.719, "ev": "user_transcript", "text": "Every token needs a", "final": false}
+{"t": 7.766, "ev": "user_transcript", "text": "Every token needs a way to relate to distant", "final": false}
+{"t": 8.485, "ev": "user_transcript", "text": "Every token needs a way to relate to distant tokens.", "final": true}
+{"t": 8.657, "ev": "phase", "name": "analyze"}
+{"t": 8.657, "ev": "agent_speech_start", "speech_id": "speech_4e5d9919aa21", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 8.657, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 8.657, "ev": "agent_speech_start", "speech_id": "speech_a9008e6aa662", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 8.657, "ev": "phase", "name": "prep"}
+{"t": 8.657, "ev": "agent_speech_end", "speech_id": "speech_4e5d9919aa21", "interrupted": true, "played_s": 0.0}
+{"t": 8.657, "ev": "interrupt", "speech_id": "speech_4e5d9919aa21", "latency_ms": 3047}
+{"t": 8.657, "ev": "agent_speech_end", "speech_id": "speech_a9008e6aa662", "interrupted": false, "played_s": 0.0}
+{"t": 8.985, "ev": "user_speech_end"}

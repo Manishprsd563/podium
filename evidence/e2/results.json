@@ -6,36 +6,36 @@
         "path": "evidence\\e2\\fixtures\\fx1_2000ms.wav",
         "sr": 24000,
         "pause_ms_requested": 2000,
-        "pause_start_s": 2.752,
-        "pause_end_s": 4.752,
-        "total_s": 7.55
+        "pause_start_s": 2.728,
+        "pause_end_s": 4.728,
+        "total_s": 7.48
       },
       {
         "id": "fx2_2600ms",
         "path": "evidence\\e2\\fixtures\\fx2_2600ms.wav",
         "sr": 24000,
         "pause_ms_requested": 2600,
-        "pause_start_s": 2.833,
-        "pause_end_s": 5.433,
-        "total_s": 8.451
+        "pause_start_s": 3.123,
+        "pause_end_s": 5.723,
+        "total_s": 8.788
       },
       {
         "id": "fx3_3200ms",
         "path": "evidence\\e2\\fixtures\\fx3_3200ms.wav",
         "sr": 24000,
         "pause_ms_requested": 3200,
-        "pause_start_s": 3.843,
-        "pause_end_s": 7.043,
-        "total_s": 10.201
+        "pause_start_s": 3.75,
+        "pause_end_s": 6.95,
+        "total_s": 10.062
       },
       {
         "id": "fx4_3800ms",
         "path": "evidence\\e2\\fixtures\\fx4_3800ms.wav",
         "sr": 24000,
         "pause_ms_requested": 3800,
-        "pause_start_s": 2.543,
-        "pause_end_s": 6.343,
-        "total_s": 9.837
+        "pause_start_s": 2.612,
+        "pause_end_s": 6.412,
+        "total_s": 9.884
       },
       {
         "id": "fx5_4400ms",
@@ -44,16 +44,16 @@
         "pause_ms_requested": 4400,
         "pause_start_s": 4.644,
         "pause_end_s": 9.044,
-        "total_s": 11.656
+        "total_s": 11.679
       },
       {
         "id": "fx6_5000ms",
         "path": "evidence\\e2\\fixtures\\fx6_5000ms.wav",
         "sr": 24000,
         "pause_ms_requested": 5000,
-        "pause_start_s": 3.17,
-        "pause_end_s": 8.17,
-        "total_s": 10.213
+        "pause_start_s": 3.123,
+        "pause_end_s": 8.123,
+        "total_s": 10.225
       }
     ],
     "baseline_default_vad": {
@@ -109,12 +109,12 @@
               "silence_duration": 0.288
             },
             {
-              "type": "start_of_speech",
-              "timestamp": 0.288,
-              "silence_duration": 0.0
+              "type": "inference_done",
+              "timestamp": 0.32,
+              "silence_duration": 0.32
             },
             {
-              "type": "inference_done",
+              "type": "start_of_speech",
               "timestamp": 0.32,
               "silence_duration": 0.0
             },
@@ -559,297 +559,297 @@
               "silence_duration": 0.0
             },
             {
-              "type": "inference_done",
-              "timestamp": 3.168,
-              "silence_duration": 0.0
-            },
-            {
               "type": "end_of_speech",
-              "timestamp": 3.168,
+              "timestamp": 3.136,
               "silence_duration": 0.576
             },
             {
               "type": "inference_done",
-              "timestamp": 3.2,
+              "timestamp": 3.168,
               "silence_duration": 0.608
             },
             {
               "type": "inference_done",
-              "timestamp": 3.232,
+              "timestamp": 3.2,
               "silence_duration": 0.64
             },
             {
               "type": "inference_done",
-              "timestamp": 3.264,
+              "timestamp": 3.232,
               "silence_duration": 0.672
             },
             {
               "type": "inference_done",
-              "timestamp": 3.296,
+              "timestamp": 3.264,
               "silence_duration": 0.704
             },
             {
               "type": "inference_done",
-              "timestamp": 3.328,
+              "timestamp": 3.296,
               "silence_duration": 0.736
             },
             {
               "type": "inference_done",
-              "timestamp": 3.36,
+              "timestamp": 3.328,
               "silence_duration": 0.768
             },
             {
               "type": "inference_done",
-              "timestamp": 3.392,
+              "timestamp": 3.36,
               "silence_duration": 0.8
             },
             {
               "type": "inference_done",
-              "timestamp": 3.424,
+              "timestamp": 3.392,
               "silence_duration": 0.832
             },
             {
               "type": "inference_done",
-              "timestamp": 3.456,
+              "timestamp": 3.424,
               "silence_duration": 0.864
             },
             {
               "type": "inference_done",
-              "timestamp": 3.488,
+              "timestamp": 3.456,
               "silence_duration": 0.896
             },
             {
               "type": "inference_done",
-              "timestamp": 3.52,
+              "timestamp": 3.488,
               "silence_duration": 0.928
             },
             {
               "type": "inference_done",
-              "timestamp": 3.552,
+              "timestamp": 3.52,
               "silence_duration": 0.96
             },
             {
               "type": "inference_done",
-              "timestamp": 3.584,
+              "timestamp": 3.552,
               "silence_duration": 0.992
             },
             {
               "type": "inference_done",
-              "timestamp": 3.616,
+              "timestamp": 3.584,
               "silence_duration": 1.024
             },
             {
               "type": "inference_done",
-              "timestamp": 3.648,
+              "timestamp": 3.616,
               "silence_duration": 1.056
             },
             {
               "type": "inference_done",
-              "timestamp": 3.68,
+              "timestamp": 3.648,
               "silence_duration": 1.088
             },
             {
               "type": "inference_done",
-              "timestamp": 3.712,
+              "timestamp": 3.68,
               "silence_duration": 1.12
             },
             {
               "type": "inference_done",
-              "timestamp": 3.744,
+              "timestamp": 3.712,
               "silence_duration": 1.152
             },
             {
               "type": "inference_done",
-              "timestamp": 3.776,
+              "timestamp": 3.744,
               "silence_duration": 1.184
             },
             {
               "type": "inference_done",
-              "timestamp": 3.808,
+              "timestamp": 3.776,
               "silence_duration": 1.216
             },
             {
               "type": "inference_done",
-              "timestamp": 3.84,
+              "timestamp": 3.808,
               "silence_duration": 1.248
             },
             {
               "type": "inference_done",
-              "timestamp": 3.872,
+              "timestamp": 3.84,
               "silence_duration": 1.28
             },
             {
               "type": "inference_done",
-              "timestamp": 3.904,
+              "timestamp": 3.872,
               "silence_duration": 1.312
             },
             {
               "type": "inference_done",
-              "timestamp": 3.936,
+              "timestamp": 3.904,
               "silence_duration": 1.344
             },
             {
               "type": "inference_done",
-              "timestamp": 3.968,
+              "timestamp": 3.936,
               "silence_duration": 1.376
             },
             {
               "type": "inference_done",
-              "timestamp": 4.0,
+              "timestamp": 3.968,
               "silence_duration": 1.408
             },
             {
               "type": "inference_done",
-              "timestamp": 4.032,
+              "timestamp": 4.0,
               "silence_duration": 1.44
             },
             {
               "type": "inference_done",
-              "timestamp": 4.064,
+              "timestamp": 4.032,
               "silence_duration": 1.472
             },
             {
               "type": "inference_done",
-              "timestamp": 4.096,
+              "timestamp": 4.064,
               "silence_duration": 1.504
             },
             {
               "type": "inference_done",
-              "timestamp": 4.128,
+              "timestamp": 4.096,
               "silence_duration": 1.536
             },
             {
               "type": "inference_done",
-              "timestamp": 4.16,
+              "timestamp": 4.128,
               "silence_duration": 1.568
             },
             {
               "type": "inference_done",
-              "timestamp": 4.192,
+              "timestamp": 4.16,
               "silence_duration": 1.6
             },
             {
               "type": "inference_done",
-              "timestamp": 4.224,
+              "timestamp": 4.192,
               "silence_duration": 1.632
             },
             {
               "type": "inference_done",
-              "timestamp": 4.256,
+              "timestamp": 4.224,
               "silence_duration": 1.664
             },
             {
               "type": "inference_done",
-              "timestamp": 4.288,
+              "timestamp": 4.256,
               "silence_duration": 1.696
             },
             {
               "type": "inference_done",
-              "timestamp": 4.32,
+              "timestamp": 4.288,
               "silence_duration": 1.728
             },
             {
               "type": "inference_done",
-              "timestamp": 4.352,
+              "timestamp": 4.32,
               "silence_duration": 1.76
             },
             {
               "type": "inference_done",
-              "timestamp": 4.384,
+              "timestamp": 4.352,
               "silence_duration": 1.792
             },
             {
               "type": "inference_done",
-              "timestamp": 4.416,
+              "timestamp": 4.384,
               "silence_duration": 1.824
             },
             {
               "type": "inference_done",
-              "timestamp": 4.448,
+              "timestamp": 4.416,
               "silence_duration": 1.856
             },
             {
               "type": "inference_done",
-              "timestamp": 4.48,
+              "timestamp": 4.448,
               "silence_duration": 1.888
             },
             {
               "type": "inference_done",
-              "timestamp": 4.512,
+              "timestamp": 4.48,
               "silence_duration": 1.92
             },
             {
               "type": "inference_done",
-              "timestamp": 4.544,
+              "timestamp": 4.512,
               "silence_duration": 1.952
             },
             {
               "type": "inference_done",
-              "timestamp": 4.576,
+              "timestamp": 4.544,
               "silence_duration": 1.984
             },
             {
               "type": "inference_done",
-              "timestamp": 4.608,
+              "timestamp": 4.576,
               "silence_duration": 2.016
             },
             {
               "type": "inference_done",
-              "timestamp": 4.64,
+              "timestamp": 4.608,
               "silence_duration": 2.048
             },
             {
               "type": "inference_done",
-              "timestamp": 4.672,
+              "timestamp": 4.64,
               "silence_duration": 2.08
             },
             {
               "type": "inference_done",
-              "timestamp": 4.704,
+              "timestamp": 4.672,
               "silence_duration": 2.112
             },
             {
               "type": "inference_done",
-              "timestamp": 4.736,
+              "timestamp": 4.704,
               "silence_duration": 2.144
             },
             {
               "type": "inference_done",
-              "timestamp": 4.768,
+              "timestamp": 4.736,
               "silence_duration": 2.176
             },
             {
               "type": "inference_done",
-              "timestamp": 4.8,
+              "timestamp": 4.768,
               "silence_duration": 2.208
             },
             {
               "type": "inference_done",
-              "timestamp": 4.832,
+              "timestamp": 4.8,
               "silence_duration": 2.24
             },
             {
               "type": "inference_done",
-              "timestamp": 4.864,
+              "timestamp": 4.832,
               "silence_duration": 2.272
             },
             {
               "type": "inference_done",
-              "timestamp": 4.896,
+              "timestamp": 4.864,
               "silence_duration": 2.304
             },
             {
               "type": "inference_done",
-              "timestamp": 4.928,
+              "timestamp": 4.896,
               "silence_duration": 2.336
             },
             {
               "type": "inference_done",
-              "timestamp": 4.96,
+              "timestamp": 4.928,
               "silence_duration": 2.368
             },
             {
               "type": "start_of_speech",
+              "timestamp": 4.928,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
               "timestamp": 4.96,
               "silence_duration": 0.0
             },
@@ -1241,16 +1241,6 @@
             {
               "type": "inference_done",
               "timestamp": 7.456,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 7.488,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 7.52,
               "silence_duration": 0.0
             }
           ],
@@ -1774,427 +1764,427 @@
               "silence_duration": 0.0
             },
             {
-              "type": "end_of_speech",
-              "timestamp": 3.264,
-              "silence_duration": 0.576
-            },
-            {
               "type": "inference_done",
               "timestamp": 3.296,
-              "silence_duration": 0.608
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.328,
-              "silence_duration": 0.64
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.36,
-              "silence_duration": 0.672
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.392,
-              "silence_duration": 0.704
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.424,
-              "silence_duration": 0.736
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.456,
-              "silence_duration": 0.768
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.488,
-              "silence_duration": 0.8
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.52,
-              "silence_duration": 0.832
+              "silence_duration": 0.0
+            },
+            {
+              "type": "end_of_speech",
+              "timestamp": 3.52,
+              "silence_duration": 0.576
             },
             {
               "type": "inference_done",
               "timestamp": 3.552,
-              "silence_duration": 0.864
+              "silence_duration": 0.608
             },
             {
               "type": "inference_done",
               "timestamp": 3.584,
-              "silence_duration": 0.896
+              "silence_duration": 0.64
             },
             {
               "type": "inference_done",
               "timestamp": 3.616,
-              "silence_duration": 0.928
+              "silence_duration": 0.672
             },
             {
               "type": "inference_done",
               "timestamp": 3.648,
-              "silence_duration": 0.96
+              "silence_duration": 0.704
             },
             {
               "type": "inference_done",
               "timestamp": 3.68,
-              "silence_duration": 0.992
+              "silence_duration": 0.736
             },
             {
               "type": "inference_done",
               "timestamp": 3.712,
-              "silence_duration": 1.024
+              "silence_duration": 0.768
             },
             {
               "type": "inference_done",
               "timestamp": 3.744,
-              "silence_duration": 1.056
+              "silence_duration": 0.8
             },
             {
               "type": "inference_done",
               "timestamp": 3.776,
-              "silence_duration": 1.088
+              "silence_duration": 0.832
             },
             {
               "type": "inference_done",
               "timestamp": 3.808,
-              "silence_duration": 1.12
+              "silence_duration": 0.864
             },
             {
               "type": "inference_done",
               "timestamp": 3.84,
-              "silence_duration": 1.152
+              "silence_duration": 0.896
             },
             {
               "type": "inference_done",
               "timestamp": 3.872,
-              "silence_duration": 1.184
+              "silence_duration": 0.928
             },
             {
               "type": "inference_done",
               "timestamp": 3.904,
-              "silence_duration": 1.216
+              "silence_duration": 0.96
             },
             {
               "type": "inference_done",
               "timestamp": 3.936,
-              "silence_duration": 1.248
+              "silence_duration": 0.992
             },
             {
               "type": "inference_done",
               "timestamp": 3.968,
-              "silence_duration": 1.28
+              "silence_duration": 1.024
             },
             {
               "type": "inference_done",
               "timestamp": 4.0,
-              "silence_duration": 1.312
+              "silence_duration": 1.056
             },
             {
               "type": "inference_done",
               "timestamp": 4.032,
-              "silence_duration": 1.344
+              "silence_duration": 1.088
             },
             {
               "type": "inference_done",
               "timestamp": 4.064,
-              "silence_duration": 1.376
+              "silence_duration": 1.12
             },
             {
               "type": "inference_done",
               "timestamp": 4.096,
-              "silence_duration": 1.408
+              "silence_duration": 1.152
             },
             {
               "type": "inference_done",
               "timestamp": 4.128,
-              "silence_duration": 1.44
+              "silence_duration": 1.184
             },
             {
               "type": "inference_done",
               "timestamp": 4.16,
-              "silence_duration": 1.472
+              "silence_duration": 1.216
             },
             {
               "type": "inference_done",
               "timestamp": 4.192,
-              "silence_duration": 1.504
+              "silence_duration": 1.248
             },
             {
               "type": "inference_done",
               "timestamp": 4.224,
-              "silence_duration": 1.536
+              "silence_duration": 1.28
             },
             {
               "type": "inference_done",
               "timestamp": 4.256,
-              "silence_duration": 1.568
+              "silence_duration": 1.312
             },
             {
               "type": "inference_done",
               "timestamp": 4.288,
-              "silence_duration": 1.6
+              "silence_duration": 1.344
             },
             {
               "type": "inference_done",
               "timestamp": 4.32,
-              "silence_duration": 1.632
+              "silence_duration": 1.376
             },
             {
               "type": "inference_done",
               "timestamp": 4.352,
-              "silence_duration": 1.664
+              "silence_duration": 1.408
             },
             {
               "type": "inference_done",
               "timestamp": 4.384,
-              "silence_duration": 1.696
+              "silence_duration": 1.44
             },
             {
               "type": "inference_done",
               "timestamp": 4.416,
-              "silence_duration": 1.728
+              "silence_duration": 1.472
             },
             {
               "type": "inference_done",
               "timestamp": 4.448,
-              "silence_duration": 1.76
+              "silence_duration": 1.504
             },
             {
               "type": "inference_done",
               "timestamp": 4.48,
-              "silence_duration": 1.792
+              "silence_duration": 1.536
             },
             {
               "type": "inference_done",
               "timestamp": 4.512,
-              "silence_duration": 1.824
+              "silence_duration": 1.568
             },
             {
               "type": "inference_done",
               "timestamp": 4.544,
-              "silence_duration": 1.856
+              "silence_duration": 1.6
             },
             {
               "type": "inference_done",
               "timestamp": 4.576,
-              "silence_duration": 1.888
+              "silence_duration": 1.632
             },
             {
               "type": "inference_done",
               "timestamp": 4.608,
-              "silence_duration": 1.92
+              "silence_duration": 1.664
             },
             {
               "type": "inference_done",
               "timestamp": 4.64,
-              "silence_duration": 1.952
+              "silence_duration": 1.696
             },
             {
               "type": "inference_done",
               "timestamp": 4.672,
-              "silence_duration": 1.984
+              "silence_duration": 1.728
             },
             {
               "type": "inference_done",
               "timestamp": 4.704,
-              "silence_duration": 2.016
+              "silence_duration": 1.76
             },
             {
               "type": "inference_done",
               "timestamp": 4.736,
-              "silence_duration": 2.048
+              "silence_duration": 1.792
             },
             {
               "type": "inference_done",
               "timestamp": 4.768,
-              "silence_duration": 2.08
+              "silence_duration": 1.824
             },
             {
               "type": "inference_done",
               "timestamp": 4.8,
-              "silence_duration": 2.112
+              "silence_duration": 1.856
             },
             {
               "type": "inference_done",
               "timestamp": 4.832,
-              "silence_duration": 2.144
+              "silence_duration": 1.888
             },
             {
               "type": "inference_done",
               "timestamp": 4.864,
-              "silence_duration": 2.176
+              "silence_duration": 1.92
             },
             {
               "type": "inference_done",
               "timestamp": 4.896,
-              "silence_duration": 2.208
+              "silence_duration": 1.952
             },
             {
               "type": "inference_done",
               "timestamp": 4.928,
-              "silence_duration": 2.24
+              "silence_duration": 1.984
             },
             {
               "type": "inference_done",
               "timestamp": 4.96,
-              "silence_duration": 2.272
+              "silence_duration": 2.016
             },
             {
               "type": "inference_done",
               "timestamp": 4.992,
-              "silence_duration": 2.304
+              "silence_duration": 2.048
             },
             {
               "type": "inference_done",
               "timestamp": 5.024,
-              "silence_duration": 2.336
+              "silence_duration": 2.08
             },
             {
               "type": "inference_done",
               "timestamp": 5.056,
-              "silence_duration": 2.368
+              "silence_duration": 2.112
             },
             {
               "type": "inference_done",
               "timestamp": 5.088,
-              "silence_duration": 2.4
+              "silence_duration": 2.144
             },
             {
               "type": "inference_done",
               "timestamp": 5.12,
-              "silence_duration": 2.432
+              "silence_duration": 2.176
             },
             {
               "type": "inference_done",
               "timestamp": 5.152,
-              "silence_duration": 2.464
+              "silence_duration": 2.208
             },
             {
               "type": "inference_done",
               "timestamp": 5.184,
-              "silence_duration": 2.496
+              "silence_duration": 2.24
             },
             {
               "type": "inference_done",
               "timestamp": 5.216,
-              "silence_duration": 2.528
+              "silence_duration": 2.272
             },
             {
               "type": "inference_done",
               "timestamp": 5.248,
-              "silence_duration": 2.56
+              "silence_duration": 2.304
             },
             {
               "type": "inference_done",
               "timestamp": 5.28,
-              "silence_duration": 2.592
+              "silence_duration": 2.336
             },
             {
               "type": "inference_done",
               "timestamp": 5.312,
-              "silence_duration": 2.624
+              "silence_duration": 2.368
             },
             {
               "type": "inference_done",
               "timestamp": 5.344,
-              "silence_duration": 2.656
+              "silence_duration": 2.4
             },
             {
               "type": "inference_done",
               "timestamp": 5.376,
-              "silence_duration": 2.688
+              "silence_duration": 2.432
             },
             {
               "type": "inference_done",
               "timestamp": 5.408,
-              "silence_duration": 2.72
+              "silence_duration": 2.464
             },
             {
               "type": "inference_done",
               "timestamp": 5.44,
-              "silence_duration": 2.752
+              "silence_duration": 2.496
             },
             {
               "type": "inference_done",
               "timestamp": 5.472,
-              "silence_duration": 2.784
+              "silence_duration": 2.528
             },
             {
               "type": "inference_done",
               "timestamp": 5.504,
-              "silence_duration": 2.816
+              "silence_duration": 2.56
             },
             {
               "type": "inference_done",
               "timestamp": 5.536,
-              "silence_duration": 2.848
+              "silence_duration": 2.592
             },
             {
               "type": "inference_done",
               "timestamp": 5.568,
-              "silence_duration": 2.88
+              "silence_duration": 2.624
             },
             {
               "type": "inference_done",
               "timestamp": 5.6,
-              "silence_duration": 2.912
+              "silence_duration": 2.656
             },
             {
               "type": "inference_done",
               "timestamp": 5.632,
-              "silence_duration": 2.944
-            },
-            {
-              "type": "start_of_speech",
-              "timestamp": 5.632,
-              "silence_duration": 0.0
+              "silence_duration": 2.688
             },
             {
               "type": "inference_done",
               "timestamp": 5.664,
-              "silence_duration": 0.0
+              "silence_duration": 2.72
             },
             {
               "type": "inference_done",
               "timestamp": 5.696,
-              "silence_duration": 0.0
+              "silence_duration": 2.752
             },
             {
               "type": "inference_done",
               "timestamp": 5.728,
-              "silence_duration": 0.0
+              "silence_duration": 2.784
             },
             {
               "type": "inference_done",
               "timestamp": 5.76,
-              "silence_duration": 0.0
+              "silence_duration": 2.816
             },
             {
               "type": "inference_done",
               "timestamp": 5.792,
-              "silence_duration": 0.0
+              "silence_duration": 2.848
             },
             {
               "type": "inference_done",
               "timestamp": 5.824,
-              "silence_duration": 0.0
+              "silence_duration": 2.88
             },
             {
               "type": "inference_done",
               "timestamp": 5.856,
-              "silence_duration": 0.0
+              "silence_duration": 2.912
             },
             {
               "type": "inference_done",
               "timestamp": 5.888,
-              "silence_duration": 0.0
+              "silence_duration": 2.944
             },
             {
               "type": "inference_done",
+              "timestamp": 5.92,
+              "silence_duration": 2.976
+            },
+            {
+              "type": "start_of_speech",
               "timestamp": 5.92,
               "silence_duration": 0.0
             },
@@ -2586,6 +2576,61 @@
             {
               "type": "inference_done",
               "timestamp": 8.416,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.448,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.48,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.512,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.544,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.576,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.608,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.64,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.672,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.704,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.736,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 8.768,
               "silence_duration": 0.0
             }
           ],
@@ -3239,502 +3284,502 @@
               "silence_duration": 0.0
             },
             {
-              "type": "inference_done",
-              "timestamp": 4.128,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 4.16,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 4.192,
-              "silence_duration": 0.0
-            },
-            {
               "type": "end_of_speech",
-              "timestamp": 4.192,
+              "timestamp": 4.096,
               "silence_duration": 0.576
             },
             {
               "type": "inference_done",
-              "timestamp": 4.224,
+              "timestamp": 4.128,
               "silence_duration": 0.608
             },
             {
               "type": "inference_done",
-              "timestamp": 4.256,
+              "timestamp": 4.16,
               "silence_duration": 0.64
             },
             {
               "type": "inference_done",
-              "timestamp": 4.288,
+              "timestamp": 4.192,
               "silence_duration": 0.672
             },
             {
               "type": "inference_done",
-              "timestamp": 4.32,
+              "timestamp": 4.224,
               "silence_duration": 0.704
             },
             {
               "type": "inference_done",
-              "timestamp": 4.352,
+              "timestamp": 4.256,
               "silence_duration": 0.736
             },
             {
               "type": "inference_done",
-              "timestamp": 4.384,
+              "timestamp": 4.288,
               "silence_duration": 0.768
             },
             {
               "type": "inference_done",
-              "timestamp": 4.416,
+              "timestamp": 4.32,
               "silence_duration": 0.8
             },
             {
               "type": "inference_done",
-              "timestamp": 4.448,
+              "timestamp": 4.352,
               "silence_duration": 0.832
             },
             {
               "type": "inference_done",
-              "timestamp": 4.48,
+              "timestamp": 4.384,
               "silence_duration": 0.864
             },
             {
               "type": "inference_done",
-              "timestamp": 4.512,
+              "timestamp": 4.416,
               "silence_duration": 0.896
             },
             {
               "type": "inference_done",
-              "timestamp": 4.544,
+              "timestamp": 4.448,
               "silence_duration": 0.928
             },
             {
               "type": "inference_done",
-              "timestamp": 4.576,
+              "timestamp": 4.48,
               "silence_duration": 0.96
             },
             {
               "type": "inference_done",
-              "timestamp": 4.608,
+              "timestamp": 4.512,
               "silence_duration": 0.992
             },
             {
               "type": "inference_done",
-              "timestamp": 4.64,
+              "timestamp": 4.544,
               "silence_duration": 1.024
             },
             {
               "type": "inference_done",
-              "timestamp": 4.672,
+              "timestamp": 4.576,
               "silence_duration": 1.056
             },
             {
               "type": "inference_done",
-              "timestamp": 4.704,
+              "timestamp": 4.608,
               "silence_duration": 1.088
             },
             {
               "type": "inference_done",
-              "timestamp": 4.736,
+              "timestamp": 4.64,
               "silence_duration": 1.12
             },
             {
               "type": "inference_done",
-              "timestamp": 4.768,
+              "timestamp": 4.672,
               "silence_duration": 1.152
             },
             {
               "type": "inference_done",
-              "timestamp": 4.8,
+              "timestamp": 4.704,
               "silence_duration": 1.184
             },
             {
               "type": "inference_done",
-              "timestamp": 4.832,
+              "timestamp": 4.736,
               "silence_duration": 1.216
             },
             {
               "type": "inference_done",
-              "timestamp": 4.864,
+              "timestamp": 4.768,
               "silence_duration": 1.248
             },
             {
               "type": "inference_done",
-              "timestamp": 4.896,
+              "timestamp": 4.8,
               "silence_duration": 1.28
             },
             {
               "type": "inference_done",
-              "timestamp": 4.928,
+              "timestamp": 4.832,
               "silence_duration": 1.312
             },
             {
               "type": "inference_done",
-              "timestamp": 4.96,
+              "timestamp": 4.864,
               "silence_duration": 1.344
             },
             {
               "type": "inference_done",
-              "timestamp": 4.992,
+              "timestamp": 4.896,
               "silence_duration": 1.376
             },
             {
               "type": "inference_done",
-              "timestamp": 5.024,
+              "timestamp": 4.928,
               "silence_duration": 1.408
             },
             {
               "type": "inference_done",
-              "timestamp": 5.056,
+              "timestamp": 4.96,
               "silence_duration": 1.44
             },
             {
               "type": "inference_done",
-              "timestamp": 5.088,
+              "timestamp": 4.992,
               "silence_duration": 1.472
             },
             {
               "type": "inference_done",
-              "timestamp": 5.12,
+              "timestamp": 5.024,
               "silence_duration": 1.504
             },
             {
               "type": "inference_done",
-              "timestamp": 5.152,
+              "timestamp": 5.056,
               "silence_duration": 1.536
             },
             {
               "type": "inference_done",
-              "timestamp": 5.184,
+              "timestamp": 5.088,
               "silence_duration": 1.568
             },
             {
               "type": "inference_done",
-              "timestamp": 5.216,
+              "timestamp": 5.12,
               "silence_duration": 1.6
             },
             {
               "type": "inference_done",
-              "timestamp": 5.248,
+              "timestamp": 5.152,
               "silence_duration": 1.632
             },
             {
               "type": "inference_done",
-              "timestamp": 5.28,
+              "timestamp": 5.184,
               "silence_duration": 1.664
             },
             {
               "type": "inference_done",
-              "timestamp": 5.312,
+              "timestamp": 5.216,
               "silence_duration": 1.696
             },
             {
               "type": "inference_done",
-              "timestamp": 5.344,
+              "timestamp": 5.248,
               "silence_duration": 1.728
             },
             {
               "type": "inference_done",
-              "timestamp": 5.376,
+              "timestamp": 5.28,
               "silence_duration": 1.76
             },
             {
               "type": "inference_done",
-              "timestamp": 5.408,
+              "timestamp": 5.312,
               "silence_duration": 1.792
             },
             {
               "type": "inference_done",
-              "timestamp": 5.44,
+              "timestamp": 5.344,
               "silence_duration": 1.824
             },
             {
               "type": "inference_done",
-              "timestamp": 5.472,
+              "timestamp": 5.376,
               "silence_duration": 1.856
             },
             {
               "type": "inference_done",
-              "timestamp": 5.504,
+              "timestamp": 5.408,
               "silence_duration": 1.888
             },
             {
               "type": "inference_done",
-              "timestamp": 5.536,
+              "timestamp": 5.44,
               "silence_duration": 1.92
             },
             {
               "type": "inference_done",
-              "timestamp": 5.568,
+              "timestamp": 5.472,
               "silence_duration": 1.952
             },
             {
               "type": "inference_done",
-              "timestamp": 5.6,
+              "timestamp": 5.504,
               "silence_duration": 1.984
             },
             {
               "type": "inference_done",
-              "timestamp": 5.632,
+              "timestamp": 5.536,
               "silence_duration": 2.016
             },
             {
               "type": "inference_done",
-              "timestamp": 5.664,
+              "timestamp": 5.568,
               "silence_duration": 2.048
             },
             {
               "type": "inference_done",
-              "timestamp": 5.696,
+              "timestamp": 5.6,
               "silence_duration": 2.08
             },
             {
               "type": "inference_done",
-              "timestamp": 5.728,
+              "timestamp": 5.632,
               "silence_duration": 2.112
             },
             {
               "type": "inference_done",
-              "timestamp": 5.76,
+              "timestamp": 5.664,
               "silence_duration": 2.144
             },
             {
               "type": "inference_done",
-              "timestamp": 5.792,
+              "timestamp": 5.696,
               "silence_duration": 2.176
             },
             {
               "type": "inference_done",
-              "timestamp": 5.824,
+              "timestamp": 5.728,
               "silence_duration": 2.208
             },
             {
               "type": "inference_done",
-              "timestamp": 5.856,
+              "timestamp": 5.76,
               "silence_duration": 2.24
             },
             {
               "type": "inference_done",
-              "timestamp": 5.888,
+              "timestamp": 5.792,
               "silence_duration": 2.272
             },
             {
               "type": "inference_done",
-              "timestamp": 5.92,
+              "timestamp": 5.824,
               "silence_duration": 2.304
             },
             {
               "type": "inference_done",
-              "timestamp": 5.952,
+              "timestamp": 5.856,
               "silence_duration": 2.336
             },
             {
               "type": "inference_done",
-              "timestamp": 5.984,
+              "timestamp": 5.888,
               "silence_duration": 2.368
             },
             {
               "type": "inference_done",
-              "timestamp": 6.016,
+              "timestamp": 5.92,
               "silence_duration": 2.4
             },
             {
               "type": "inference_done",
-              "timestamp": 6.048,
+              "timestamp": 5.952,
               "silence_duration": 2.432
             },
             {
               "type": "inference_done",
-              "timestamp": 6.08,
+              "timestamp": 5.984,
               "silence_duration": 2.464
             },
             {
               "type": "inference_done",
-              "timestamp": 6.112,
+              "timestamp": 6.016,
               "silence_duration": 2.496
             },
             {
               "type": "inference_done",
-              "timestamp": 6.144,
+              "timestamp": 6.048,
               "silence_duration": 2.528
             },
             {
               "type": "inference_done",
-              "timestamp": 6.176,
+              "timestamp": 6.08,
               "silence_duration": 2.56
             },
             {
               "type": "inference_done",
-              "timestamp": 6.208,
+              "timestamp": 6.112,
               "silence_duration": 2.592
             },
             {
               "type": "inference_done",
-              "timestamp": 6.24,
+              "timestamp": 6.144,
               "silence_duration": 2.624
             },
             {
               "type": "inference_done",
-              "timestamp": 6.272,
+              "timestamp": 6.176,
               "silence_duration": 2.656
             },
             {
               "type": "inference_done",
-              "timestamp": 6.304,
+              "timestamp": 6.208,
               "silence_duration": 2.688
             },
             {
               "type": "inference_done",
-              "timestamp": 6.336,
+              "timestamp": 6.24,
               "silence_duration": 2.72
             },
             {
               "type": "inference_done",
-              "timestamp": 6.368,
+              "timestamp": 6.272,
               "silence_duration": 2.752
             },
             {
               "type": "inference_done",
-              "timestamp": 6.4,
+              "timestamp": 6.304,
               "silence_duration": 2.784
             },
             {
               "type": "inference_done",
-              "timestamp": 6.432,
+              "timestamp": 6.336,
               "silence_duration": 2.816
             },
             {
               "type": "inference_done",
-              "timestamp": 6.464,
+              "timestamp": 6.368,
               "silence_duration": 2.848
             },
             {
               "type": "inference_done",
-              "timestamp": 6.496,
+              "timestamp": 6.4,
               "silence_duration": 2.88
             },
             {
               "type": "inference_done",
-              "timestamp": 6.528,
+              "timestamp": 6.432,
               "silence_duration": 2.912
             },
             {
               "type": "inference_done",
-              "timestamp": 6.56,
+              "timestamp": 6.464,
               "silence_duration": 2.944
             },
             {
               "type": "inference_done",
-              "timestamp": 6.592,
+              "timestamp": 6.496,
               "silence_duration": 2.976
             },
             {
               "type": "inference_done",
-              "timestamp": 6.624,
+              "timestamp": 6.528,
               "silence_duration": 3.008
             },
             {
               "type": "inference_done",
-              "timestamp": 6.656,
+              "timestamp": 6.56,
               "silence_duration": 3.04
             },
             {
               "type": "inference_done",
-              "timestamp": 6.688,
+              "timestamp": 6.592,
               "silence_duration": 3.072
             },
             {
               "type": "inference_done",
-              "timestamp": 6.72,
+              "timestamp": 6.624,
               "silence_duration": 3.104
             },
             {
               "type": "inference_done",
-              "timestamp": 6.752,
+              "timestamp": 6.656,
               "silence_duration": 3.136
             },
             {
               "type": "inference_done",
-              "timestamp": 6.784,
+              "timestamp": 6.688,
               "silence_duration": 3.168
             },
             {
               "type": "inference_done",
-              "timestamp": 6.816,
+              "timestamp": 6.72,
               "silence_duration": 3.2
             },
             {
               "type": "inference_done",
-              "timestamp": 6.848,
+              "timestamp": 6.752,
               "silence_duration": 3.232
             },
             {
               "type": "inference_done",
-              "timestamp": 6.88,
+              "timestamp": 6.784,
               "silence_duration": 3.264
             },
             {
               "type": "inference_done",
-              "timestamp": 6.912,
+              "timestamp": 6.816,
               "silence_duration": 3.296
             },
             {
               "type": "inference_done",
-              "timestamp": 6.944,
+              "timestamp": 6.848,
               "silence_duration": 3.328
             },
             {
               "type": "inference_done",
-              "timestamp": 6.976,
+              "timestamp": 6.88,
               "silence_duration": 3.36
             },
             {
               "type": "inference_done",
-              "timestamp": 7.008,
+              "timestamp": 6.912,
               "silence_duration": 3.392
             },
             {
               "type": "inference_done",
-              "timestamp": 7.04,
+              "timestamp": 6.944,
               "silence_duration": 3.424
             },
             {
               "type": "inference_done",
-              "timestamp": 7.072,
+              "timestamp": 6.976,
               "silence_duration": 3.456
             },
             {
               "type": "inference_done",
-              "timestamp": 7.104,
+              "timestamp": 7.008,
               "silence_duration": 3.488
             },
             {
               "type": "inference_done",
-              "timestamp": 7.136,
+              "timestamp": 7.04,
               "silence_duration": 3.52
             },
             {
               "type": "inference_done",
-              "timestamp": 7.168,
+              "timestamp": 7.072,
               "silence_duration": 3.552
             },
             {
               "type": "inference_done",
-              "timestamp": 7.2,
+              "timestamp": 7.104,
               "silence_duration": 3.584
             },
             {
               "type": "inference_done",
-              "timestamp": 7.232,
+              "timestamp": 7.136,
               "silence_duration": 3.616
             },
             {
               "type": "start_of_speech",
+              "timestamp": 7.136,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 7.168,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 7.2,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
               "timestamp": 7.232,
               "silence_duration": 0.0
             },
@@ -4177,26 +4222,6 @@
               "type": "inference_done",
               "timestamp": 10.048,
               "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 10.08,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 10.112,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 10.144,
-              "silence_duration": 0.0
-            },
-            {
-              "type": "inference_done",
-              "timestamp": 10.176,
-              "silence_duration": 0.0
             }
           ],
           "premature_end": true
@@ -4244,12 +4269,12 @@
               "silence_duration": 0.256
             },
             {
-              "type": "start_of_speech",
-              "timestamp": 0.256,
-              "silence_duration": 0.0
+              "type": "inference_done",
+              "timestamp": 0.288,
+              "silence_duration": 0.288
             },
             {
-              "type": "inference_done",
+              "type": "start_of_speech",
               "timestamp": 0.288,
               "silence_duration": 0.0
             },
@@ -4669,597 +4694,597 @@
               "silence_duration": 0.0
             },
             {
-              "type": "end_of_speech",
-              "timestamp": 2.944,
-              "silence_duration": 0.576
-            },
-            {
               "type": "inference_done",
               "timestamp": 2.976,
-              "silence_duration": 0.608
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.008,
-              "silence_duration": 0.64
+              "silence_duration": 0.0
             },
             {
               "type": "inference_done",
               "timestamp": 3.04,
-              "silence_duration": 0.672
+              "silence_duration": 0.0
+            },
+            {
+              "type": "end_of_speech",
+              "timestamp": 3.04,
+              "silence_duration": 0.576
             },
             {
               "type": "inference_done",
               "timestamp": 3.072,
-              "silence_duration": 0.704
+              "silence_duration": 0.608
             },
             {
               "type": "inference_done",
               "timestamp": 3.104,
-              "silence_duration": 0.736
+              "silence_duration": 0.64
             },
             {
               "type": "inference_done",
               "timestamp": 3.136,
-              "silence_duration": 0.768
+              "silence_duration": 0.672
             },
             {
               "type": "inference_done",
               "timestamp": 3.168,
-              "silence_duration": 0.8
+              "silence_duration": 0.704
             },
             {
               "type": "inference_done",
               "timestamp": 3.2,
-              "silence_duration": 0.832
+              "silence_duration": 0.736
             },
             {
               "type": "inference_done",
               "timestamp": 3.232,
-              "silence_duration": 0.864
+              "silence_duration": 0.768
             },
             {
               "type": "inference_done",
               "timestamp": 3.264,
-              "silence_duration": 0.896
+              "silence_duration": 0.8
             },
             {
               "type": "inference_done",
               "timestamp": 3.296,
-              "silence_duration": 0.928
+              "silence_duration": 0.832
             },
             {
               "type": "inference_done",
               "timestamp": 3.328,
-              "silence_duration": 0.96
+              "silence_duration": 0.864
             },
             {
               "type": "inference_done",
               "timestamp": 3.36,
-              "silence_duration": 0.992
+              "silence_duration": 0.896
             },
             {
               "type": "inference_done",
               "timestamp": 3.392,
-              "silence_duration": 1.024
+              "silence_duration": 0.928
             },
             {
               "type": "inference_done",
               "timestamp": 3.424,
-              "silence_duration": 1.056
+              "silence_duration": 0.96
             },
             {
               "type": "inference_done",
               "timestamp": 3.456,
-              "silence_duration": 1.088
+              "silence_duration": 0.992
             },
             {
               "type": "inference_done",
               "timestamp": 3.488,
-              "silence_duration": 1.12
+              "silence_duration": 1.024
             },
             {
               "type": "inference_done",
               "timestamp": 3.52,
-              "silence_duration": 1.152
+              "silence_duration": 1.056
             },
             {
               "type": "inference_done",
               "timestamp": 3.552,
-              "silence_duration": 1.184
+              "silence_duration": 1.088
             },
             {
               "type": "inference_done",
               "timestamp": 3.584,
-              "silence_duration": 1.216
+              "silence_duration": 1.12
             },
             {
               "type": "inference_done",
               "timestamp": 3.616,
-              "silence_duration": 1.248
+              "silence_duration": 1.152
             },
             {
               "type": "inference_done",
               "timestamp": 3.648,
-              "silence_duration": 1.28
+              "silence_duration": 1.184
             },
             {
               "type": "inference_done",
               "timestamp": 3.68,
-              "silence_duration": 1.312
+              "silence_duration": 1.216
             },
             {
               "type": "inference_done",
               "timestamp": 3.712,
-              "silence_duration": 1.344
+              "silence_duration": 1.248
             },
             {
               "type": "inference_done",
               "timestamp": 3.744,
-              "silence_duration": 1.376
+              "silence_duration": 1.28
             },
             {
               "type": "inference_done",
               "timestamp": 3.776,
-              "silence_duration": 1.408
+              "silence_duration": 1.312
             },
             {
               "type": "inference_done",
               "timestamp": 3.808,
-              "silence_duration": 1.44
+              "silence_duration": 1.344
             },
             {
               "type": "inference_done",
               "timestamp": 3.84,
-              "silence_duration": 1.472
+              "silence_duration": 1.376
             },
             {
               "type": "inference_done",
               "timestamp": 3.872,
-              "silence_duration": 1.504
+              "silence_duration": 1.408
             },
             {
               "type": "inference_done",
               "timestamp": 3.904,
-              "silence_duration": 1.536
+              "silence_duration": 1.44
             },
             {
               "type": "inference_done",
               "timestamp": 3.936,
-              "silence_duration": 1.568
+              "silence_duration": 1.472
             },
             {
               "type": "inference_done",
               "timestamp": 3.968,
-              "silence_duration": 1.6
+              "silence_duration": 1.504
             },
             {
               "type": "inference_done",
               "timestamp": 4.0,
-              "silence_duration": 1.632
+              "silence_duration": 1.536
             },
             {
               "type": "inference_done",
               "timestamp": 4.032,
-              "silence_duration": 1.664
+              "silence_duration": 1.568
             },
             {
               "type": "inference_done",
               "timestamp": 4.064,
-              "silence_duration": 1.696
+              "silence_duration": 1.6
             },
             {
               "type": "inference_done",
               "timestamp": 4.096,
-              "silence_duration": 1.728
+              "silence_duration": 1.632
             },
             {
               "type": "inference_done",
               "timestamp": 4.128,
-              "silence_duration": 1.76
+              "silence_duration": 1.664
             },
             {
               "type": "inference_done",
               "timestamp": 4.16,
-              "silence_duration": 1.792
+              "silence_duration": 1.696
             },
             {
               "type": "inference_done",
               "timestamp": 4.192,
-              "silence_duration": 1.824
+              "silence_duration": 1.728
             },
             {
               "type": "inference_done",
               "timestamp": 4.224,
-              "silence_duration": 1.856
+              "silence_duration": 1.76
             },
             {
               "type": "inference_done",
               "timestamp": 4.256,
-              "silence_duration": 1.888
+              "silence_duration": 1.792
             },
             {
               "type": "inference_done",
               "timestamp": 4.288,
-              "silence_duration": 1.92
+              "silence_duration": 1.824
             },
             {
               "type": "inference_done",
               "timestamp": 4.32,
-              "silence_duration": 1.952
+              "silence_duration": 1.856
             },
             {
               "type": "inference_done",
               "timestamp": 4.352,
-              "silence_duration": 1.984
+              "silence_duration": 1.888
             },
             {
               "type": "inference_done",
               "timestamp": 4.384,
-              "silence_duration": 2.016
+              "silence_duration": 1.92
             },
             {
               "type": "inference_done",
               "timestamp": 4.416,
-              "silence_duration": 2.048
+              "silence_duration": 1.952
             },
             {
               "type": "inference_done",
               "timestamp": 4.448,
-              "silence_duration": 2.08
+              "silence_duration": 1.984
             },
             {
               "type": "inference_done",
               "timestamp": 4.48,
-              "silence_duration": 2.112
+              "silence_duration": 2.016
             },
             {
               "type": "inference_done",
               "timestamp": 4.512,
-              "silence_duration": 2.144
+              "silence_duration": 2.048
             },
             {
               "type": "inference_done",
               "timestamp": 4.544,
-              "silence_duration": 2.176
+              "silence_duration": 2.08
             },
             {
               "type": "inference_done",
               "timestamp": 4.576,
-              "silence_duration": 2.208
+              "silence_duration": 2.112
             },
             {
               "type": "inference_done",
               "timestamp": 4.608,
-              "silence_duration": 2.24
+              "silence_duration": 2.144
             },
             {
               "type": "inference_done",
               "timestamp": 4.64,
-              "silence_duration": 2.272
+              "silence_duration": 2.176
             },
             {
               "type": "inference_done",
               "timestamp": 4.672,
-              "silence_duration": 2.304
+              "silence_duration": 2.208
             },
             {
               "type": "inference_done",
               "timestamp": 4.704,
-              "silence_duration": 2.336
+              "silence_duration": 2.24
             },
             {
               "type": "inference_done",
               "timestamp": 4.736,
-              "silence_duration": 2.368
+              "silence_duration": 2.272
             },
             {
               "type": "inference_done",
               "timestamp": 4.768,
-              "silence_duration": 2.4
+              "silence_duration": 2.304
             },
             {
               "type": "inference_done",
               "timestamp": 4.8,
-              "silence_duration": 2.432
+              "silence_duration": 2.336
             },
             {
               "type": "inference_done",
               "timestamp": 4.832,
-              "silence_duration": 2.464
+              "silence_duration": 2.368
             },
             {
               "type": "inference_done",
               "timestamp": 4.864,
-              "silence_duration": 2.496
+              "silence_duration": 2.4
             },
             {
               "type": "inference_done",
               "timestamp": 4.896,
-              "silence_duration": 2.528
+              "silence_duration": 2.432
             },
             {
               "type": "inference_done",
               "timestamp": 4.928,
-              "silence_duration": 2.56
+              "silence_duration": 2.464
             },
             {
               "type": "inference_done",
               "timestamp": 4.96,
-              "silence_duration": 2.592
+              "silence_duration": 2.496
             },
             {
               "type": "inference_done",
               "timestamp": 4.992,
-              "silence_duration": 2.624
+              "silence_duration": 2.528
             },
             {
               "type": "inference_done",
               "timestamp": 5.024,
-              "silence_duration": 2.656
+              "silence_duration": 2.56
             },
             {
               "type": "inference_done",
               "timestamp": 5.056,
-              "silence_duration": 2.688
+              "silence_duration": 2.592
             },
             {
               "type": "inference_done",
               "timestamp": 5.088,
-              "silence_duration": 2.72
+              "silence_duration": 2.624
             },
             {
               "type": "inference_done",
               "timestamp": 5.12,
-              "silence_duration": 2.752
+              "silence_duration": 2.656
             },
             {
               "type": "inference_done",
               "timestamp": 5.152,
-              "silence_duration": 2.784
+              "silence_duration": 2.688
             },
             {
               "type": "inference_done",
               "timestamp": 5.184,
-              "silence_duration": 2.816
+              "silence_duration": 2.72
             },
             {
               "type": "inference_done",
               "timestamp": 5.216,
-              "silence_duration": 2.848
+              "silence_duration": 2.752
             },
             {
               "type": "inference_done",
               "timestamp": 5.248,
-              "silence_duration": 2.88
+              "silence_duration": 2.784
             },
             {
               "type": "inference_done",
               "timestamp": 5.28,
-              "silence_duration": 2.912
+              "silence_duration": 2.816
             },
             {
               "type": "inference_done",
               "timestamp": 5.312,
-              "silence_duration": 2.944
+              "silence_duration": 2.848
             },
             {
               "type": "inference_done",
               "timestamp": 5.344,
-              "silence_duration": 2.976
+              "silence_duration": 2.88
             },
             {
               "type": "inference_done",
               "timestamp": 5.376,
-              "silence_duration": 3.008
+              "silence_duration": 2.912
             },
             {
               "type": "inference_done",
               "timestamp": 5.408,
-              "silence_duration": 3.04
+              "silence_duration": 2.944
             },
             {
               "type": "inference_done",
               "timestamp": 5.44,
-              "silence_duration": 3.072
+              "silence_duration": 2.976
             },
             {
               "type": "inference_done",
               "timestamp": 5.472,
-              "silence_duration": 3.104
+              "silence_duration": 3.008
             },
             {
               "type": "inference_done",
               "timestamp": 5.504,
-              "silence_duration": 3.136
+              "silence_duration": 3.04
             },
             {
               "type": "inference_done",
               "timestamp": 5.536,
-              "silence_duration": 3.168
+              "silence_duration": 3.072
             },
             {
               "type": "inference_done",
               "timestamp": 5.568,
-              "silence_duration": 3.2
+              "silence_duration": 3.104
             },
             {
               "type": "inference_done",
               "timestamp": 5.6,
-              "silence_duration": 3.232
+              "silence_duration": 3.136
             },
             {
               "type": "inference_done",
               "timestamp": 5.632,
-              "silence_duration": 3.264
+              "silence_duration": 3.168
             },
             {
               "type": "inference_done",
               "timestamp": 5.664,
-              "silence_duration": 3.296
+              "silence_duration": 3.2
             },
             {
               "type": "inference_done",
               "timestamp": 5.696,
-              "silence_duration": 3.328
+              "silence_duration": 3.232
             },
             {
               "type": "inference_done",
               "timestamp": 5.728,
-              "silence_duration": 3.36
+              "silence_duration": 3.264
             },
             {
               "type": "inference_done",
               "timestamp": 5.76,
-              "silence_duration": 3.392
+              "silence_duration": 3.296
             },
             {
               "type": "inference_done",
               "timestamp": 5.792,
-              "silence_duration": 3.424
+              "silence_duration": 3.328
             },
             {
               "type": "inference_done",
               "timestamp": 5.824,
-              "silence_duration": 3.456
+              "silence_duration": 3.36
             },
             {
               "type": "inference_done",
               "timestamp": 5.856,
-              "silence_duration": 3.488
+              "silence_duration": 3.392
             },
             {
               "type": "inference_done",
               "timestamp": 5.888,
-              "silence_duration": 3.52
+              "silence_duration": 3.424
             },
             {
               "type": "inference_done",
               "timestamp": 5.92,
-              "silence_duration": 3.552
+              "silence_duration": 3.456
             },
             {
               "type": "inference_done",
               "timestamp": 5.952,
-              "silence_duration": 3.584
+              "silence_duration": 3.488
             },
             {
               "type": "inference_done",
               "timestamp": 5.984,
-              "silence_duration": 3.616
+              "silence_duration": 3.52
             },
             {
               "type": "inference_done",
               "timestamp": 6.016,
-              "silence_duration": 3.648
+              "silence_duration": 3.552
             },
             {
               "type": "inference_done",
               "timestamp": 6.048,
-              "silence_duration": 3.68
+              "silence_duration": 3.584
             },
             {
               "type": "inference_done",
               "timestamp": 6.08,
-              "silence_duration": 3.712
+              "silence_duration": 3.616
             },
             {
               "type": "inference_done",
               "timestamp": 6.112,
-              "silence_duration": 3.744
+              "silence_duration": 3.648
             },
             {
               "type": "inference_done",
               "timestamp": 6.144,
-              "silence_duration": 3.776
+              "silence_duration": 3.68
             },
             {
               "type": "inference_done",
               "timestamp": 6.176,
-              "silence_duration": 3.808
+              "silence_duration": 3.712
             },
             {
               "type": "inference_done",
               "timestamp": 6.208,
-              "silence_duration": 3.84
+              "silence_duration": 3.744
             },
             {
               "type": "inference_done",
               "timestamp": 6.24,
-              "silence_duration": 3.872
+              "silence_duration": 3.776
             },
             {
               "type": "inference_done",
               "timestamp": 6.272,
-              "silence_duration": 3.904
+              "silence_duration": 3.808
             },
             {
               "type": "inference_done",
               "timestamp": 6.304,
-              "silence_duration": 3.936
+              "silence_duration": 3.84
             },
             {
               "type": "inference_done",
               "timestamp": 6.336,
-              "silence_duration": 3.968
+              "silence_duration": 3.872
             },
             {
               "type": "inference_done",
               "timestamp": 6.368,
-              "silence_duration": 4.0
+              "silence_duration": 3.904
             },
             {
               "type": "inference_done",
               "timestamp": 6.4,
-              "silence_duration": 4.032
+              "silence_duration": 3.936
             },
             {
               "type": "inference_done",
               "timestamp": 6.432,
-              "silence_duration": 4.064
+              "silence_duration": 3.968
             },
             {
               "type": "inference_done",
               "timestamp": 6.464,
-              "silence_duration": 4.096
+              "silence_duration": 4.0
             },
             {
               "type": "inference_done",
               "timestamp": 6.496,
-              "silence_duration": 4.128
+              "silence_duration": 4.032
             },
             {
               "type": "inference_done",
               "timestamp": 6.528,
-              "silence_duration": 4.16
+              "silence_duration": 4.064
             },
             {
               "type": "inference_done",
               "timestamp": 6.56,
-              "silence_duration": 4.192
-            },
-            {
-              "type": "start_of_speech",
-              "timestamp": 6.56,
-              "silence_duration": 0.0
+              "silence_duration": 4.096
             },
             {
               "type": "inference_done",
               "timestamp": 6.592,
-              "silence_duration": 0.0
+              "silence_duration": 4.128
             },
             {
               "type": "inference_done",
               "timestamp": 6.624,
-              "silence_duration": 0.0
+              "silence_duration": 4.16
             },
             {
               "type": "inference_done",
               "timestamp": 6.656,
-              "silence_duration": 0.0
+              "silence_duration": 4.192
             },
             {
               "type": "inference_done",
+              "timestamp": 6.688,
+              "silence_duration": 4.224
+            },
+            {
+              "type": "start_of_speech",
               "timestamp": 6.688,
               "silence_duration": 0.0
             },
@@ -5746,6 +5771,16 @@
             {
               "type": "inference_done",
               "timestamp": 9.792,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 9.824,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 9.856,
               "silence_duration": 0.0
             }
           ],
@@ -6549,669 +6584,669 @@
               "silence_duration": 0.0
             },
             {
+              "type": "inference_done",
+              "timestamp": 5.088,
+              "silence_duration": 0.0
+            },
+            {
               "type": "end_of_speech",
-              "timestamp": 5.056,
+              "timestamp": 5.088,
               "silence_duration": 0.576
             },
             {
               "type": "inference_done",
-              "timestamp": 5.088,
+              "timestamp": 5.12,
               "silence_duration": 0.608
             },
             {
               "type": "inference_done",
-              "timestamp": 5.12,
+              "timestamp": 5.152,
               "silence_duration": 0.64
             },
             {
               "type": "inference_done",
-              "timestamp": 5.152,
+              "timestamp": 5.184,
               "silence_duration": 0.672
             },
             {
               "type": "inference_done",
-              "timestamp": 5.184,
+              "timestamp": 5.216,
               "silence_duration": 0.704
             },
             {
               "type": "inference_done",
-              "timestamp": 5.216,
+              "timestamp": 5.248,
               "silence_duration": 0.736
             },
             {
               "type": "inference_done",
-              "timestamp": 5.248,
+              "timestamp": 5.28,
               "silence_duration": 0.768
             },
             {
               "type": "inference_done",
-              "timestamp": 5.28,
+              "timestamp": 5.312,
               "silence_duration": 0.8
             },
             {
               "type": "inference_done",
-              "timestamp": 5.312,
+              "timestamp": 5.344,
               "silence_duration": 0.832
             },
             {
               "type": "inference_done",
-              "timestamp": 5.344,
+              "timestamp": 5.376,
               "silence_duration": 0.864
             },
             {
               "type": "inference_done",
-              "timestamp": 5.376,
+              "timestamp": 5.408,
               "silence_duration": 0.896
             },
             {
               "type": "inference_done",
-              "timestamp": 5.408,
+              "timestamp": 5.44,
               "silence_duration": 0.928
             },
             {
               "type": "inference_done",
-              "timestamp": 5.44,
+              "timestamp": 5.472,
               "silence_duration": 0.96
             },
             {
               "type": "inference_done",
-              "timestamp": 5.472,
+              "timestamp": 5.504,
               "silence_duration": 0.992
             },
             {
               "type": "inference_done",
-              "timestamp": 5.504,
+              "timestamp": 5.536,
               "silence_duration": 1.024
             },
             {
               "type": "inference_done",
-              "timestamp": 5.536,
+              "timestamp": 5.568,
               "silence_duration": 1.056
             },
             {
               "type": "inference_done",
-              "timestamp": 5.568,
+              "timestamp": 5.6,
               "silence_duration": 1.088
             },
             {
               "type": "inference_done",
-              "timestamp": 5.6,
+              "timestamp": 5.632,
               "silence_duration": 1.12
             },
             {
               "type": "inference_done",
-              "timestamp": 5.632,
+              "timestamp": 5.664,
               "silence_duration": 1.152
             },
             {
               "type": "inference_done",
-              "timestamp": 5.664,
+              "timestamp": 5.696,
               "silence_duration": 1.184
             },
             {
               "type": "inference_done",
-              "timestamp": 5.696,
+              "timestamp": 5.728,
               "silence_duration": 1.216
             },
             {
               "type": "inference_done",
-              "timestamp": 5.728,
+              "timestamp": 5.76,
               "silence_duration": 1.248
             },
             {
               "type": "inference_done",
-              "timestamp": 5.76,
+              "timestamp": 5.792,
               "silence_duration": 1.28
             },
             {
               "type": "inference_done",
-              "timestamp": 5.792,
+              "timestamp": 5.824,
               "silence_duration": 1.312
             },
             {
               "type": "inference_done",
-              "timestamp": 5.824,
+              "timestamp": 5.856,
               "silence_duration": 1.344
             },
             {
               "type": "inference_done",
-              "timestamp": 5.856,
+              "timestamp": 5.888,
               "silence_duration": 1.376
             },
             {
               "type": "inference_done",
-              "timestamp": 5.888,
+              "timestamp": 5.92,
               "silence_duration": 1.408
             },
             {
               "type": "inference_done",
-              "timestamp": 5.92,
+              "timestamp": 5.952,
               "silence_duration": 1.44
             },
             {
               "type": "inference_done",
-              "timestamp": 5.952,
+              "timestamp": 5.984,
               "silence_duration": 1.472
             },
             {
               "type": "inference_done",
-              "timestamp": 5.984,
+              "timestamp": 6.016,
               "silence_duration": 1.504
             },
             {
               "type": "inference_done",
-              "timestamp": 6.016,
+              "timestamp": 6.048,
               "silence_duration": 1.536
             },
             {
               "type": "inference_done",
-              "timestamp": 6.048,
+              "timestamp": 6.08,
               "silence_duration": 1.568
             },
             {
               "type": "inference_done",
-              "timestamp": 6.08,
+              "timestamp": 6.112,
               "silence_duration": 1.6
             },
             {
               "type": "inference_done",
-              "timestamp": 6.112,
+              "timestamp": 6.144,
               "silence_duration": 1.632
             },
             {
               "type": "inference_done",
-              "timestamp": 6.144,
+              "timestamp": 6.176,
               "silence_duration": 1.664
             },
             {
               "type": "inference_done",
-              "timestamp": 6.176,
+              "timestamp": 6.208,
               "silence_duration": 1.696
             },
             {
               "type": "inference_done",
-              "timestamp": 6.208,
+              "timestamp": 6.24,
               "silence_duration": 1.728
             },
             {
               "type": "inference_done",
-              "timestamp": 6.24,
+              "timestamp": 6.272,
               "silence_duration": 1.76
             },
             {
               "type": "inference_done",
-              "timestamp": 6.272,
+              "timestamp": 6.304,
               "silence_duration": 1.792
             },
             {
               "type": "inference_done",
-              "timestamp": 6.304,
+              "timestamp": 6.336,
               "silence_duration": 1.824
             },
             {
               "type": "inference_done",
-              "timestamp": 6.336,
+              "timestamp": 6.368,
               "silence_duration": 1.856
             },
             {
               "type": "inference_done",
-              "timestamp": 6.368,
+              "timestamp": 6.4,
               "silence_duration": 1.888
             },
             {
               "type": "inference_done",
-              "timestamp": 6.4,
+              "timestamp": 6.432,
               "silence_duration": 1.92
             },
             {
               "type": "inference_done",
-              "timestamp": 6.432,
+              "timestamp": 6.464,
               "silence_duration": 1.952
             },
             {
               "type": "inference_done",
-              "timestamp": 6.464,
+              "timestamp": 6.496,
               "silence_duration": 1.984
             },
             {
               "type": "inference_done",
-              "timestamp": 6.496,
+              "timestamp": 6.528,
               "silence_duration": 2.016
             },
             {
               "type": "inference_done",
-              "timestamp": 6.528,
+              "timestamp": 6.56,
               "silence_duration": 2.048
             },
             {
               "type": "inference_done",
-              "timestamp": 6.56,
+              "timestamp": 6.592,
               "silence_duration": 2.08
             },
             {
               "type": "inference_done",
-              "timestamp": 6.592,
+              "timestamp": 6.624,
               "silence_duration": 2.112
             },
             {
               "type": "inference_done",
-              "timestamp": 6.624,
+              "timestamp": 6.656,
               "silence_duration": 2.144
             },
             {
               "type": "inference_done",
-              "timestamp": 6.656,
+              "timestamp": 6.688,
               "silence_duration": 2.176
             },
             {
               "type": "inference_done",
-              "timestamp": 6.688,
+              "timestamp": 6.72,
               "silence_duration": 2.208
             },
             {
               "type": "inference_done",
-              "timestamp": 6.72,
+              "timestamp": 6.752,
               "silence_duration": 2.24
             },
             {
               "type": "inference_done",
-              "timestamp": 6.752,
+              "timestamp": 6.784,
               "silence_duration": 2.272
             },
             {
               "type": "inference_done",
-              "timestamp": 6.784,
+              "timestamp": 6.816,
               "silence_duration": 2.304
             },
             {
               "type": "inference_done",
-              "timestamp": 6.816,
+              "timestamp": 6.848,
               "silence_duration": 2.336
             },
             {
               "type": "inference_done",
-              "timestamp": 6.848,
+              "timestamp": 6.88,
               "silence_duration": 2.368
             },
             {
               "type": "inference_done",
-              "timestamp": 6.88,
+              "timestamp": 6.912,
               "silence_duration": 2.4
             },
             {
               "type": "inference_done",
-              "timestamp": 6.912,
+              "timestamp": 6.944,
               "silence_duration": 2.432
             },
             {
               "type": "inference_done",
-              "timestamp": 6.944,
+              "timestamp": 6.976,
               "silence_duration": 2.464
             },
             {
               "type": "inference_done",
-              "timestamp": 6.976,
+              "timestamp": 7.008,
               "silence_duration": 2.496
             },
             {
               "type": "inference_done",
-              "timestamp": 7.008,
+              "timestamp": 7.04,
               "silence_duration": 2.528
             },
             {
               "type": "inference_done",
-              "timestamp": 7.04,
+              "timestamp": 7.072,
               "silence_duration": 2.56
             },
             {
               "type": "inference_done",
-              "timestamp": 7.072,
+              "timestamp": 7.104,
               "silence_duration": 2.592
             },
             {
               "type": "inference_done",
-              "timestamp": 7.104,
+              "timestamp": 7.136,
               "silence_duration": 2.624
             },
             {
               "type": "inference_done",
-              "timestamp": 7.136,
+              "timestamp": 7.168,
               "silence_duration": 2.656
             },
             {
               "type": "inference_done",
-              "timestamp": 7.168,
+              "timestamp": 7.2,
               "silence_duration": 2.688
             },
             {
               "type": "inference_done",
-              "timestamp": 7.2,
+              "timestamp": 7.232,
               "silence_duration": 2.72
             },
             {
               "type": "inference_done",
-              "timestamp": 7.232,
+              "timestamp": 7.264,
               "silence_duration": 2.752
             },
             {
               "type": "inference_done",
-              "timestamp": 7.264,
+              "timestamp": 7.296,
               "silence_duration": 2.784
             },
             {
               "type": "inference_done",
-              "timestamp": 7.296,
+              "timestamp": 7.328,
               "silence_duration": 2.816
             },
             {
               "type": "inference_done",
-              "timestamp": 7.328,
+              "timestamp": 7.36,
               "silence_duration": 2.848
             },
             {
               "type": "inference_done",
-              "timestamp": 7.36,
+              "timestamp": 7.392,
               "silence_duration": 2.88
             },
             {
               "type": "inference_done",
-              "timestamp": 7.392,
+              "timestamp": 7.424,
               "silence_duration": 2.912
             },
             {
               "type": "inference_done",
-              "timestamp": 7.424,
+              "timestamp": 7.456,
               "silence_duration": 2.944
             },
             {
               "type": "inference_done",
-              "timestamp": 7.456,
+              "timestamp": 7.488,
               "silence_duration": 2.976
             },
             {
               "type": "inference_done",
-              "timestamp": 7.488,
+              "timestamp": 7.52,
               "silence_duration": 3.008
             },
             {
               "type": "inference_done",
-              "timestamp": 7.52,
+              "timestamp": 7.552,
               "silence_duration": 3.04
             },
             {
               "type": "inference_done",
-              "timestamp": 7.552,
+              "timestamp": 7.584,
               "silence_duration": 3.072
             },
             {
               "type": "inference_done",
-              "timestamp": 7.584,
+              "timestamp": 7.616,
               "silence_duration": 3.104
             },
             {
               "type": "inference_done",
-              "timestamp": 7.616,
+              "timestamp": 7.648,
               "silence_duration": 3.136
             },
             {
               "type": "inference_done",
-              "timestamp": 7.648,
+              "timestamp": 7.68,
               "silence_duration": 3.168
             },
             {
               "type": "inference_done",
-              "timestamp": 7.68,
+              "timestamp": 7.712,
               "silence_duration": 3.2
             },
             {
               "type": "inference_done",
-              "timestamp": 7.712,
+              "timestamp": 7.744,
               "silence_duration": 3.232
             },
             {
               "type": "inference_done",
-              "timestamp": 7.744,
+              "timestamp": 7.776,
               "silence_duration": 3.264
             },
             {
               "type": "inference_done",
-              "timestamp": 7.776,
+              "timestamp": 7.808,
               "silence_duration": 3.296
             },
             {
               "type": "inference_done",
-              "timestamp": 7.808,
+              "timestamp": 7.84,
               "silence_duration": 3.328
             },
             {
               "type": "inference_done",
-              "timestamp": 7.84,
+              "timestamp": 7.872,
               "silence_duration": 3.36
             },
             {
               "type": "inference_done",
-              "timestamp": 7.872,
+              "timestamp": 7.904,
               "silence_duration": 3.392
             },
             {
               "type": "inference_done",
-              "timestamp": 7.904,
+              "timestamp": 7.936,
               "silence_duration": 3.424
             },
             {
               "type": "inference_done",
-              "timestamp": 7.936,
+              "timestamp": 7.968,
               "silence_duration": 3.456
             },
             {
               "type": "inference_done",
-              "timestamp": 7.968,
+              "timestamp": 8.0,
               "silence_duration": 3.488
             },
             {
               "type": "inference_done",
-              "timestamp": 8.0,
+              "timestamp": 8.032,
               "silence_duration": 3.52
             },
             {
               "type": "inference_done",
-              "timestamp": 8.032,
+              "timestamp": 8.064,
               "silence_duration": 3.552
             },
             {
               "type": "inference_done",
-              "timestamp": 8.064,
+              "timestamp": 8.096,
               "silence_duration": 3.584
             },
             {
               "type": "inference_done",
-              "timestamp": 8.096,
+              "timestamp": 8.128,
               "silence_duration": 3.616
             },
             {
               "type": "inference_done",
-              "timestamp": 8.128,
+              "timestamp": 8.16,
               "silence_duration": 3.648
             },
             {
               "type": "inference_done",
-              "timestamp": 8.16,
+              "timestamp": 8.192,
               "silence_duration": 3.68
             },
             {
               "type": "inference_done",
-              "timestamp": 8.192,
+              "timestamp": 8.224,
               "silence_duration": 3.712
             },
             {
               "type": "inference_done",
-              "timestamp": 8.224,
+              "timestamp": 8.256,
               "silence_duration": 3.744
             },
             {
               "type": "inference_done",
-              "timestamp": 8.256,
+              "timestamp": 8.288,
               "silence_duration": 3.776
             },
             {
               "type": "inference_done",
-              "timestamp": 8.288,
+              "timestamp": 8.32,
               "silence_duration": 3.808
             },
             {
               "type": "inference_done",
-              "timestamp": 8.32,
+              "timestamp": 8.352,
               "silence_duration": 3.84
             },
             {
               "type": "inference_done",
-              "timestamp": 8.352,
+              "timestamp": 8.384,
               "silence_duration": 3.872
             },
             {
               "type": "inference_done",
-              "timestamp": 8.384,
+              "timestamp": 8.416,
               "silence_duration": 3.904
             },
             {
               "type": "inference_done",
-              "timestamp": 8.416,
+              "timestamp": 8.448,
               "silence_duration": 3.936
             },
             {
               "type": "inference_done",
-              "timestamp": 8.448,
+              "timestamp": 8.48,
               "silence_duration": 3.968
             },
             {
               "type": "inference_done",
-              "timestamp": 8.48,
+              "timestamp": 8.512,
               "silence_duration": 4.0
             },
             {
               "type": "inference_done",
-              "timestamp": 8.512,
+              "timestamp": 8.544,
               "silence_duration": 4.032
             },
             {
               "type": "inference_done",
-              "timestamp": 8.544,
+              "timestamp": 8.576,
               "silence_duration": 4.064
             },
             {
               "type": "inference_done",
-              "timestamp": 8.576,
+              "timestamp": 8.608,
               "silence_duration": 4.096
             },
             {
               "type": "inference_done",
-              "timestamp": 8.608,
+              "timestamp": 8.64,
               "silence_duration": 4.128
             },
             {
               "type": "inference_done",
-              "timestamp": 8.64,
+              "timestamp": 8.672,
               "silence_duration": 4.16
             },
             {
               "type": "inference_done",
-              "timestamp": 8.672,
+              "timestamp": 8.704,
               "silence_duration": 4.192
             },
             {
               "type": "inference_done",
-              "timestamp": 8.704,
+              "timestamp": 8.736,
               "silence_duration": 4.224
             },
             {
               "type": "inference_done",
-              "timestamp": 8.736,
+              "timestamp": 8.768,
               "silence_duration": 4.256
             },
             {
               "type": "inference_done",
-              "timestamp": 8.768,
+              "timestamp": 8.8,
               "silence_duration": 4.288
             },
             {
               "type": "inference_done",
-              "timestamp": 8.8,
+              "timestamp": 8.832,
               "silence_duration": 4.32
             },
             {
               "type": "inference_done",
-              "timestamp": 8.832,
+              "timestamp": 8.864,
               "silence_duration": 4.352
             },
             {
               "type": "inference_done",
-              "timestamp": 8.864,
+              "timestamp": 8.896,
               "silence_duration": 4.384
             },
             {
               "type": "inference_done",
-              "timestamp": 8.896,
+              "timestamp": 8.928,
               "silence_duration": 4.416
             },
             {
               "type": "inference_done",
-              "timestamp": 8.928,
+              "timestamp": 8.96,
               "silence_duration": 4.448
             },
             {
               "type": "inference_done",
-              "timestamp": 8.96,
+              "timestamp": 8.992,
               "silence_duration": 4.48
             },
             {
               "type": "inference_done",
-              "timestamp": 8.992,
+              "timestamp": 9.024,
               "silence_duration": 4.512
             },
             {
               "type": "inference_done",
-              "timestamp": 9.024,
+              "timestamp": 9.056,
               "silence_duration": 4.544
             },
             {
               "type": "inference_done",
-              "timestamp": 9.056,
+              "timestamp": 9.088,
               "silence_duration": 4.576
             },
             {
               "type": "inference_done",
-              "timestamp": 9.088,
+              "timestamp": 9.12,
               "silence_duration": 4.608
             },
             {
               "type": "inference_done",
-              "timestamp": 9.12,
+              "timestamp": 9.152,
               "silence_duration": 4.64
             },
             {
               "type": "inference_done",
-              "timestamp": 9.152,
+              "timestamp": 9.184,
               "silence_duration": 4.672
             },
             {
               "type": "inference_done",
-              "timestamp": 9.184,
+              "timestamp": 9.216,
               "silence_duration": 4.704
             },
             {
               "type": "inference_done",
-              "timestamp": 9.216,
+              "timestamp": 9.248,
               "silence_duration": 4.736
             },
             {
               "type": "inference_done",
-              "timestamp": 9.248,
-              "silence_duration": 4.768
-            },
-            {
-              "type": "inference_done",
               "timestamp": 9.28,
-              "silence_duration": 4.8
+              "silence_duration": 4.768
             },
             {
               "type": "start_of_speech",
@@ -7581,6 +7616,11 @@
             {
               "type": "inference_done",
               "timestamp": 11.616,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 11.648,
               "silence_duration": 0.0
             }
           ],
@@ -8144,772 +8184,772 @@
               "silence_duration": 0.0
             },
             {
-              "type": "inference_done",
-              "timestamp": 3.552,
-              "silence_duration": 0.0
-            },
-            {
               "type": "end_of_speech",
-              "timestamp": 3.552,
+              "timestamp": 3.52,
               "silence_duration": 0.576
             },
             {
               "type": "inference_done",
-              "timestamp": 3.584,
+              "timestamp": 3.552,
               "silence_duration": 0.608
             },
             {
               "type": "inference_done",
-              "timestamp": 3.616,
+              "timestamp": 3.584,
               "silence_duration": 0.64
             },
             {
               "type": "inference_done",
-              "timestamp": 3.648,
+              "timestamp": 3.616,
               "silence_duration": 0.672
             },
             {
               "type": "inference_done",
-              "timestamp": 3.68,
+              "timestamp": 3.648,
               "silence_duration": 0.704
             },
             {
               "type": "inference_done",
-              "timestamp": 3.712,
+              "timestamp": 3.68,
               "silence_duration": 0.736
             },
             {
               "type": "inference_done",
-              "timestamp": 3.744,
+              "timestamp": 3.712,
               "silence_duration": 0.768
             },
             {
               "type": "inference_done",
-              "timestamp": 3.776,
+              "timestamp": 3.744,
               "silence_duration": 0.8
             },
             {
               "type": "inference_done",
-              "timestamp": 3.808,
+              "timestamp": 3.776,
               "silence_duration": 0.832
             },
             {
               "type": "inference_done",
-              "timestamp": 3.84,
+              "timestamp": 3.808,
               "silence_duration": 0.864
             },
             {
               "type": "inference_done",
-              "timestamp": 3.872,
+              "timestamp": 3.84,
               "silence_duration": 0.896
             },
             {
               "type": "inference_done",
-              "timestamp": 3.904,
+              "timestamp": 3.872,
               "silence_duration": 0.928
             },
             {
               "type": "inference_done",
-              "timestamp": 3.936,
+              "timestamp": 3.904,
               "silence_duration": 0.96
             },
             {
               "type": "inference_done",
-              "timestamp": 3.968,
+              "timestamp": 3.936,
               "silence_duration": 0.992
             },
             {
               "type": "inference_done",
-              "timestamp": 4.0,
+              "timestamp": 3.968,
               "silence_duration": 1.024
             },
             {
               "type": "inference_done",
-              "timestamp": 4.032,
+              "timestamp": 4.0,
               "silence_duration": 1.056
             },
             {
               "type": "inference_done",
-              "timestamp": 4.064,
+              "timestamp": 4.032,
               "silence_duration": 1.088
             },
             {
               "type": "inference_done",
-              "timestamp": 4.096,
+              "timestamp": 4.064,
               "silence_duration": 1.12
             },
             {
               "type": "inference_done",
-              "timestamp": 4.128,
+              "timestamp": 4.096,
               "silence_duration": 1.152
             },
             {
               "type": "inference_done",
-              "timestamp": 4.16,
+              "timestamp": 4.128,
               "silence_duration": 1.184
             },
             {
               "type": "inference_done",
-              "timestamp": 4.192,
+              "timestamp": 4.16,
               "silence_duration": 1.216
             },
             {
               "type": "inference_done",
-              "timestamp": 4.224,
+              "timestamp": 4.192,
               "silence_duration": 1.248
             },
             {
               "type": "inference_done",
-              "timestamp": 4.256,
+              "timestamp": 4.224,
               "silence_duration": 1.28
             },
             {
               "type": "inference_done",
-              "timestamp": 4.288,
+              "timestamp": 4.256,
               "silence_duration": 1.312
             },
             {
               "type": "inference_done",
-              "timestamp": 4.32,
+              "timestamp": 4.288,
               "silence_duration": 1.344
             },
             {
               "type": "inference_done",
-              "timestamp": 4.352,
+              "timestamp": 4.32,
               "silence_duration": 1.376
             },
             {
               "type": "inference_done",
-              "timestamp": 4.384,
+              "timestamp": 4.352,
               "silence_duration": 1.408
             },
             {
               "type": "inference_done",
-              "timestamp": 4.416,
+              "timestamp": 4.384,
               "silence_duration": 1.44
             },
             {
               "type": "inference_done",
-              "timestamp": 4.448,
+              "timestamp": 4.416,
               "silence_duration": 1.472
             },
             {
               "type": "inference_done",
-              "timestamp": 4.48,
+              "timestamp": 4.448,
               "silence_duration": 1.504
             },
             {
               "type": "inference_done",
-              "timestamp": 4.512,
+              "timestamp": 4.48,
               "silence_duration": 1.536
             },
             {
               "type": "inference_done",
-              "timestamp": 4.544,
+              "timestamp": 4.512,
               "silence_duration": 1.568
             },
             {
               "type": "inference_done",
-              "timestamp": 4.576,
+              "timestamp": 4.544,
               "silence_duration": 1.6
             },
             {
               "type": "inference_done",
-              "timestamp": 4.608,
+              "timestamp": 4.576,
               "silence_duration": 1.632
             },
             {
               "type": "inference_done",
-              "timestamp": 4.64,
+              "timestamp": 4.608,
               "silence_duration": 1.664
             },
             {
               "type": "inference_done",
-              "timestamp": 4.672,
+              "timestamp": 4.64,
               "silence_duration": 1.696
             },
             {
               "type": "inference_done",
-              "timestamp": 4.704,
+              "timestamp": 4.672,
               "silence_duration": 1.728
             },
             {
               "type": "inference_done",
-              "timestamp": 4.736,
+              "timestamp": 4.704,
               "silence_duration": 1.76
             },
             {
               "type": "inference_done",
-              "timestamp": 4.768,
+              "timestamp": 4.736,
               "silence_duration": 1.792
             },
             {
               "type": "inference_done",
-              "timestamp": 4.8,
+              "timestamp": 4.768,
               "silence_duration": 1.824
             },
             {
               "type": "inference_done",
-              "timestamp": 4.832,
+              "timestamp": 4.8,
               "silence_duration": 1.856
             },
             {
               "type": "inference_done",
-              "timestamp": 4.864,
+              "timestamp": 4.832,
               "silence_duration": 1.888
             },
             {
               "type": "inference_done",
-              "timestamp": 4.896,
+              "timestamp": 4.864,
               "silence_duration": 1.92
             },
             {
               "type": "inference_done",
-              "timestamp": 4.928,
+              "timestamp": 4.896,
               "silence_duration": 1.952
             },
             {
               "type": "inference_done",
-              "timestamp": 4.96,
+              "timestamp": 4.928,
               "silence_duration": 1.984
             },
             {
               "type": "inference_done",
-              "timestamp": 4.992,
+              "timestamp": 4.96,
               "silence_duration": 2.016
             },
             {
               "type": "inference_done",
-              "timestamp": 5.024,
+              "timestamp": 4.992,
               "silence_duration": 2.048
             },
             {
               "type": "inference_done",
-              "timestamp": 5.056,
+              "timestamp": 5.024,
               "silence_duration": 2.08
             },
             {
               "type": "inference_done",
-              "timestamp": 5.088,
+              "timestamp": 5.056,
               "silence_duration": 2.112
             },
             {
               "type": "inference_done",
-              "timestamp": 5.12,
+              "timestamp": 5.088,
               "silence_duration": 2.144
             },
             {
               "type": "inference_done",
-              "timestamp": 5.152,
+              "timestamp": 5.12,
               "silence_duration": 2.176
             },
             {
               "type": "inference_done",
-              "timestamp": 5.184,
+              "timestamp": 5.152,
               "silence_duration": 2.208
             },
             {
               "type": "inference_done",
-              "timestamp": 5.216,
+              "timestamp": 5.184,
               "silence_duration": 2.24
             },
             {
               "type": "inference_done",
-              "timestamp": 5.248,
+              "timestamp": 5.216,
               "silence_duration": 2.272
             },
             {
               "type": "inference_done",
-              "timestamp": 5.28,
+              "timestamp": 5.248,
               "silence_duration": 2.304
             },
             {
               "type": "inference_done",
-              "timestamp": 5.312,
+              "timestamp": 5.28,
               "silence_duration": 2.336
             },
             {
               "type": "inference_done",
-              "timestamp": 5.344,
+              "timestamp": 5.312,
               "silence_duration": 2.368
             },
             {
               "type": "inference_done",
-              "timestamp": 5.376,
+              "timestamp": 5.344,
               "silence_duration": 2.4
             },
             {
               "type": "inference_done",
-              "timestamp": 5.408,
+              "timestamp": 5.376,
               "silence_duration": 2.432
             },
             {
               "type": "inference_done",
-              "timestamp": 5.44,
+              "timestamp": 5.408,
               "silence_duration": 2.464
             },
             {
               "type": "inference_done",
-              "timestamp": 5.472,
+              "timestamp": 5.44,
               "silence_duration": 2.496
             },
             {
               "type": "inference_done",
-              "timestamp": 5.504,
+              "timestamp": 5.472,
               "silence_duration": 2.528
             },
             {
               "type": "inference_done",
-              "timestamp": 5.536,
+              "timestamp": 5.504,
               "silence_duration": 2.56
             },
             {
               "type": "inference_done",
-              "timestamp": 5.568,
+              "timestamp": 5.536,
               "silence_duration": 2.592
             },
             {
               "type": "inference_done",
-              "timestamp": 5.6,
+              "timestamp": 5.568,
               "silence_duration": 2.624
             },
             {
               "type": "inference_done",
-              "timestamp": 5.632,
+              "timestamp": 5.6,
               "silence_duration": 2.656
             },
             {
               "type": "inference_done",
-              "timestamp": 5.664,
+              "timestamp": 5.632,
               "silence_duration": 2.688
             },
             {
               "type": "inference_done",
-              "timestamp": 5.696,
+              "timestamp": 5.664,
               "silence_duration": 2.72
             },
             {
               "type": "inference_done",
-              "timestamp": 5.728,
+              "timestamp": 5.696,
               "silence_duration": 2.752
             },
             {
               "type": "inference_done",
-              "timestamp": 5.76,
+              "timestamp": 5.728,
               "silence_duration": 2.784
             },
             {
               "type": "inference_done",
-              "timestamp": 5.792,
+              "timestamp": 5.76,
               "silence_duration": 2.816
             },
             {
               "type": "inference_done",
-              "timestamp": 5.824,
+              "timestamp": 5.792,
               "silence_duration": 2.848
             },
             {
               "type": "inference_done",
-              "timestamp": 5.856,
+              "timestamp": 5.824,
               "silence_duration": 2.88
             },
             {
               "type": "inference_done",
-              "timestamp": 5.888,
+              "timestamp": 5.856,
               "silence_duration": 2.912
             },
             {
               "type": "inference_done",
-              "timestamp": 5.92,
+              "timestamp": 5.888,
               "silence_duration": 2.944
             },
             {
               "type": "inference_done",
-              "timestamp": 5.952,
+              "timestamp": 5.92,
               "silence_duration": 2.976
             },
             {
               "type": "inference_done",
-              "timestamp": 5.984,
+              "timestamp": 5.952,
               "silence_duration": 3.008
             },
             {
               "type": "inference_done",
-              "timestamp": 6.016,
+              "timestamp": 5.984,
               "silence_duration": 3.04
             },
             {
               "type": "inference_done",
-              "timestamp": 6.048,
+              "timestamp": 6.016,
               "silence_duration": 3.072
             },
             {
               "type": "inference_done",
-              "timestamp": 6.08,
+              "timestamp": 6.048,
               "silence_duration": 3.104
             },
             {
               "type": "inference_done",
-              "timestamp": 6.112,
+              "timestamp": 6.08,
               "silence_duration": 3.136
             },
             {
               "type": "inference_done",
-              "timestamp": 6.144,
+              "timestamp": 6.112,
               "silence_duration": 3.168
             },
             {
               "type": "inference_done",
-              "timestamp": 6.176,
+              "timestamp": 6.144,
               "silence_duration": 3.2
             },
             {
               "type": "inference_done",
-              "timestamp": 6.208,
+              "timestamp": 6.176,
               "silence_duration": 3.232
             },
             {
               "type": "inference_done",
-              "timestamp": 6.24,
+              "timestamp": 6.208,
               "silence_duration": 3.264
             },
             {
               "type": "inference_done",
-              "timestamp": 6.272,
+              "timestamp": 6.24,
               "silence_duration": 3.296
             },
             {
               "type": "inference_done",
-              "timestamp": 6.304,
+              "timestamp": 6.272,
               "silence_duration": 3.328
             },
             {
               "type": "inference_done",
-              "timestamp": 6.336,
+              "timestamp": 6.304,
               "silence_duration": 3.36
             },
             {
               "type": "inference_done",
-              "timestamp": 6.368,
+              "timestamp": 6.336,
               "silence_duration": 3.392
             },
             {
               "type": "inference_done",
-              "timestamp": 6.4,
+              "timestamp": 6.368,
               "silence_duration": 3.424
             },
             {
               "type": "inference_done",
-              "timestamp": 6.432,
+              "timestamp": 6.4,
               "silence_duration": 3.456
             },
             {
               "type": "inference_done",
-              "timestamp": 6.464,
+              "timestamp": 6.432,
               "silence_duration": 3.488
             },
             {
               "type": "inference_done",
-              "timestamp": 6.496,
+              "timestamp": 6.464,
               "silence_duration": 3.52
             },
             {
               "type": "inference_done",
-              "timestamp": 6.528,
+              "timestamp": 6.496,
               "silence_duration": 3.552
             },
             {
               "type": "inference_done",
-              "timestamp": 6.56,
+              "timestamp": 6.528,
               "silence_duration": 3.584
             },
             {
               "type": "inference_done",
-              "timestamp": 6.592,
+              "timestamp": 6.56,
               "silence_duration": 3.616
             },
             {
               "type": "inference_done",
-              "timestamp": 6.624,
+              "timestamp": 6.592,
               "silence_duration": 3.648
             },
             {
               "type": "inference_done",
-              "timestamp": 6.656,
+              "timestamp": 6.624,
               "silence_duration": 3.68
             },
             {
               "type": "inference_done",
-              "timestamp": 6.688,
+              "timestamp": 6.656,
               "silence_duration": 3.712
             },
             {
               "type": "inference_done",
-              "timestamp": 6.72,
+              "timestamp": 6.688,
               "silence_duration": 3.744
             },
             {
               "type": "inference_done",
-              "timestamp": 6.752,
+              "timestamp": 6.72,
               "silence_duration": 3.776
             },
             {
               "type": "inference_done",
-              "timestamp": 6.784,
+              "timestamp": 6.752,
               "silence_duration": 3.808
             },
             {
               "type": "inference_done",
-              "timestamp": 6.816,
+              "timestamp": 6.784,
               "silence_duration": 3.84
             },
             {
               "type": "inference_done",
-              "timestamp": 6.848,
+              "timestamp": 6.816,
               "silence_duration": 3.872
             },
             {
               "type": "inference_done",
-              "timestamp": 6.88,
+              "timestamp": 6.848,
               "silence_duration": 3.904
             },
             {
               "type": "inference_done",
-              "timestamp": 6.912,
+              "timestamp": 6.88,
               "silence_duration": 3.936
             },
             {
               "type": "inference_done",
-              "timestamp": 6.944,
+              "timestamp": 6.912,
               "silence_duration": 3.968
             },
             {
               "type": "inference_done",
-              "timestamp": 6.976,
+              "timestamp": 6.944,
               "silence_duration": 4.0
             },
             {
               "type": "inference_done",
-              "timestamp": 7.008,
+              "timestamp": 6.976,
               "silence_duration": 4.032
             },
             {
               "type": "inference_done",
-              "timestamp": 7.04,
+              "timestamp": 7.008,
               "silence_duration": 4.064
             },
             {
               "type": "inference_done",
-              "timestamp": 7.072,
+              "timestamp": 7.04,
               "silence_duration": 4.096
             },
             {
               "type": "inference_done",
-              "timestamp": 7.104,
+              "timestamp": 7.072,
               "silence_duration": 4.128
             },
             {
               "type": "inference_done",
-              "timestamp": 7.136,
+              "timestamp": 7.104,
               "silence_duration": 4.16
             },
             {
               "type": "inference_done",
-              "timestamp": 7.168,
+              "timestamp": 7.136,
               "silence_duration": 4.192
             },
             {
               "type": "inference_done",
-              "timestamp": 7.2,
+              "timestamp": 7.168,
               "silence_duration": 4.224
             },
             {
               "type": "inference_done",
-              "timestamp": 7.232,
+              "timestamp": 7.2,
               "silence_duration": 4.256
             },
             {
               "type": "inference_done",
-              "timestamp": 7.264,
+              "timestamp": 7.232,
               "silence_duration": 4.288
             },
             {
               "type": "inference_done",
-              "timestamp": 7.296,
+              "timestamp": 7.264,
               "silence_duration": 4.32
             },
             {
               "type": "inference_done",
-              "timestamp": 7.328,
+              "timestamp": 7.296,
               "silence_duration": 4.352
             },
             {
               "type": "inference_done",
-              "timestamp": 7.36,
+              "timestamp": 7.328,
               "silence_duration": 4.384
             },
             {
               "type": "inference_done",
-              "timestamp": 7.392,
+              "timestamp": 7.36,
               "silence_duration": 4.416
             },
             {
               "type": "inference_done",
-              "timestamp": 7.424,
+              "timestamp": 7.392,
               "silence_duration": 4.448
             },
             {
               "type": "inference_done",
-              "timestamp": 7.456,
+              "timestamp": 7.424,
               "silence_duration": 4.48
             },
             {
               "type": "inference_done",
-              "timestamp": 7.488,
+              "timestamp": 7.456,
               "silence_duration": 4.512
             },
             {
               "type": "inference_done",
-              "timestamp": 7.52,
+              "timestamp": 7.488,
               "silence_duration": 4.544
             },
             {
               "type": "inference_done",
-              "timestamp": 7.552,
+              "timestamp": 7.52,
               "silence_duration": 4.576
             },
             {
               "type": "inference_done",
-              "timestamp": 7.584,
+              "timestamp": 7.552,
               "silence_duration": 4.608
             },
             {
               "type": "inference_done",
-              "timestamp": 7.616,
+              "timestamp": 7.584,
               "silence_duration": 4.64
             },
             {
               "type": "inference_done",
-              "timestamp": 7.648,
+              "timestamp": 7.616,
               "silence_duration": 4.672
             },
             {
               "type": "inference_done",
-              "timestamp": 7.68,
+              "timestamp": 7.648,
               "silence_duration": 4.704
             },
             {
               "type": "inference_done",
-              "timestamp": 7.712,
+              "timestamp": 7.68,
               "silence_duration": 4.736
             },
             {
               "type": "inference_done",
-              "timestamp": 7.744,
+              "timestamp": 7.712,
               "silence_duration": 4.768
             },
             {
               "type": "inference_done",
-              "timestamp": 7.776,
+              "timestamp": 7.744,
               "silence_duration": 4.8
             },
             {
               "type": "inference_done",
-              "timestamp": 7.808,
+              "timestamp": 7.776,
               "silence_duration": 4.832
             },
             {
               "type": "inference_done",
-              "timestamp": 7.84,
+              "timestamp": 7.808,
               "silence_duration": 4.864
             },
             {
               "type": "inference_done",
-              "timestamp": 7.872,
+              "timestamp": 7.84,
               "silence_duration": 4.896
             },
             {
               "type": "inference_done",
-              "timestamp": 7.904,
+              "timestamp": 7.872,
               "silence_duration": 4.928
             },
             {
               "type": "inference_done",
-              "timestamp": 7.936,
+              "timestamp": 7.904,
               "silence_duration": 4.96
             },
             {
               "type": "inference_done",
-              "timestamp": 7.968,
+              "timestamp": 7.936,
               "silence_duration": 4.992
             },
             {
               "type": "inference_done",
-              "timestamp": 8.0,
+              "timestamp": 7.968,
               "silence_duration": 5.024
             },
             {
               "type": "inference_done",
-              "timestamp": 8.032,
+              "timestamp": 8.0,
               "silence_duration": 5.056
             },
             {
               "type": "inference_done",
-              "timestamp": 8.064,
+              "timestamp": 8.032,
               "silence_duration": 5.088
             },
             {
               "type": "inference_done",
-              "timestamp": 8.096,
+              "timestamp": 8.064,
               "silence_duration": 5.12
             },
             {
               "type": "inference_done",
-              "timestamp": 8.128,
+              "timestamp": 8.096,
               "silence_duration": 5.152
             },
             {
               "type": "inference_done",
-              "timestamp": 8.16,
+              "timestamp": 8.128,
               "silence_duration": 5.184
             },
             {
               "type": "inference_done",
-              "timestamp": 8.192,
+              "timestamp": 8.16,
               "silence_duration": 5.216
             },
             {
               "type": "inference_done",
-              "timestamp": 8.224,
+              "timestamp": 8.192,
               "silence_duration": 5.248
             },
             {
               "type": "inference_done",
-              "timestamp": 8.256,
+              "timestamp": 8.224,
               "silence_duration": 5.28
             },
             {
               "type": "inference_done",
-              "timestamp": 8.288,
+              "timestamp": 8.256,
               "silence_duration": 5.312
             },
             {
               "type": "inference_done",
-              "timestamp": 8.32,
+              "timestamp": 8.288,
               "silence_duration": 5.344
             },
             {
               "type": "inference_done",
-              "timestamp": 8.352,
+              "timestamp": 8.32,
               "silence_duration": 5.376
             },
             {
-              "type": "inference_done",
-              "timestamp": 8.384,
-              "silence_duration": 5.408
+              "type": "start_of_speech",
+              "timestamp": 8.32,
+              "silence_duration": 0.0
             },
             {
-              "type": "start_of_speech",
+              "type": "inference_done",
+              "timestamp": 8.352,
+              "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
               "timestamp": 8.384,
               "silence_duration": 0.0
             },
@@ -9192,6 +9232,11 @@
               "type": "inference_done",
               "timestamp": 10.176,
               "silence_duration": 0.0
+            },
+            {
+              "type": "inference_done",
+              "timestamp": 10.208,
+              "silence_duration": 0.0
             }
           ],
           "premature_end": true
@@ -9212,17 +9257,17 @@
         "fx2_2600ms": {
           "timeline_path": "evidence\\e2\\live_presentation\\fx2_2600ms\\timeline.jsonl",
           "premature_end": false,
-          "n_events": 23
+          "n_events": 24
         },
         "fx3_3200ms": {
           "timeline_path": "evidence\\e2\\live_presentation\\fx3_3200ms\\timeline.jsonl",
           "premature_end": false,
-          "n_events": 22
+          "n_events": 23
         },
         "fx4_3800ms": {
           "timeline_path": "evidence\\e2\\live_presentation\\fx4_3800ms\\timeline.jsonl",
           "premature_end": false,
-          "n_events": 22
+          "n_events": 23
         },
         "fx5_4400ms": {
           "timeline_path": "evidence\\e2\\live_presentation\\fx5_4400ms\\timeline.jsonl",
@@ -9240,7 +9285,7 @@
   "part_b": {
     "exercised": true,
     "stale_fencing": {
-      "phase_at_rerecord": "present",
+      "phase_at_rerecord": "prep",
       "revision_before_rerecord": 1,
       "revision_after_rerecord": 2,
       "stale_dropped_events": [],
@@ -9251,8 +9296,15 @@
     },
     "feedback_heard_count": 0,
     "duplicate_feedback_heard": 0,
-    "interrupt_mechanism_fired": false,
-    "interrupt_events": [],
+    "interrupt_mechanism_fired": true,
+    "interrupt_events": [
+      {
+        "t": 8.657,
+        "ev": "interrupt",
+        "speech_id": "speech_4e5d9919aa21",
+        "latency_ms": 3047
+      }
+    ],
     "stop_latency_caveat": "session.say()'s wait_for_playout() does not reliably pace through real audio duration with no live room / audio output sink attached (observed played_s for comparable feedback text ranged 0.0s-1.0s+ across otherwise-identical runs in this harness) -- so a P95 stop-latency number computed here would not be trustworthy evidence for the <=300ms target. The interrupt mechanism itself (session.interrupt() / SpeechHandle.interrupted / the timeline 'interrupt' event) is exercised and fires correctly; only the millisecond latency number requires a real room.",
     "targets": {
       "p95_stop_latency_ms": 300,
@@ -9449,7 +9501,7 @@
     },
     "tuned_interruption": {
       "exercised": true,
-      "room": "podium-e2-live-0730c05891",
+      "room": "podium-e2-live-b7499933ae",
       "config": {
         "turn_handling": "TurnHandlingOptions(turn_detection='vad', interruption={'mode': 'vad', 'min_duration': 0.12, 'discard_audio_if_uninterruptible': True, 'resume_false_interruption': True, 'false_interruption_timeout': 1.5})",
         "vad": "silero.VAD.load(min_speech_duration=0.03, min_silence_duration=0.55)",
@@ -9457,10 +9509,10 @@
       },
       "decomposition_not_reported": {
         "reported": false,
-        "agent_interrupt_event_count": 20,
+        "agent_interrupt_event_count": 21,
         "measured_trial_count": 12,
-        "cascade_ratio": 1.67,
-        "reason": "20 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.67x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event."
+        "cascade_ratio": 1.75,
+        "reason": "21 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.75x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event."
       },
       "false_interruption_tradeoff": {
         "trials_affected": [
@@ -9483,17 +9535,17 @@
       },
       "end_to_end_proof": {
         "words_transcribed": 37,
-        "wpm": 198.4,
+        "wpm": 200.0,
         "filler_count": 0,
         "improvement_count": 3,
-        "session_dir": "sessions\\s_20260908_095327"
+        "session_dir": "sessions\\s_20260908_100318"
       },
       "stop_latency": {
         "n_trials": 12,
         "n_attempted": 12,
-        "p50_ms": 595.5,
-        "p95_ms": 698.0,
-        "max_ms": 2948.0,
+        "p50_ms": 666.0,
+        "p95_ms": 744.0,
+        "max_ms": 1713.0,
         "target_ms": 300,
         "target_met": false,
         "trials": [
@@ -9502,9 +9554,9 @@
             "offset_label": "early",
             "delay_s": 0.25,
             "measured": true,
-            "onset_mono": 79859.234,
-            "last_agent_frame_mono": 79859.603,
-            "latency_ms": 369.0,
+            "onset_mono": 80449.718,
+            "last_agent_frame_mono": 80450.103,
+            "latency_ms": 385.0,
             "wav_path": "evidence\\e2\\live_room\\trial_0.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9514,79 +9566,55 @@
             "offset_label": "mid",
             "delay_s": 1.4,
             "measured": true,
-            "onset_mono": 79865.546,
-            "last_agent_frame_mono": 79868.494,
-            "latency_ms": 2948.0,
+            "onset_mono": 80456.0,
+            "last_agent_frame_mono": 80457.713,
+            "latency_ms": 1713.0,
             "wav_path": "evidence\\e2\\live_room\\trial_1.wav",
             "false_interruption_candidate": true,
             "supporting_dips": [
               {
-                "start_t": 79865.546,
-                "duration_s": 0.135
+                "start_t": 80456.25,
+                "duration_s": 0.01
               },
               {
-                "start_t": 79865.906,
+                "start_t": 80456.484,
+                "duration_s": 0.01
+              },
+              {
+                "start_t": 80456.796,
+                "duration_s": 0.01
+              },
+              {
+                "start_t": 80456.984,
+                "duration_s": 0.041
+              },
+              {
+                "start_t": 80457.046,
+                "duration_s": 0.042
+              },
+              {
+                "start_t": 80457.156,
                 "duration_s": 0.025
               },
               {
-                "start_t": 79866.25,
+                "start_t": 80457.281,
                 "duration_s": 0.025
               },
               {
-                "start_t": 79866.468,
-                "duration_s": 0.026
-              },
-              {
-                "start_t": 79866.531,
-                "duration_s": 0.041
-              },
-              {
-                "start_t": 79866.75,
-                "duration_s": 0.041
-              },
-              {
-                "start_t": 79866.812,
+                "start_t": 80457.312,
                 "duration_s": 0.01
               },
               {
-                "start_t": 79866.984,
-                "duration_s": 0.026
-              },
-              {
-                "start_t": 79867.093,
-                "duration_s": 0.026
-              },
-              {
-                "start_t": 79867.125,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 79867.343,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 79867.359,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 79867.75,
-                "duration_s": 0.041
-              },
-              {
-                "start_t": 79867.812,
+                "start_t": 80457.484,
                 "duration_s": 0.057
               },
               {
-                "start_t": 79867.984,
-                "duration_s": 0.088
-              },
-              {
-                "start_t": 79868.109,
+                "start_t": 80457.64,
                 "duration_s": 0.01
               },
               {
-                "start_t": 79868.296,
-                "duration_s": 0.042
+                "start_t": 80457.656,
+                "duration_s": 0.041
               }
             ]
           },
@@ -9595,9 +9623,9 @@
             "offset_label": "late",
             "delay_s": 3.0,
             "measured": true,
-            "onset_mono": 79872.625,
-            "last_agent_frame_mono": 79873.228,
-            "latency_ms": 603.0,
+            "onset_mono": 80463.109,
+            "last_agent_frame_mono": 80463.119,
+            "latency_ms": 10.0,
             "wav_path": "evidence\\e2\\live_room\\trial_2.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9607,9 +9635,9 @@
             "offset_label": "early",
             "delay_s": 0.35,
             "measured": true,
-            "onset_mono": 79876.093,
-            "last_agent_frame_mono": 79876.713,
-            "latency_ms": 620.0,
+            "onset_mono": 80467.515,
+            "last_agent_frame_mono": 80468.197,
+            "latency_ms": 682.0,
             "wav_path": "evidence\\e2\\live_room\\trial_3.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9619,9 +9647,9 @@
             "offset_label": "mid",
             "delay_s": 0.9,
             "measured": true,
-            "onset_mono": 79880.187,
-            "last_agent_frame_mono": 79880.885,
-            "latency_ms": 698.0,
+            "onset_mono": 80472.718,
+            "last_agent_frame_mono": 80473.103,
+            "latency_ms": 385.0,
             "wav_path": "evidence\\e2\\live_room\\trial_4.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9631,9 +9659,9 @@
             "offset_label": "late",
             "delay_s": 2.2,
             "measured": true,
-            "onset_mono": 79885.593,
-            "last_agent_frame_mono": 79886.181,
-            "latency_ms": 588.0,
+            "onset_mono": 80480.078,
+            "last_agent_frame_mono": 80480.791,
+            "latency_ms": 713.0,
             "wav_path": "evidence\\e2\\live_room\\trial_5.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9643,9 +9671,9 @@
             "offset_label": "early",
             "delay_s": 0.3,
             "measured": true,
-            "onset_mono": 79889.125,
-            "last_agent_frame_mono": 79889.728,
-            "latency_ms": 603.0,
+            "onset_mono": 80484.453,
+            "last_agent_frame_mono": 80485.103,
+            "latency_ms": 650.0,
             "wav_path": "evidence\\e2\\live_room\\trial_6.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9655,9 +9683,9 @@
             "offset_label": "late",
             "delay_s": 1.8,
             "measured": true,
-            "onset_mono": 79895.656,
-            "last_agent_frame_mono": 79896.322,
-            "latency_ms": 666.0,
+            "onset_mono": 80489.406,
+            "last_agent_frame_mono": 80490.15,
+            "latency_ms": 744.0,
             "wav_path": "evidence\\e2\\live_room\\trial_7.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9667,9 +9695,9 @@
             "offset_label": "early",
             "delay_s": 0.5,
             "measured": true,
-            "onset_mono": 79899.421,
-            "last_agent_frame_mono": 79899.76,
-            "latency_ms": 339.0,
+            "onset_mono": 80493.093,
+            "last_agent_frame_mono": 80493.494,
+            "latency_ms": 401.0,
             "wav_path": "evidence\\e2\\live_room\\trial_8.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9679,9 +9707,9 @@
             "offset_label": "mid",
             "delay_s": 1.1,
             "measured": true,
-            "onset_mono": 79903.953,
-            "last_agent_frame_mono": 79904.525,
-            "latency_ms": 572.0,
+            "onset_mono": 80497.609,
+            "last_agent_frame_mono": 80498.322,
+            "latency_ms": 713.0,
             "wav_path": "evidence\\e2\\live_room\\trial_9.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9691,9 +9719,9 @@
             "offset_label": "late",
             "delay_s": 2.6,
             "measured": true,
-            "onset_mono": 79911.984,
-            "last_agent_frame_mono": 79912.181,
-            "latency_ms": 197.0,
+            "onset_mono": 80503.687,
+            "last_agent_frame_mono": 80504.088,
+            "latency_ms": 401.0,
             "wav_path": "evidence\\e2\\live_room\\trial_10.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9703,9 +9731,9 @@
             "offset_label": "early",
             "delay_s": 0.4,
             "measured": true,
-            "onset_mono": 79916.625,
-            "last_agent_frame_mono": 79917.166,
-            "latency_ms": 541.0,
+            "onset_mono": 80508.203,
+            "last_agent_frame_mono": 80508.916,
+            "latency_ms": 713.0,
             "wav_path": "evidence\\e2\\live_room\\trial_11.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9714,20 +9742,20 @@
         "latency_decomposition": {
           "attempted": true,
           "reliable": false,
-          "agent_interrupt_event_count": 20,
+          "agent_interrupt_event_count": 21,
           "measured_trial_count": 12,
-          "cascade_ratio": 1.67,
+          "cascade_ratio": 1.75,
           "agent_reported_latency_ms_sample": [
-            11937,
-            12406,
-            3828,
-            18063,
-            18078,
-            2375,
-            2500,
-            2469
+            11984,
+            12359,
+            3875,
+            17828,
+            17828,
+            2360,
+            2453,
+            2344
           ],
-          "reason": "20 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.67x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event.",
+          "reason": "21 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.75x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event.",
           "conclusion": "per Main's own fallback: the agent's own event timestamps are not usable for a rigorous per-trial detection/drain split here. Reporting only the onset->last-frame headline number (this-process clock only) as the trustworthy per-trial metric."
         },
         "false_interruption_observations": {
@@ -9740,75 +9768,51 @@
           "detail": [
             {
               "trial": 1,
-              "latency_ms": 2948.0,
+              "latency_ms": 1713.0,
               "supporting_dips": [
                 {
-                  "start_t": 79865.546,
-                  "duration_s": 0.135
+                  "start_t": 80456.25,
+                  "duration_s": 0.01
                 },
                 {
-                  "start_t": 79865.906,
+                  "start_t": 80456.484,
+                  "duration_s": 0.01
+                },
+                {
+                  "start_t": 80456.796,
+                  "duration_s": 0.01
+                },
+                {
+                  "start_t": 80456.984,
+                  "duration_s": 0.041
+                },
+                {
+                  "start_t": 80457.046,
+                  "duration_s": 0.042
+                },
+                {
+                  "start_t": 80457.156,
                   "duration_s": 0.025
                 },
                 {
-                  "start_t": 79866.25,
+                  "start_t": 80457.281,
                   "duration_s": 0.025
                 },
                 {
-                  "start_t": 79866.468,
-                  "duration_s": 0.026
-                },
-                {
-                  "start_t": 79866.531,
-                  "duration_s": 0.041
-                },
-                {
-                  "start_t": 79866.75,
-                  "duration_s": 0.041
-                },
-                {
-                  "start_t": 79866.812,
+                  "start_t": 80457.312,
                   "duration_s": 0.01
                 },
                 {
-                  "start_t": 79866.984,
-                  "duration_s": 0.026
-                },
-                {
-                  "start_t": 79867.093,
-                  "duration_s": 0.026
-                },
-                {
-                  "start_t": 79867.125,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 79867.343,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 79867.359,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 79867.75,
-                  "duration_s": 0.041
-                },
-                {
-                  "start_t": 79867.812,
+                  "start_t": 80457.484,
                   "duration_s": 0.057
                 },
                 {
-                  "start_t": 79867.984,
-                  "duration_s": 0.088
-                },
-                {
-                  "start_t": 79868.109,
+                  "start_t": 80457.64,
                   "duration_s": 0.01
                 },
                 {
-                  "start_t": 79868.296,
-                  "duration_s": 0.042
+                  "start_t": 80457.656,
+                  "duration_s": 0.041
                 }
               ]
             }
@@ -9832,198 +9836,204 @@
         "heard_item_ids": [],
         "truncation_checks": [
           {
-            "speech_id": "speech_f6e1e721b26b",
+            "speech_id": "speech_5c3cf75a6544",
             "kind": "cue",
             "item_id": null,
-            "played_s": 12.421
+            "played_s": 12.484
           },
           {
-            "speech_id": "speech_59b8aa81a220",
+            "speech_id": "speech_6aa5d12b594b",
             "kind": "ack",
             "item_id": null,
-            "played_s": 0.656
+            "played_s": 0.625
           },
           {
-            "speech_id": "speech_6d8fdc7b8ceb",
+            "speech_id": "speech_75ce74a723aa",
             "kind": "cue",
             "item_id": null,
-            "played_s": 4.343
+            "played_s": 4.39
           },
           {
-            "speech_id": "speech_d21cd183e490",
+            "speech_id": "speech_609a502a5d05",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 1.532
+            "played_s": 1.906
           },
           {
-            "speech_id": "speech_99d9fef6f626",
+            "speech_id": "speech_a38458a9f607",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 1.547
+            "played_s": 1.906
           },
           {
-            "speech_id": "speech_fe2ca49b143d",
+            "speech_id": "speech_7059a7e00ebb",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 2.515
+            "played_s": 2.532
           },
           {
-            "speech_id": "speech_33eb7a4699b9",
+            "speech_id": "speech_49b26a9a340a",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 0.125
+            "played_s": 0.093
           },
           {
-            "speech_id": "speech_21d17ee80428",
+            "speech_id": "speech_8715c00039b1",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 6.266
+            "played_s": 6.188
           },
           {
-            "speech_id": "speech_16b744831bdb",
+            "speech_id": "speech_425894e91545",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 7.062
+            "played_s": 7.047
           },
           {
-            "speech_id": "speech_e105ab99248d",
+            "speech_id": "speech_0ff4dcf5111f",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 3.454
+            "played_s": 4.39
           },
           {
-            "speech_id": "speech_f3a4c1ad823f",
+            "speech_id": "speech_bacc221f96a3",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 1.531
+            "played_s": 2.75
           },
           {
-            "speech_id": "speech_ad9950e22f84",
+            "speech_id": "speech_717a60037c15",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 2.594
+            "played_s": 2.5
           },
           {
-            "speech_id": "speech_3df5d0296c9b",
+            "speech_id": "speech_2c8b7fc7dfa5",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 0.109
+            "played_s": 0.079
           },
           {
-            "speech_id": "speech_2e93e162c8f3",
+            "speech_id": "speech_636022d73908",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 5.25
+            "played_s": 7.296
           },
           {
-            "speech_id": "speech_9c7b415a352e",
+            "speech_id": "speech_71b81aaf7687",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 3.547
+            "played_s": 4.329
           },
           {
-            "speech_id": "speech_5c49197ea863",
+            "speech_id": "speech_375611aa1f35",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 6.531
+            "played_s": 4.984
           },
           {
-            "speech_id": "speech_20c5312554df",
+            "speech_id": "speech_adb1691635d3",
             "kind": "feedback",
             "item_id": "imp_1",
             "played_s": 1.203
           },
           {
-            "speech_id": "speech_56668ad330a4",
+            "speech_id": "speech_61148dbf2617",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 2.594
+            "played_s": 2.484
           },
           {
-            "speech_id": "speech_63612f6c1d6d",
+            "speech_id": "speech_e5bf9350b672",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 0.094
+            "played_s": 0.188
           },
           {
-            "speech_id": "speech_c6d070714670",
+            "speech_id": "speech_f5989943ca55",
             "kind": "feedback",
             "item_id": "imp_1",
-            "played_s": 4.468
+            "played_s": 4.312
+          },
+          {
+            "speech_id": "speech_549eafb089bb",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 6.094
           }
         ],
         "cross_checks_our_latency_vs_agent_played_s": [
           {
             "trial": 0,
-            "our_latency_ms": 369.0,
-            "agent_played_s": 12.421,
-            "agent_speech_id": "speech_f6e1e721b26b"
+            "our_latency_ms": 385.0,
+            "agent_played_s": 12.484,
+            "agent_speech_id": "speech_5c3cf75a6544"
           },
           {
             "trial": 1,
-            "our_latency_ms": 2948.0,
-            "agent_played_s": 0.656,
-            "agent_speech_id": "speech_59b8aa81a220"
+            "our_latency_ms": 1713.0,
+            "agent_played_s": 0.625,
+            "agent_speech_id": "speech_6aa5d12b594b"
           },
           {
             "trial": 2,
-            "our_latency_ms": 603.0,
-            "agent_played_s": 4.343,
-            "agent_speech_id": "speech_6d8fdc7b8ceb"
+            "our_latency_ms": 10.0,
+            "agent_played_s": 4.39,
+            "agent_speech_id": "speech_75ce74a723aa"
           },
           {
             "trial": 3,
-            "our_latency_ms": 620.0,
-            "agent_played_s": 1.532,
-            "agent_speech_id": "speech_d21cd183e490"
+            "our_latency_ms": 682.0,
+            "agent_played_s": 1.906,
+            "agent_speech_id": "speech_609a502a5d05"
           },
           {
             "trial": 4,
-            "our_latency_ms": 698.0,
-            "agent_played_s": 1.547,
-            "agent_speech_id": "speech_99d9fef6f626"
+            "our_latency_ms": 385.0,
+            "agent_played_s": 1.906,
+            "agent_speech_id": "speech_a38458a9f607"
           },
           {
             "trial": 5,
-            "our_latency_ms": 588.0,
-            "agent_played_s": 2.515,
-            "agent_speech_id": "speech_fe2ca49b143d"
+            "our_latency_ms": 713.0,
+            "agent_played_s": 2.532,
+            "agent_speech_id": "speech_7059a7e00ebb"
           },
           {
             "trial": 6,
-            "our_latency_ms": 603.0,
-            "agent_played_s": 0.125,
-            "agent_speech_id": "speech_33eb7a4699b9"
+            "our_latency_ms": 650.0,
+            "agent_played_s": 0.093,
+            "agent_speech_id": "speech_49b26a9a340a"
           },
           {
             "trial": 7,
-            "our_latency_ms": 666.0,
-            "agent_played_s": 6.266,
-            "agent_speech_id": "speech_21d17ee80428"
+            "our_latency_ms": 744.0,
+            "agent_played_s": 6.188,
+            "agent_speech_id": "speech_8715c00039b1"
           },
           {
             "trial": 8,
-            "our_latency_ms": 339.0,
-            "agent_played_s": 7.062,
-            "agent_speech_id": "speech_16b744831bdb"
+            "our_latency_ms": 401.0,
+            "agent_played_s": 7.047,
+            "agent_speech_id": "speech_425894e91545"
           },
           {
             "trial": 9,
-            "our_latency_ms": 572.0,
-            "agent_played_s": 3.454,
-            "agent_speech_id": "speech_e105ab99248d"
+            "our_latency_ms": 713.0,
+            "agent_played_s": 4.39,
+            "agent_speech_id": "speech_0ff4dcf5111f"
           },
           {
             "trial": 10,
-            "our_latency_ms": 197.0,
-            "agent_played_s": 1.531,
-            "agent_speech_id": "speech_f3a4c1ad823f"
+            "our_latency_ms": 401.0,
+            "agent_played_s": 2.75,
+            "agent_speech_id": "speech_bacc221f96a3"
           },
           {
             "trial": 11,
-            "our_latency_ms": 541.0,
-            "agent_played_s": 2.594,
-            "agent_speech_id": "speech_ad9950e22f84"
+            "our_latency_ms": 713.0,
+            "agent_played_s": 2.5,
+            "agent_speech_id": "speech_717a60037c15"
           }
         ],
         "details": "interrupted_items_marked_heard/duplicate_heard_items are computed from the full live timeline.jsonl, not fabricated: an item is 'interrupted' if a real agent_speech_end{interrupted:true} event's matching agent_speech_start text maps back to one of the real judgment's improvements (infer_item_id); 'heard' comes from real feedback_heard events. cross_checks zips each measured trial's own (this-process-clock) latency against the orchestrator's independently measured played_s (agent-process clock) for the same interrupted speech, in chronological order -- agreement between two independently-clocked measurements is the evidence that the interrupted speech's audio genuinely stopped early rather than completing anyway (the exact failure mode evidence/e2_duplex.py Part B could not rule out)."
@@ -10035,7 +10045,7 @@
         "stale_judgment_spoken": false,
         "analyze1_to_rerecord_s": 0.39
       },
-      "timeline_path": "sessions\\s_20260908_095327\\timeline.jsonl",
+      "timeline_path": "sessions\\s_20260908_100318\\timeline.jsonl",
       "not_measured": []
     }
   }

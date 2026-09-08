@@ -1,0 +1,22 @@
+{"t": 0.531, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.531, "ev": "slide", "slide": 1}
+{"t": 0.531, "ev": "phase", "name": "present"}
+{"t": 0.859, "ev": "user_speech_start"}
+{"t": 2.344, "ev": "user_transcript", "text": "Sparse attention", "final": false}
+{"t": 3.156, "ev": "user_transcript", "text": "Sparse attention is one", "final": false}
+{"t": 4.156, "ev": "user_transcript", "text": "Sparse attention is one option. Low rank", "final": false}
+{"t": 5.172, "ev": "user_transcript", "text": "Sparse attention is one option. Low rank approximation is", "final": false}
+{"t": 5.859, "ev": "user_transcript", "text": "Sparse attention is one option. Low rank approximation is another.", "final": true}
+{"t": 5.922, "ev": "user_speech_end"}
+{"t": 10.437, "ev": "user_speech_start"}
+{"t": 11.203, "ev": "user_transcript", "text": "Each tray", "final": false}
+{"t": 12.219, "ev": "user_transcript", "text": "Each trade some accuracy for", "final": false}
+{"t": 13.312, "ev": "user_transcript", "text": "Each trade some accuracy for a lot of speed.", "final": true}
+{"t": 13.344, "ev": "user_speech_end"}
+{"t": 13.344, "ev": "phase", "name": "analyze"}
+{"t": 13.344, "ev": "agent_speech_start", "speech_id": "speech_946f5a7444c7", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 13.344, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 13.344, "ev": "agent_speech_start", "speech_id": "speech_50b412628b04", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 13.344, "ev": "phase", "name": "prep"}
+{"t": 13.344, "ev": "agent_speech_end", "speech_id": "speech_946f5a7444c7", "interrupted": false, "played_s": 0.0}
+{"t": 13.344, "ev": "agent_speech_end", "speech_id": "speech_50b412628b04", "interrupted": false, "played_s": 0.0}

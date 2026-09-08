@@ -159,9 +159,9 @@ The active speech provider is never silently swapped or hidden:
 - **Interruption stop latency currently misses its target.** Interrupting the coach's spoken
   feedback fires correctly (`session.interrupt()`, no stale judgments spoken, no duplicate
   "heard" marks — measured through a real LiveKit room in `evidence/e2_live_room.py`), but the
-  measured P95 stop latency is **698 ms – 1417 ms** against a ≤300 ms target, even after
-  retuning the agent's VAD interruption window. See `RIME_EVIDENCE.md` claim 4, Part C, for
-  the full before/after numbers and why the measurement itself has a caveat (barge-in retry
+  measured P95 stop latency is **667–744 ms across three tuned runs** (1417 ms before
+  retuning) against a ≤300 ms target. See `RIME_EVIDENCE.md` claim 4, Part C, for the full
+  before/after numbers and why the measurement itself carries a caveat (barge-in retry
   cascades inflate a few outlier trials).
 
 ## Prior art and what's different

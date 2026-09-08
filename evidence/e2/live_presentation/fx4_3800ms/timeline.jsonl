@@ -1,0 +1,23 @@
+{"t": 0.563, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.563, "ev": "slide", "slide": 1}
+{"t": 0.563, "ev": "phase", "name": "present"}
+{"t": 0.766, "ev": "user_speech_start"}
+{"t": 2.36, "ev": "user_transcript", "text": "So for long", "final": false}
+{"t": 3.156, "ev": "user_transcript", "text": "So for long documents this becomes the", "final": false}
+{"t": 3.594, "ev": "user_speech_end"}
+{"t": 3.641, "ev": "user_transcript", "text": "So for long documents, this becomes the bottleneck.", "final": true}
+{"t": 7.547, "ev": "user_speech_start"}
+{"t": 7.844, "ev": "user_transcript", "text": "So", "final": false}
+{"t": 8.781, "ev": "user_transcript", "text": "Several methods try to", "final": false}
+{"t": 9.875, "ev": "user_transcript", "text": "Several methods try to approximate the full", "final": false}
+{"t": 10.969, "ev": "user_transcript", "text": "Several methods try to approximate the full attention matrix.", "final": false}
+{"t": 11.141, "ev": "user_transcript", "text": "Several methods try to approximate the full attention matrix.", "final": true}
+{"t": 11.156, "ev": "phase", "name": "analyze"}
+{"t": 11.156, "ev": "agent_speech_start", "speech_id": "speech_b908c6e190a6", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 11.156, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 11.156, "ev": "agent_speech_start", "speech_id": "speech_8c2f2f064dfd", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 11.156, "ev": "phase", "name": "prep"}
+{"t": 11.156, "ev": "agent_speech_end", "speech_id": "speech_b908c6e190a6", "interrupted": true, "played_s": 0.0}
+{"t": 11.156, "ev": "interrupt", "speech_id": "speech_b908c6e190a6", "latency_ms": 3609}
+{"t": 11.156, "ev": "agent_speech_end", "speech_id": "speech_8c2f2f064dfd", "interrupted": false, "played_s": 0.0}
+{"t": 11.406, "ev": "user_speech_end"}
