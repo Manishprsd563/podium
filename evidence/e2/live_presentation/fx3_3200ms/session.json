@@ -1,0 +1,23 @@
+{
+  "session_id": "fx3_3200ms",
+  "created_at": "2026-09-08T04:31:21Z",
+  "config": {},
+  "deck": null,
+  "revisions": [
+    {
+      "revision": 1,
+      "scope": "full",
+      "audio": "presentation_r1.wav",
+      "started_at": "2026-09-08T04:31:22Z",
+      "ended_at": null,
+      "transcript": {
+        "text": "",
+        "words": []
+      },
+      "slide_events": [],
+      "metrics": null,
+      "judgment": null,
+      "superseded": false
+    }
+  ]
+}

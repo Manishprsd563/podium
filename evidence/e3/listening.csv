@@ -1,0 +1,13 @@
+clip_id,file,question,answer
+imp_1,evidence\e3\blind\imp_1_A.wav,"Item imp_1: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_1,evidence\e3\blind\imp_1_B.wav,"Item imp_1: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_2,evidence\e3\blind\imp_2_A.wav,"Item imp_2: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_2,evidence\e3\blind\imp_2_B.wav,"Item imp_2: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_3,evidence\e3\blind\imp_3_A.wav,"Item imp_3: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_3,evidence\e3\blind\imp_3_B.wav,"Item imp_3: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_4,evidence\e3\blind\imp_4_A.wav,"Item imp_4: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_4,evidence\e3\blind\imp_4_B.wav,"Item imp_4: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_5,evidence\e3\blind\imp_5_A.wav,"Item imp_5: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_5,evidence\e3\blind\imp_5_B.wav,"Item imp_5: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_6,evidence\e3\blind\imp_6_A.wav,"Item imp_6: listen to clip A and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",
+imp_6,evidence\e3\blind\imp_6_B.wav,"Item imp_6: listen to clip B and its pair (same clip_id, the other letter). Which of the two sounds more confident and clear -- A or B? (write the answer once, on the A row)",

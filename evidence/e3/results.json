@@ -1,0 +1,347 @@
+{
+  "summary": {
+    "render_source": "analysis.render.render_variants",
+    "n_fixtures": 6,
+    "v1_fillers_audible": "6/6",
+    "v2_no_ge400ms_gap": "6/6",
+    "v3_pause_ge400ms_over_v2": "6/6",
+    "markup_never_spoken": "6/6",
+    "gap_threshold_ms": 400,
+    "speech_presence_thresh_db": -25.0
+  },
+  "fixtures": [
+    {
+      "id": "imp_1",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_1_v1_asdelivered.wav",
+        "duration_s": 5.584,
+        "transcript": "so, um, uh, tension is basically each token looking at every other token?",
+        "fillers_found": [
+          "um",
+          "uh",
+          "er",
+          "basically"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_1_v2_cleaned.wav",
+        "duration_s": 3.437,
+        "max_gap_silence_ms": 220,
+        "max_gap_speech_ms": 350,
+        "gaps_speech": [
+          {
+            "at_s": 1.8,
+            "ms": 230
+          },
+          {
+            "at_s": 3.08,
+            "ms": 350
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_1_v3_paced.wav",
+        "duration_s": 4.516,
+        "max_gap_speech_ms": 1230,
+        "gaps_speech": [
+          {
+            "at_s": 1.87,
+            "ms": 1230
+          },
+          {
+            "at_s": 4.13,
+            "ms": 380
+          }
+        ],
+        "pause_margin_over_v2_ms": 880,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    },
+    {
+      "id": "imp_2",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_2_v1_asdelivered.wav",
+        "duration_s": 5.584,
+        "transcript": "the cost here is basically quadratic, you know, in sequence length.",
+        "fillers_found": [
+          "er",
+          "you know",
+          "basically"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_2_v2_cleaned.wav",
+        "duration_s": 2.856,
+        "max_gap_silence_ms": 340,
+        "max_gap_speech_ms": 560,
+        "gaps_speech": [
+          {
+            "at_s": 2.29,
+            "ms": 560
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_2_v3_paced.wav",
+        "duration_s": 3.901,
+        "max_gap_speech_ms": 1150,
+        "gaps_speech": [
+          {
+            "at_s": 0.83,
+            "ms": 1150
+          },
+          {
+            "at_s": 3.32,
+            "ms": 580
+          }
+        ],
+        "pause_margin_over_v2_ms": 590,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    },
+    {
+      "id": "imp_3",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_3_v1_asdelivered.wav",
+        "duration_s": 4.307,
+        "transcript": "so i think, like, the main trade off is speed versus accuracy. right?",
+        "fillers_found": [
+          "er",
+          "like",
+          "right"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_3_v2_cleaned.wav",
+        "duration_s": 2.635,
+        "max_gap_silence_ms": 0,
+        "max_gap_speech_ms": 400,
+        "gaps_speech": [
+          {
+            "at_s": 2.0,
+            "ms": 200
+          },
+          {
+            "at_s": 2.23,
+            "ms": 400
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_3_v3_paced.wav",
+        "duration_s": 3.611,
+        "max_gap_speech_ms": 1190,
+        "gaps_speech": [
+          {
+            "at_s": 0.9,
+            "ms": 1190
+          },
+          {
+            "at_s": 2.99,
+            "ms": 620
+          }
+        ],
+        "pause_margin_over_v2_ms": 790,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    },
+    {
+      "id": "imp_4",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_4_v1_asdelivered.wav",
+        "duration_s": 4.447,
+        "transcript": "this slide is, um, actually about how transformers scale with data.",
+        "fillers_found": [
+          "um",
+          "er",
+          "actually"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_4_v2_cleaned.wav",
+        "duration_s": 2.961,
+        "max_gap_silence_ms": 0,
+        "max_gap_speech_ms": 380,
+        "gaps_speech": [
+          {
+            "at_s": 2.58,
+            "ms": 380
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_4_v3_paced.wav",
+        "duration_s": 3.866,
+        "max_gap_speech_ms": 1070,
+        "gaps_speech": [
+          {
+            "at_s": 0.95,
+            "ms": 1070
+          },
+          {
+            "at_s": 3.47,
+            "ms": 390
+          }
+        ],
+        "pause_margin_over_v2_ms": 690,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    },
+    {
+      "id": "imp_5",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_5_v1_asdelivered.wav",
+        "duration_s": 4.923,
+        "transcript": "and basically, so the takeaway here is that sparsity helps a lot.",
+        "fillers_found": [
+          "er",
+          "basically"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_5_v2_cleaned.wav",
+        "duration_s": 2.589,
+        "max_gap_silence_ms": 210,
+        "max_gap_speech_ms": 290,
+        "gaps_speech": [
+          {
+            "at_s": 2.29,
+            "ms": 290
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_5_v3_paced.wav",
+        "duration_s": 3.646,
+        "max_gap_speech_ms": 1050,
+        "gaps_speech": [
+          {
+            "at_s": 1.02,
+            "ms": 1050
+          },
+          {
+            "at_s": 2.16,
+            "ms": 220
+          },
+          {
+            "at_s": 3.29,
+            "ms": 350
+          }
+        ],
+        "pause_margin_over_v2_ms": 760,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    },
+    {
+      "id": "imp_6",
+      "v1": {
+        "path": "evidence\\e3\\clips\\imp_6_v1_asdelivered.wav",
+        "duration_s": 4.969,
+        "transcript": "okay. so, um, to wrap up, self attention is expensive but powerful.",
+        "fillers_found": [
+          "um",
+          "er"
+        ],
+        "fillers_pass": true
+      },
+      "v2": {
+        "path": "evidence\\e3\\clips\\imp_6_v2_cleaned.wav",
+        "duration_s": 3.495,
+        "max_gap_silence_ms": 210,
+        "max_gap_speech_ms": 380,
+        "gaps_speech": [
+          {
+            "at_s": 0.59,
+            "ms": 320
+          },
+          {
+            "at_s": 2.29,
+            "ms": 220
+          },
+          {
+            "at_s": 3.11,
+            "ms": 380
+          }
+        ],
+        "no_ge400_pass": true
+      },
+      "v3": {
+        "path": "evidence\\e3\\clips\\imp_6_v3_paced.wav",
+        "duration_s": 4.435,
+        "max_gap_speech_ms": 1010,
+        "gaps_speech": [
+          {
+            "at_s": 0.55,
+            "ms": 270
+          },
+          {
+            "at_s": 1.59,
+            "ms": 1010
+          },
+          {
+            "at_s": 2.65,
+            "ms": 200
+          },
+          {
+            "at_s": 3.5,
+            "ms": 210
+          },
+          {
+            "at_s": 3.91,
+            "ms": 520
+          }
+        ],
+        "pause_margin_over_v2_ms": 630,
+        "has_ge400_pass": true
+      },
+      "speech_presence_thresh_db": -25.0,
+      "markup_never_spoken_pass": true
+    }
+  ],
+  "listening_key": {
+    "imp_1": {
+      "A": "v3",
+      "B": "v2"
+    },
+    "imp_2": {
+      "A": "v3",
+      "B": "v2"
+    },
+    "imp_3": {
+      "A": "v2",
+      "B": "v3"
+    },
+    "imp_4": {
+      "A": "v3",
+      "B": "v2"
+    },
+    "imp_5": {
+      "A": "v2",
+      "B": "v3"
+    },
+    "imp_6": {
+      "A": "v3",
+      "B": "v2"
+    }
+  }
+}

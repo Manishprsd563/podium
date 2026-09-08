@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podium</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topbar">
+  <div id="brand">Podium</div>
+  <div id="conn-badge" class="badge muted">connecting&hellip;</div>
+  <div id="mic-badge" class="badge hidden">&#127908; mic live</div>
+  <div id="agent-badge" class="badge hidden">listening</div>
+  <div id="provider-badge" class="badge hidden">&mdash;</div>
+</header>
+
+<div id="error-banner" class="banner hidden" role="alert"></div>
+
+<main>
+
+  <!-- ============ SETUP VIEW ============ -->
+  <section id="view-setup" class="view">
+    <h1>Set up your talk</h1>
+
+    <form id="setup-form" class="panel">
+      <label>
+        Topic
+        <input id="setup-topic" type="text" placeholder="e.g. self-attention" required>
+      </label>
+      <div class="row">
+        <label>
+          Level
+          <select id="setup-level">
+            <option value="beginner">beginner</option>
+            <option value="intermediate" selected>intermediate</option>
+            <option value="advanced">advanced</option>
+          </select>
+        </label>
+        <label>
+          Duration
+          <select id="setup-duration">
+            <option value="60" selected>60 s</option>
+            <option value="90">90 s</option>
+            <option value="120">120 s</option>
+          </select>
+        </label>
+      </div>
+      <button id="setup-generate" type="submit">Generate slides</button>
+    </form>
+
+    <div class="panel">
+      <h2>Or upload a deck</h2>
+      <p class="hint">A PDF export of your slides. Parsed in the browser &mdash; nothing is sent until you confirm.</p>
+      <input id="upload-input" type="file" accept="application/pdf">
+      <div id="upload-status" class="hint"></div>
+      <div id="upload-error" class="error hidden"></div>
+    </div>
+
+    <div id="setup-deck-preview" class="panel hidden">
+      <h2>Deck ready</h2>
+      <div id="deck-preview-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ STAGE VIEW (prep + present) ============ -->
+  <section id="view-stage" class="view hidden">
+
+    <div id="stage-status" class="status-pill">listening</div>
+
+    <div id="stage-prep" class="hidden">
+      <h1>Get ready</h1>
+      <div id="prep-countdown" class="countdown">&mdash;</div>
+      <button id="prep-ready-btn" type="button">I&rsquo;m ready</button>
+    </div>
+
+    <div id="stage-present" class="hidden">
+      <div id="present-timer" class="timer">&mdash;</div>
+      <div id="slide-card" class="slide-card">
+        <div id="slide-title" class="slide-title">&mdash;</div>
+        <ul id="slide-bullets" class="slide-bullets"></ul>
+      </div>
+      <div class="stage-controls">
+        <button id="slide-next-btn" type="button">Next slide <kbd>Space</kbd></button>
+        <button id="present-done-btn" type="button">Done <kbd>Enter</kbd></button>
+      </div>
+      <div id="transcript-strip" class="transcript-strip"></div>
+    </div>
+
+  </section>
+
+  <!-- ============ REPORT VIEW ============ -->
+  <section id="view-report" class="view hidden">
+    <h1>Report</h1>
+
+    <div class="panel" id="scorecard-panel">
+      <h2>Scorecard</h2>
+      <div id="scorecard"></div>
+      <p id="judgment-summary" class="hint"></p>
+    </div>
+
+    <div class="panel" id="metrics-panel">
+      <h2>Metrics</h2>
+      <div id="metrics-grid"></div>
+      <div id="metrics-perslide" class="hint"></div>
+    </div>
+
+    <div class="panel" id="rerecord-panel">
+      <h2>Re-record a slide</h2>
+      <div class="row">
+        <select id="rerecord-slide"></select>
+        <button id="rerecord-btn" type="button">Re-record this slide</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Improvements</h2>
+      <div id="improvement-cards"></div>
+    </div>
+  </section>
+
+<footer id="shortcuts">Space = next slide (while presenting) &middot; Enter = done</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

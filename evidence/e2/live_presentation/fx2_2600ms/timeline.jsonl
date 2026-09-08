@@ -1,0 +1,24 @@
+{"t": 0.515, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.515, "ev": "slide", "slide": 1}
+{"t": 0.515, "ev": "phase", "name": "present"}
+{"t": 0.734, "ev": "user_speech_start"}
+{"t": 2.265, "ev": "user_transcript", "text": "The mechanism that", "final": false}
+{"t": 3.062, "ev": "user_transcript", "text": "The mechanism that solves this is", "final": false}
+{"t": 4.0, "ev": "user_transcript", "text": "The mechanism that solves this is called attention.", "final": false}
+{"t": 4.078, "ev": "user_transcript", "text": "The mechanism that solves this is called attention.", "final": true}
+{"t": 4.234, "ev": "user_speech_end"}
+{"t": 6.781, "ev": "user_speech_start"}
+{"t": 7.343, "ev": "user_transcript", "text": "Each", "final": false}
+{"t": 8.421, "ev": "user_transcript", "text": "Each token computes a", "final": false}
+{"t": 9.5, "ev": "user_transcript", "text": "Each token computes a score against", "final": true}
+{"t": 9.89, "ev": "phase", "name": "analyze"}
+{"t": 9.89, "ev": "agent_speech_start", "speech_id": "speech_9d6b3b2896b0", "text": "Got it, give me a moment.", "kind": "ack"}
+{"t": 9.89, "ev": "no_speech", "revision": 1, "words": 0}
+{"t": 9.89, "ev": "agent_speech_start", "speech_id": "speech_255350667941", "text": "I did not hear your presentation. Check your microphone, then say you're ready and start again.", "kind": "feedback"}
+{"t": 9.89, "ev": "phase", "name": "prep"}
+{"t": 9.921, "ev": "agent_speech_end", "speech_id": "speech_9d6b3b2896b0", "interrupted": true, "played_s": 0.031}
+{"t": 9.921, "ev": "interrupt", "speech_id": "speech_9d6b3b2896b0", "latency_ms": 3140}
+{"t": 9.984, "ev": "agent_speech_end", "speech_id": "speech_255350667941", "interrupted": true, "played_s": 0.094}
+{"t": 9.984, "ev": "interrupt", "speech_id": "speech_255350667941", "latency_ms": 3203}
+{"t": 10.125, "ev": "user_transcript", "text": "every other token.", "final": true}
+{"t": 10.484, "ev": "user_speech_end"}

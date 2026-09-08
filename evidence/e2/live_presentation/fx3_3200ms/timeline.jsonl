@@ -1,0 +1,9 @@
+{"t": 0.578, "ev": "revision", "revision": 1, "scope": "full"}
+{"t": 0.578, "ev": "slide", "slide": 1}
+{"t": 0.578, "ev": "phase", "name": "present"}
+{"t": 0.812, "ev": "user_speech_start"}
+{"t": 2.344, "ev": "user_transcript", "text": "That gives you a rich", "final": false}
+{"t": 3.14, "ev": "user_transcript", "text": "That gives you a rich representation", "final": false}
+{"t": 4.031, "ev": "user_transcript", "text": "That gives you a rich representation, but it has a", "final": false}
+{"t": 4.719, "ev": "user_transcript", "text": "That gives you a rich representation, but it has a cost.", "final": true}
+{"t": 4.89, "ev": "user_speech_end"}

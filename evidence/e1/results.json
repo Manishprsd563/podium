@@ -1,0 +1,228 @@
+[
+  {
+    "model": "mistv3",
+    "speaker": "astra",
+    "fixture": "attention",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 5.4,
+    "B_duration_s": 6.83,
+    "A_gaps": [
+      {
+        "at_s": 1.53,
+        "ms": 370
+      },
+      {
+        "at_s": 3.84,
+        "ms": 410
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 1.5,
+        "ms": 940
+      },
+      {
+        "at_s": 2.45,
+        "ms": 300
+      },
+      {
+        "at_s": 4.76,
+        "ms": 420
+      },
+      {
+        "at_s": 5.53,
+        "ms": 200
+      }
+    ],
+    "A_max_gap_ms": 410,
+    "B_max_gap_ms": 940,
+    "B_transcript": "The key idea is this. Every token looks at every other token. That is attention.",
+    "added_ms": 1430,
+    "error_ms": -70,
+    "within_tolerance": true,
+    "markup_spoken": false
+  },
+  {
+    "model": "mistv3",
+    "speaker": "astra",
+    "fixture": "tradeoff",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 5.77,
+    "B_duration_s": 7.21,
+    "A_gaps": [
+      {
+        "at_s": 1.28,
+        "ms": 250
+      },
+      {
+        "at_s": 3.8,
+        "ms": 540
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 1.28,
+        "ms": 440
+      },
+      {
+        "at_s": 4.81,
+        "ms": 970
+      }
+    ],
+    "A_max_gap_ms": 540,
+    "B_max_gap_ms": 970,
+    "B_transcript": "There is a cost. Attention is quadratic in sequence length. That limits context.",
+    "added_ms": 1440,
+    "error_ms": -60,
+    "within_tolerance": true,
+    "markup_spoken": false
+  },
+  {
+    "model": "mistv3",
+    "speaker": "astra",
+    "fixture": "closing",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 4.62,
+    "B_duration_s": 5.83,
+    "A_gaps": [
+      {
+        "at_s": 1.44,
+        "ms": 270
+      },
+      {
+        "at_s": 2.62,
+        "ms": 240
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 1.34,
+        "ms": 620
+      },
+      {
+        "at_s": 2.11,
+        "ms": 230
+      },
+      {
+        "at_s": 3.26,
+        "ms": 770
+      }
+    ],
+    "A_max_gap_ms": 270,
+    "B_max_gap_ms": 770,
+    "B_transcript": "So that is the mechanism. It is simple. It is also expensive.",
+    "added_ms": 1210,
+    "error_ms": -290,
+    "within_tolerance": true,
+    "markup_spoken": false
+  },
+  {
+    "model": "coda",
+    "speaker": "astra",
+    "fixture": "attention",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 6.0,
+    "B_duration_s": 5.92,
+    "A_gaps": [
+      {
+        "at_s": 1.49,
+        "ms": 450
+      },
+      {
+        "at_s": 4.27,
+        "ms": 440
+      },
+      {
+        "at_s": 4.94,
+        "ms": 230
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 1.05,
+        "ms": 570
+      },
+      {
+        "at_s": 3.41,
+        "ms": 980
+      }
+    ],
+    "A_max_gap_ms": 450,
+    "B_max_gap_ms": 980,
+    "B_transcript": "The key idea is this. Every token looks at every other token. That is attention.",
+    "added_ms": -80,
+    "error_ms": -1580,
+    "within_tolerance": false,
+    "markup_spoken": false
+  },
+  {
+    "model": "coda",
+    "speaker": "astra",
+    "fixture": "tradeoff",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 4.88,
+    "B_duration_s": 6.24,
+    "A_gaps": [
+      {
+        "at_s": 0.89,
+        "ms": 330
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 0.83,
+        "ms": 230
+      },
+      {
+        "at_s": 1.16,
+        "ms": 600
+      },
+      {
+        "at_s": 3.85,
+        "ms": 900
+      }
+    ],
+    "A_max_gap_ms": 330,
+    "B_max_gap_ms": 900,
+    "B_transcript": "There is a cost. Attention is quadratic in sequence length. That limits context.",
+    "added_ms": 1360,
+    "error_ms": -140,
+    "within_tolerance": true,
+    "markup_spoken": false
+  },
+  {
+    "model": "coda",
+    "speaker": "astra",
+    "fixture": "closing",
+    "requested_pause_ms": 1500,
+    "A_duration_s": 4.32,
+    "B_duration_s": 5.28,
+    "A_gaps": [
+      {
+        "at_s": 1.24,
+        "ms": 250
+      },
+      {
+        "at_s": 2.18,
+        "ms": 590
+      }
+    ],
+    "B_gaps": [
+      {
+        "at_s": 1.48,
+        "ms": 760
+      },
+      {
+        "at_s": 2.94,
+        "ms": 560
+      }
+    ],
+    "A_max_gap_ms": 590,
+    "B_max_gap_ms": 760,
+    "B_transcript": "So that is the mechanism. It is simple. It is also expensive.",
+    "added_ms": 960,
+    "error_ms": -540,
+    "within_tolerance": false,
+    "markup_spoken": false
+  }
+]

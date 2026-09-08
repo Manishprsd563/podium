@@ -1,0 +1,41 @@
+[
+  {
+    "id": "imp_1",
+    "quote": "So, um, attention is basically each token looking at every other token.",
+    "v2_text": "Attention means each token looks at every other token.",
+    "v3_markup": "Attention means each token looks <1000> at every other token.",
+    "pauses": [{"after_word": 1, "ms": 800}]
+  },
+  {
+    "id": "imp_2",
+    "quote": "The, uh, cost here is basically quadratic, you know, in sequence length.",
+    "v2_text": "The cost here is quadratic in sequence length.",
+    "v3_markup": "The cost here is <1000> quadratic in sequence length.",
+    "pauses": [{"after_word": 1, "ms": 900}]
+  },
+  {
+    "id": "imp_3",
+    "quote": "So I think, like, the main tradeoff is speed versus accuracy, right.",
+    "v2_text": "The main tradeoff is speed versus accuracy.",
+    "v3_markup": "The main tradeoff is <1000> speed versus accuracy."
+  },
+  {
+    "id": "imp_4",
+    "quote": "This slide is, um, actually about how transformers scale with data.",
+    "v2_text": "This slide is about how transformers scale with data.",
+    "v3_markup": "This slide is about <1000> how transformers scale with data."
+  },
+  {
+    "id": "imp_5",
+    "quote": "And basically, so, the takeaway here is that sparsity helps a lot.",
+    "v2_text": "The takeaway here is that sparsity helps a lot.",
+    "v3_markup": "The takeaway here is <1000> that sparsity helps a lot.",
+    "pauses": [{"after_word": 1, "ms": 750}]
+  },
+  {
+    "id": "imp_6",
+    "quote": "Okay so, um, to wrap up, self attention is expensive but powerful.",
+    "v2_text": "To wrap up, self attention is expensive but powerful.",
+    "v3_markup": "To wrap up, self attention is <1000> expensive but powerful."
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "fx1_2000ms",
+    "path": "evidence\\e2\\fixtures\\fx1_2000ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 2000,
+    "pause_start_s": 2.728,
+    "pause_end_s": 4.728,
+    "total_s": 7.48,
+    "a_text": "Let's start with the core problem in sequence models.",
+    "b_text": "Every token needs a way to relate to distant tokens."
+  },
+  {
+    "id": "fx2_2600ms",
+    "path": "evidence\\e2\\fixtures\\fx2_2600ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 2600,
+    "pause_start_s": 3.123,
+    "pause_end_s": 5.723,
+    "total_s": 8.788,
+    "a_text": "The mechanism that solves this is called attention.",
+    "b_text": "Each token computes a score against every other token."
+  },
+  {
+    "id": "fx3_3200ms",
+    "path": "evidence\\e2\\fixtures\\fx3_3200ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 3200,
+    "pause_start_s": 3.75,
+    "pause_end_s": 6.95,
+    "total_s": 10.062,
+    "a_text": "That gives you a rich representation, but it has a cost.",
+    "b_text": "The cost is quadratic in the length of the sequence."
+  },
+  {
+    "id": "fx4_3800ms",
+    "path": "evidence\\e2\\fixtures\\fx4_3800ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 3800,
+    "pause_start_s": 2.612,
+    "pause_end_s": 6.412,
+    "total_s": 9.884,
+    "a_text": "So for long documents this becomes the bottleneck.",
+    "b_text": "Several methods try to approximate the full attention matrix."
+  },
+  {
+    "id": "fx5_4400ms",
+    "path": "evidence\\e2\\fixtures\\fx5_4400ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 4400,
+    "pause_start_s": 4.644,
+    "pause_end_s": 9.044,
+    "total_s": 11.679,
+    "a_text": "Sparse attention is one option, low rank approximation is another.",
+    "b_text": "Each trades some accuracy for a lot of speed."
+  },
+  {
+    "id": "fx6_5000ms",
+    "path": "evidence\\e2\\fixtures\\fx6_5000ms.wav",
+    "sr": 24000,
+    "pause_ms_requested": 5000,
+    "pause_start_s": 3.123,
+    "pause_end_s": 8.123,
+    "total_s": 10.225,
+    "a_text": "That's the tradeoff at the heart of efficient transformers.",
+    "b_text": "Thanks for listening, that's the whole idea."
+  }
+]

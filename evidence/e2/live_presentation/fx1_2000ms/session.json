@@ -1,0 +1,73 @@
+{
+  "session_id": "fx1_2000ms",
+  "created_at": "2026-09-08T04:30:56Z",
+  "config": {},
+  "deck": null,
+  "revisions": [
+    {
+      "revision": 1,
+      "scope": "full",
+      "audio": "presentation_r1.wav",
+      "started_at": "2026-09-08T04:30:58Z",
+      "ended_at": "2026-09-08T04:31:06Z",
+      "transcript": {
+        "text": "Let's start with the core problem in sequence models. Every token needs a way to relate to distant tokens.",
+        "words": []
+      },
+      "slide_events": [
+        {
+          "slide": 1,
+          "at_s": 0.0
+        }
+      ],
+      "metrics": {
+        "duration_s": 0.0,
+        "words": 0,
+        "wpm": 0.0,
+        "wpm_by_slide": [
+          {
+            "slide": 1,
+            "wpm": 0.0,
+            "seconds": 0.0
+          }
+        ],
+        "fillers": {
+          "count": 0,
+          "items": [],
+          "per_min": 0.0
+        },
+        "crutches": {
+          "count": 0,
+          "items": [],
+          "per_min": 0.0
+        },
+        "pauses": {
+          "count": 0,
+          "longest_s": 0.0,
+          "mean_s": 0.0,
+          "dead_air": [],
+          "rhetorical": []
+        },
+        "loudness": {
+          "mean_dbfs": -100.0,
+          "variance_db": 0.0
+        },
+        "time_budget": {
+          "budget_s": 60,
+          "used_s": 0.0,
+          "over_s": -60.0,
+          "per_slide": [
+            {
+              "slide": 1,
+              "used_s": 0.0,
+              "fair_share_s": 60.0
+            }
+          ]
+        },
+        "low_confidence_terms": []
+      },
+      "judgment": null,
+      "superseded": false
+    }
+  ]
+}
