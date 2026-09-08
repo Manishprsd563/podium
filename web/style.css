@@ -105,7 +105,7 @@ kbd {
 
 .astra-bubble {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.8em;
   padding: 0.7em 1.2em;
   background: var(--bg-panel);
@@ -113,17 +113,9 @@ kbd {
 }
 .astra-indicator {
   flex: none;
-  width: 12px;
-  height: 12px;
-  margin-top: 0.35em;
-  border-radius: 50%;
-  background: var(--listening);
-  box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.15);
-  transition: all 0.15s ease;
-}
-.astra-indicator.speaking {
-  background: var(--speaking);
-  box-shadow: 0 0 0 4px rgba(242, 184, 75, 0.18);
+  width: 44px;
+  height: 44px;
+  display: block;
 }
 .astra-lines { flex: 1; min-width: 0; }
 .astra-line {
@@ -154,6 +146,63 @@ kbd {
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
+
+/* ---------- Start gate ---------- */
+
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 42%, var(--bg-raised) 0%, var(--bg) 68%);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+.gate.closing { opacity: 0; pointer-events: none; }
+.gate.hidden { display: none; }
+
+.gate-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7em;
+  text-align: center;
+  padding: 2em;
+}
+.gate-orb-canvas { width: 220px; height: 220px; }
+.gate-title {
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin: 0.3em 0 0;
+}
+.gate-status {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  min-height: 1.3em;
+  margin: 0 0 0.5em;
+}
+#gate-start-btn { min-width: 210px; }
+
+.unmute-pill {
+  position: fixed;
+  bottom: 1.4em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.55em 1.1em;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+.unmute-pill.hidden { display: none; }
 
 main { max-width: 880px; margin: 0 auto; padding: 1.4em 1.2em 4em; }
 body.wide-view main { max-width: 1160px; }

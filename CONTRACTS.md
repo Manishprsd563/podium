@@ -166,6 +166,8 @@ Client → agent:
 ```jsonc
 {"type":"setup","topic":"self-attention","level":"intermediate","budget_s":60}
 {"type":"deck_upload","slides":[{"index":1,"title":"...","bullets":["..."]}]}
+{"type":"client_ready"}     // sent from the start button's click handler once room.startAudio() succeeded;
+                            // the agent holds the greeting until it arrives (120 s fallback)
 {"type":"ready"}            // prep finished, start presenting
 {"type":"slide_next"}
 {"type":"present_end"}

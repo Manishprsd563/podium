@@ -1,5 +1,6 @@
 // Podium web client. No build step: plain ES module, deps from CDN.
-import { Room, RoomEvent } from "https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.esm.mjs";
+import { Room, RoomEvent, Track } from "https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.esm.mjs";
+import { createOrb } from "./orb.js";
 const PDFJS_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs";
 const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
 // A fresh room per page load: an agent job is dispatched per room, and a job's
@@ -31,6 +32,12 @@ const state = {
   coachHistory: {}, // improvement_id -> [{attempt, verdict}]
   countdownValue: null,
   countdownTimer: null,
+  gateOpen: true,
+  agentPresent: false,
+  audioCtx: null,
+  analysers: {}, // agent|user -> {analyser, data}
+  orbGate: null,
+  orbBubble: null,
 };
 const el = {};
 function q(id) { return document.getElementById(id); }
@@ -44,6 +51,7 @@ function cacheEls() {
   [
     "conn-badge", "mic-badge", "agent-badge", "provider-badge", "error-banner",
     "astra-indicator", "astra-line", "user-line",
+    "gate", "gate-orb", "gate-status", "gate-start-btn", "unmute-pill",
     "view-setup", "view-stage", "view-coach", "view-report",
     "setup-form", "setup-topic", "setup-level", "setup-duration",
     "upload-input", "upload-status", "upload-error",
@@ -79,27 +87,20 @@ async function connect() {
   } catch (err) {
     setConnBadge("offline", "muted");
     showError(`Could not connect: ${err.message || err}`);
+    renderGate();
     return;
   }
   state.room = room;
   state.connected = true;
   setConnBadge("connected", "on");
+  // A remote participant already in the room when we attach listeners won't
+  // fire ParticipantConnected retroactively, so check directly.
+  if (room.remoteParticipants && room.remoteParticipants.size > 0) markAgentPresent();
   render();
-  try {
-    // Podium measures the presenter's loudness variance as a delivery metric, so
-    // browser auto-gain and noise suppression must stay off: they flatten exactly
-    // the dynamics we score, and they attenuate steady speech by ~25 dB. Echo
-    // cancellation stays on because the coach speaks the timer cue mid-talk.
-    await room.localParticipant.setMicrophoneEnabled(true, {
-      autoGainControl: false,
-      noiseSuppression: false,
-      echoCancellation: true,
-    });
-    state.micEnabled = true;
-  } catch (err) {
-    showError(`Connected, but microphone access failed: ${err.message || err}. Grant mic permission and reload to present.`);
-  }
-  render();
+  renderGate();
+  // Microphone enablement now waits for the gate's start button: it is the
+  // same user gesture that unlocks audio playback (room.startAudio()), and
+  // both must happen together or the coach can't be heard, or heard back.
 }
 function wireRoom(room, identity) {
   room.registerTextStreamHandler("lk.transcription", async (reader, participantInfo) => {
@@ -130,6 +131,24 @@ function wireRoom(room, identity) {
     state.localSpeaking = speakers.some((p) => p.identity === identity);
     render();
   });
+  room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
+    if (track.kind === Track.Kind.Audio && participant.identity !== identity) {
+      // livekit-client does not auto-play subscribed audio: without attach()
+      // the coach is silent in every browser, gesture or not. The element is
+      // what room.startAudio() unblocks, and Chrome only feeds a remote track
+      // into Web Audio while a media element is playing it.
+      const audioEl = track.attach();
+      audioEl.id = "coach-audio";
+      audioEl.setAttribute("aria-hidden", "true");
+      document.body.appendChild(audioEl);
+      attachAnalyser(track.mediaStreamTrack, "agent");
+    }
+  });
+  room.on(RoomEvent.TrackUnsubscribed, (track) => {
+    if (track.kind === Track.Kind.Audio) track.detach().forEach((el) => el.remove());
+  });
+  room.on(RoomEvent.ParticipantConnected, () => markAgentPresent());
+  room.on(RoomEvent.AudioPlaybackStatusChanged, () => updateUnmutePill());
   room.on(RoomEvent.Disconnected, () => {
     state.connected = false;
     setConnBadge("disconnected", "muted");
@@ -155,6 +174,131 @@ function upsertTranscriptLine(segId, speaker, text, isFinal) {
   } else {
     state.lastUserLine = { text, final: isFinal };
   }
+}
+
+// ------------------------------------------------------------- start gate
+// Chrome blocks remote audio until the page has had a user gesture. The gate
+// holds the greeting-less UI until the start button click both unlocks audio
+// playback and enables the mic, then tells the agent it's safe to speak.
+function markAgentPresent() {
+  if (state.agentPresent) return;
+  state.agentPresent = true;
+  renderGate();
+}
+function renderGate() {
+  if (!el.gate) return;
+  const ready = state.connected && state.agentPresent;
+  el.gateStatus.textContent = ready ? "Your coach is ready" : "Connecting your coach\u2026";
+  if (state.gateOpen) el.gateStartBtn.disabled = !ready;
+  if (state.orbGate) state.orbGate.setState(ready ? "listening" : "connecting");
+}
+function closeGate() {
+  state.gateOpen = false;
+  el.gate.classList.add("closing");
+  setTimeout(() => el.gate.classList.add("hidden"), 420);
+  updateUnmutePill();
+}
+function updateUnmutePill() {
+  if (!el.unmutePill) return;
+  if (!state.room || state.gateOpen) {
+    el.unmutePill.classList.add("hidden");
+    return;
+  }
+  el.unmutePill.classList.toggle("hidden", !!state.room.canPlaybackAudio);
+}
+async function startSession() {
+  el.gateStartBtn.disabled = true;
+  el.gateStatus.textContent = "Starting your coach\u2026";
+  try {
+    await state.room.startAudio();
+  } catch (err) {
+    el.gateStatus.textContent = "Tap Start session to enable audio.";
+    el.gateStartBtn.disabled = false;
+    return;
+  }
+  if (!state.room.canPlaybackAudio) {
+    el.gateStatus.textContent = "Tap Start session to enable audio.";
+    el.gateStartBtn.disabled = false;
+    return;
+  }
+  ensureAudioContext();
+  try {
+    // Same constraints as before: load-bearing for the loudness metric.
+    await state.room.localParticipant.setMicrophoneEnabled(true, {
+      autoGainControl: false,
+      noiseSuppression: false,
+      echoCancellation: true,
+    });
+    state.micEnabled = true;
+    attachLocalMicAnalyser();
+  } catch (err) {
+    showError(`Connected, but microphone access failed: ${err.message || err}. Grant mic permission and reload to present.`);
+  }
+  sendMessage({ type: "client_ready" });
+  closeGate();
+  render();
+}
+
+// ---------------------------------------------------------------- audio levels
+function ensureAudioContext() {
+  if (!state.audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    state.audioCtx = new Ctx();
+  }
+  if (state.audioCtx.state === "suspended") state.audioCtx.resume();
+  return state.audioCtx;
+}
+function attachAnalyser(mediaStreamTrack, key) {
+  if (!mediaStreamTrack) return;
+  const ctx = ensureAudioContext();
+  const stream = new MediaStream([mediaStreamTrack]);
+  const source = ctx.createMediaStreamSource(stream);
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  // Analysis only: never routed to ctx.destination, so no double audio.
+  source.connect(analyser);
+  state.analysers[key] = { analyser, data: new Uint8Array(analyser.frequencyBinCount) };
+}
+function attachLocalMicAnalyser() {
+  const pub = state.room && state.room.localParticipant.getTrackPublication(Track.Source.Microphone);
+  const track = pub && pub.track;
+  if (track && track.mediaStreamTrack) attachAnalyser(track.mediaStreamTrack, "user");
+}
+function sampleLevel(entry) {
+  if (!entry) return 0;
+  const { analyser, data } = entry;
+  analyser.getByteTimeDomainData(data);
+  let sumSquares = 0;
+  for (let i = 0; i < data.length; i++) {
+    const v = (data[i] - 128) / 128;
+    sumSquares += v * v;
+  }
+  return Math.min(1, Math.sqrt(sumSquares / data.length) * 4);
+}
+const SPEAK_THRESHOLD = 0.06;
+const smoothedLevels = { agent: 0, user: 0 };
+function levelLoop() {
+  smoothedLevels.agent += (sampleLevel(state.analysers.agent) - smoothedLevels.agent) * 0.3;
+  smoothedLevels.user += (sampleLevel(state.analysers.user) - smoothedLevels.user) * 0.3;
+  let orbState;
+  if (state.gateOpen) {
+    orbState = state.connected && state.agentPresent ? "listening" : "connecting";
+  } else if (!state.connected) {
+    orbState = "connecting";
+  } else {
+    const agentActive = smoothedLevels.agent > SPEAK_THRESHOLD || state.agentSpeaking;
+    const userActive = !agentActive && (smoothedLevels.user > SPEAK_THRESHOLD || state.localSpeaking);
+    orbState = agentActive ? "speaking" : userActive ? "user" : "listening";
+  }
+  if (state.orbGate) {
+    state.orbGate.setState(orbState);
+    state.orbGate.setLevels(smoothedLevels);
+  }
+  if (state.orbBubble) {
+    state.orbBubble.setState(orbState);
+    state.orbBubble.setLevels(smoothedLevels);
+  }
+  requestAnimationFrame(levelLoop);
 }
 
 // ---------------------------------------------------------- message router
@@ -212,6 +356,7 @@ function handleMessage(msg) {
       break;
     case "provider":
       state.provider = { name: msg.name, model: msg.model, speaker: msg.speaker };
+      markAgentPresent();
       break;
     case "error":
       showError(msg.message || "Unknown agent error");
@@ -290,8 +435,6 @@ function renderAstraBubble() {
     el.astraLine.textContent = stripPauseMarkup(agent.text);
     el.astraLine.classList.toggle("partial", !agent.final);
   }
-  el.astraIndicator.classList.toggle("speaking", state.agentSpeaking);
-  el.astraIndicator.classList.toggle("listening", !state.agentSpeaking);
   const user = state.lastUserLine;
   el.userLine.classList.toggle("hidden", !user);
   if (user) {
@@ -709,6 +852,15 @@ function wireEvents() {
   el.presentDoneBtn.addEventListener("click", () => sendMessage({ type: "present_end" }));
   el.rerecordBtn.addEventListener("click", () => sendMessage({ type: "rerecord", slide: Number(el.rerecordSlide.value) }));
   el.newTalkBtn.addEventListener("click", () => location.reload());
+  el.gateStartBtn.addEventListener("click", () => startSession());
+  el.unmutePill.addEventListener("click", async () => {
+    try {
+      await state.room.startAudio();
+    } catch (err) {
+      // Leave the pill up; the user can try again.
+    }
+    updateUnmutePill();
+  });
   window.addEventListener("keydown", (e) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
@@ -724,10 +876,13 @@ function wireEvents() {
 }
 function init() {
   cacheEls();
+  state.orbGate = createOrb(el.gateOrb);
+  state.orbBubble = createOrb(el.astraIndicator);
   wireEvents();
   render();
   connect();
+  requestAnimationFrame(levelLoop);
   // Test/debug hook: lets an external driver call the router directly.
-  window.podiumDebug = { state, handleMessage, render };
+  window.podiumDebug = { state, handleMessage, render, levels: smoothedLevels };
 }
 init();

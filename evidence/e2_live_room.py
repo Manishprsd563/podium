@@ -643,6 +643,7 @@ async def run_session(room: rtc.Room, agent_participant: rtc.RemoteParticipant,
     mic = PresenterMic(audio_source)
 
     # -- setup -> prep -----------------------------------------------------------
+    await send_msg({"type": "client_ready"})  # what the browser's start button sends (CONTRACTS §5)
     await send_msg({"type": "setup", "topic": topic, "level": "intermediate", "budget_s": BUDGET_S})
     idx = await wait_for_phase(data_messages, "prep", 0, 20.0)
     print("phase=prep (deck generated)")

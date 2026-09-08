@@ -7,6 +7,16 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="gate" class="gate">
+  <div class="gate-inner">
+    <canvas id="gate-orb" class="gate-orb-canvas"></canvas>
+    <h1 class="gate-title">Podium</h1>
+    <p id="gate-status" class="gate-status">Connecting your coach&hellip;</p>
+    <button id="gate-start-btn" type="button" disabled>Start session</button>
+  </div>
+</div>
+<div id="unmute-pill" class="unmute-pill hidden" role="button" tabindex="0">Tap to unmute your coach</div>
+
 <header id="topbar">
   <div id="brand">Podium</div>
   <div id="conn-badge" class="badge muted">connecting&hellip;</div>
@@ -18,7 +28,7 @@
 <div id="error-banner" class="banner hidden" role="alert"></div>
 
 <div id="astra-bubble" class="astra-bubble">
-  <div id="astra-indicator" class="astra-indicator listening"></div>
+  <canvas id="astra-indicator" class="astra-indicator"></canvas>
   <div class="astra-lines">
     <div id="astra-line" class="astra-line">Your coach is connecting&hellip;</div>
     <div id="user-line" class="user-line hidden"></div>

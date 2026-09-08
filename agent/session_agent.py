@@ -77,6 +77,9 @@ MIN_WORDS_TO_JUDGE = 12
 PRACTICE_WAIT_S = 25.0
 ASK_PROCEED_WAIT_S = 20.0
 MAX_NUDGES_PER_WAIT = 2
+# How long start() waits for the client's start-button gesture before greeting
+# anyway (a headless harness never sends client_ready).
+CLIENT_READY_FALLBACK_S = 120.0
 
 COACH_INSTRUCTIONS = (
     f"You are {AGENT_NAME}, a warm, upbeat presentation coach who talks like a sharp friend "
@@ -393,6 +396,7 @@ class PodiumOrchestrator:
 
         # -- voice-first conversation state --------------------------------
         self._audio_subscribed = asyncio.Event()
+        self._client_ready = asyncio.Event()
         self._offered: list[str] = []
         self._intent_future: asyncio.Future[str] | None = None
         self._expect: str | None = None  # "proceed" | "menu" | "drill" | None
@@ -470,13 +474,22 @@ class PodiumOrchestrator:
         self.store.log("provider", name="rime", model=RIME_MODEL, speaker=RIME_SPEAKER)
         self.send({"type": "provider", "name": "rime", "model": RIME_MODEL, "speaker": RIME_SPEAKER})
 
+        self._set_phase("setup")
         if self.ctx is not None:
+            # Browsers block remote audio until the page has had a user gesture,
+            # so the client sends client_ready from its start button; greeting
+            # before that would be spoken into a muted tab. A headless harness
+            # that never sends it still gets greeted after the fallback.
+            try:
+                await asyncio.wait_for(self._client_ready.wait(), timeout=CLIENT_READY_FALLBACK_S)
+            except asyncio.TimeoutError:
+                self.store.log("client_ready_timeout")
             try:
                 await asyncio.wait_for(self._audio_subscribed.wait(), timeout=3.0)
             except asyncio.TimeoutError:
                 pass
-
-        self._set_phase("setup")
+        if self.phase != "setup":
+            return  # a client (or harness) already moved on without the greeting
         self._send_coach("greeting")
         self._say(GREETING_TEXT, kind="ack")
 
@@ -521,6 +534,8 @@ class PodiumOrchestrator:
                 await self._handle_rerecord(msg)
             elif t == "command":
                 await self._handle_command(str(msg.get("name", "")))
+            elif t == "client_ready":
+                self._client_ready.set()
             else:
                 log.info("ignoring client msg type=%s in phase=%s", t, self.phase)
         except Exception:
