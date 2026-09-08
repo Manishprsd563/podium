@@ -293,9 +293,14 @@ class PodiumOrchestrator:
 
     async def _publish(self, msg: dict[str, Any]) -> None:
         assert self.ctx is not None
-        await self.ctx.room.local_participant.publish_data(
-            json.dumps(msg).encode("utf-8"), reliable=True, topic="podium"
-        )
+        try:
+            await self.ctx.room.local_participant.publish_data(
+                json.dumps(msg).encode("utf-8"), reliable=True, topic="podium"
+            )
+        except Exception as exc:
+            # The presenter can close the tab mid-session; a dead engine must not
+            # surface as an unhandled task exception on every queued message.
+            log.debug("dropping %s message, room unavailable: %s", msg.get("type"), exc)
 
     def on_client(self, msg: dict[str, Any]) -> None:
         """The real dispatcher for every client->agent message (CONTRACTS §5). Plain,
