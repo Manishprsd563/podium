@@ -609,18 +609,25 @@ def find_message(data_messages: list[tuple[float, dict]], mtype: str, since_idx:
 def infer_item_id(text: str, kind: str, judgment: dict) -> str | None:
     """Best-effort post-hoc mapping from a logged agent_speech_start's (truncated
     to 200 chars by Store.log's caller) text back to the improvement id it belongs
-    to, using the real judgment payload captured from the data channel."""
+    to, using the real judgment payload captured from the data channel.
+
+    v2's intro line is "Improvement <i> of <n> -- <skill title> on slide <s>:
+    <issue>" (skill title and slide varying with the judgment), so the "feedback"
+    match is a substring-of-issue check rather than an exact fixed announce
+    string. v2's trio also opens with a "v0" clip (the user's own recording,
+    text == the verbatim quote) before v2/v3, so "quote" joins the matched keys."""
     if not judgment:
         return None
     for imp in judgment.get("improvements", []):
-        announce = f"Here's one thing to work on: {imp['issue']}"[:200]
-        if kind == "feedback" and text == announce:
+        issue = imp.get("issue", "")
+        if kind == "feedback" and issue and issue in text:
             return imp["id"]
         if kind == "clip":
-            for key in ("v2_text", "v3_markup"):
-                stripped = " ".join(imp.get(key, "").replace("<", " ").replace(">", " ").split())
-                candidate = " ".join("".join(c for c in imp.get(key, "") if not c.isdigit() or c not in "<>").split())
-                if text and (text in imp.get(key, "") or text in stripped):
+            for key in ("quote", "v2_text", "v3_markup"):
+                raw = imp.get(key, "")
+                stripped = " ".join(raw.replace("<", " ").replace(">", " ").split())
+                candidate = " ".join("".join(c for c in raw if not c.isdigit() or c not in "<>").split())
+                if text and (text in raw or text in stripped):
                     return imp["id"]
     return None
 

@@ -13,40 +13,53 @@ in [`CONTRACTS.md`](CONTRACTS.md).
 
 ## What it does
 
-Podium is voice-first: the coach, **Summit** (named after the Rime speaker in use), talks you through the
-whole session, and every button on screen has a spoken equivalent.
+Podium is voice-first: the coach, **Thunder** (named after the Rime speaker in use), talks
+you through the whole session, and every button on screen has a spoken equivalent.
 
-1. **Welcome** — on connect Summit introduces himself and offers two ways in: say or type a
-   topic ("a 90-second talk on DNS for beginners") and the LLM generates a slide deck, or
-   upload a PDF (exported from your slides; PPTX is not supported, see Limitations).
-2. **Prep** — Summit acknowledges the topic with one specific detail about it, then a 60 s
-   countdown; say "ready" or press *Begin now* to skip it.
+1. **Welcome** — press *Start session* (browsers need a gesture before they play audio);
+   Thunder introduces himself and offers two ways in: say or type a topic ("a 90-second
+   talk on DNS for beginners") and the LLM generates a slide deck, or upload a PDF
+   (exported from your slides; PPTX is not supported, see Limitations).
+2. **Prep** — Thunder acknowledges the topic with one specific detail about it, then a
+   60 s countdown; say "ready" or press *Begin now* to skip it.
 3. **Three, two, one, go** — counted aloud with Rime `<NNN>` pause markup, mirrored by an
    on-screen overlay.
-4. **Present** — you talk through the slides; the agent listens without interrupting your
-   thinking pauses (the presentation-mode turn policy, see below), speaks a T−30 s cue over
-   you without taking your turn, and advances slides on your voice or a keypress.
-5. **Analyze** — code (not the LLM) computes pace, filler rate, pause taxonomy, loudness
-   variance and time budget from the audio and transcript; the judge LLM scores four rubric
-   categories against `skills/judge/*.md` and picks up to 3 concrete improvements.
-6. **Coach, as a conversation** — the dashboard appears while Summit summarises the numbers
-   in his own words and asks whether to work through the improvements. Each one is a short
-   exchange: he names the issue, plays the as-delivered line (V1), the cleaned line (V2),
-   then the cleaned line with a deliberate pause before the key phrase (V3) — same Rime
-   model and speaker throughout — and asks you to say it yourself. Your take is recorded,
-   `analysis/practice.py` computes fillers before→after, whether the pause landed, and pace,
-   and Summit phrases the verdict as a friend would. Buttons and voice both accept *what I
-   said / cleaner / with pauses / another opening / again / slower / why / my turn / next /
-   skip / finish*.
-7. **Drill** — low-confidence terms get a short recogniser-focused follow-up.
-8. **Report** — metrics, judgment, clip playback including your practice takes, re-record.
+4. **Present** — you talk through the slides with a live clock (overtime turns amber); the
+   agent listens without interrupting your thinking pauses (the presentation-mode turn
+   policy, see below), speaks a T−30 s cue over you without taking your turn, and advances
+   slides on your voice or a keypress.
+5. **Analyze** — the recording is re-transcribed once through Deepgram's REST endpoint for
+   real per-word confidence; code (not the LLM) computes pace, filler rate, pause taxonomy,
+   loudness variance, time budget and an **intelligibility** score; the judge LLM scores
+   five rubric categories against `skills/judge/*.md`, tags each of up to 3 improvements
+   with the curriculum skill it trains (`skills/curriculum/`), and every quote's time span
+   is derived by code from the transcript words.
+6. **Coach, as a conversation** — the dashboard appears while Thunder summarises the numbers
+   in his own words and asks whether to work through the improvements. Each one is
+   signposted ("Improvement 2 of 3 — pausing, slide 2") and cued on screen: he plays
+   **your own recording** of the sentence (V0), then the cleaned line (V2), then the cleaned
+   line with a deliberate pause before the key phrase (V3) — the last two in the same Rime
+   voice — and asks you to say it yourself. Your take is recorded, `analysis/practice.py`
+   computes fillers before→after, whether the pause landed, and pace, and Thunder phrases
+   the verdict. If you interrupt him with a question he answers it and resumes at the step
+   he was on, not from the top. Buttons and voice both accept *what I said / cleaner /
+   with pauses / another opening / again / slower / why / my turn / next / skip / finish*.
+7. **Drill** — up to three words a recogniser was unsure of: you hear your own take, then
+   the coach's, say it again, and the confidence is re-measured. This is intelligibility,
+   never an accent judgement.
+8. **Report** — metrics, judgment, clip playback including your recording slices and
+   practice takes, re-record, and *Your path*: the Novice → Speaker → Presenter → Keynote →
+   TEDx-ready ladder with per-skill mastery, tracked across sessions per browser.
 
-Summit keeps the tone of a friend in your corner: if you go quiet he checks in with a light
-line rather than a timeout, and an off-topic question gets one playful sentence and a steer
-back. Every number he speaks comes from code — the coach LLM only phrases facts it is
-handed. You can interrupt him at any point or re-record a slide; a revision fence guarantees
-a stale judgment from a superseded recording is never spoken (see `RIME_EVIDENCE.md`
-claim 4).
+The coach keeps its thread through a `SessionGraph` (`agent/graph.py`): a timestamped
+in-process graph of slides, improvements, clips, attempts, verdicts and your remarks. The
+LLM's steering context and the on-screen cues come from the same structure, and a `recap`
+tool answers "what have we done so far". Thunder keeps the tone of an energetic friend in
+your corner: if you go quiet he checks in with a light line rather than a timeout, and an
+off-topic question gets one playful sentence and a steer back. Every number he speaks
+comes from code — the coach LLM only phrases facts it is handed. You can interrupt him at
+any point or re-record a slide; a revision fence guarantees a stale judgment from a
+superseded recording is never spoken (see `RIME_EVIDENCE.md` claim 4).
 
 ## Third-party services and exact configuration
 
@@ -55,9 +68,10 @@ Every value below is read from `agent/session_agent.py`, `analysis/render.py`, a
 
 | Service | Role | Model / config |
 |---|---|---|
-| **Rime** — live coach speech | TTS, streaming | Model `mistv3`, speaker `summit` (flagship male voice, catalog description "friendly, professional American male voice, warm and polished"), `lang=eng`, **WebSocket `/ws3`**, `sample_rate=24000` (24 kHz), `pause_between_brackets=true`. LiveKit `rime.TTS` plugin, `use_websocket=True`. The E1/E3 evidence clips were measured on speaker `astra` before the coach was given a male voice; pause markup is a Mist v3 model property, and a spot check on `summit` added +929 ms for a requested `<700>` (same line rendered in the four candidate voices under `evidence/voices/`), so the claims carry over. |
-| **Rime** — offline contrastive clips (V1/V2/V3) | TTS, one-shot | Same model/speaker/lang, **REST `POST https://users.rime.ai/v1/rime-tts`**, `Accept: audio/wav`, `samplingRate=24000`, `pauseBetweenBrackets=true`. Used by `analysis/render.py` and the evidence scripts, never by the live agent. |
-| **Deepgram** | STT | Model `nova-3`, `language=en`, `filler_words=true`, `punctuate=true`, `sample_rate=24000`. `filler_words=true` is load-bearing: a Whisper-class recognizer strips "um"/"uh" and blinds the core filler metric (GATE0.md). |
+| **Rime** — live coach speech | TTS, streaming | Model `mistv3`, speaker `thunder` (flagship, catalog description "a high-energy American male voice, bright and lively"), `lang=eng`, **WebSocket `/ws3`**, `sample_rate=24000` (24 kHz), `pause_between_brackets=true`. LiveKit `rime.TTS` plugin, `use_websocket=True`. The E1/E3 evidence clips were measured on speaker `astra`; pause markup is a Mist v3 model property, and spot checks on the candidate voices (`evidence/voices/`) added +534 ms (`thunder`), +685/+929 ms (`summit`), +395 ms (`wolf`), +697 ms (`hawk`), +755 ms (`bayou`) for a requested `<700>`, so the claims carry over. |
+| **Rime** — offline contrastive clips (V2/V3, and V1 as a fallback) | TTS, one-shot | Same model/speaker/lang, **REST `POST https://users.rime.ai/v1/rime-tts`**, `Accept: audio/wav`, `samplingRate=24000`, `pauseBetweenBrackets=true`. Used by `analysis/render.py` and the evidence scripts, never by the live agent. V0 is not Rime at all: it is a slice of the presenter's own recording (`analysis/slice.py`). |
+| **Deepgram** — live | STT, streaming | Model `nova-3`, `language=en`, `filler_words=true`, `punctuate=true`, `sample_rate=24000`. `filler_words=true` is load-bearing: a Whisper-class recognizer strips "um"/"uh" and blinds the core filler metric (GATE0.md). |
+| **Deepgram** — after each rehearsal | STT, one-shot | `POST https://api.deepgram.com/v1/listen?model=nova-3&language=en&filler_words=true&punctuate=true` on the recorded WAV, same key: the only path that returns **per-word confidence**, which feeds the intelligibility score and the drill. Falls back to the stream's segment confidence if the call fails (`metrics.pronunciation.source`). |
 | **LiveKit Inference — coach LLM** | Fast conversational turns | `google/gemma-4-31b-it` |
 | **LiveKit Inference — judge LLM** | Strict-JSON scorecard | `openai/gpt-5.4-mini` |
 | **LiveKit Cloud** | WebRTC transport, room, turn detection primitives, barge-in | Region **India South** |
@@ -83,14 +97,14 @@ flowchart LR
     STT[Deepgram nova-3]
     LLM1[LiveKit Inference\ncoach: gemma-4-31b-it]
     LLM2[LiveKit Inference\njudge: gpt-5.4-mini]
-    TTS_WS[Rime mistv3/summit\nWebSocket /ws3, live speech]
+    TTS_WS[Rime mistv3/thunder\nWebSocket /ws3, live speech]
   end
   subgraph Analysis[analysis/*, pure, no LiveKit]
     Metrics[metrics.py]
     Judge[judge.py + skills/judge/*.md]
     Render[render.py\nV1/V2/V3 clips]
   end
-  TTS_REST[Rime mistv3/summit\nREST /v1/rime-tts, offline clips]
+  TTS_REST[Rime mistv3/thunder\nREST /v1/rime-tts, offline clips]
 
   UI <-- WebRTC audio + data channel --> Room
   Room <-- WebRTC --> Orch
@@ -147,9 +161,9 @@ the plugin wiring; it also supports `console` mode for a room-free local mic/spe
 The active speech provider is never silently swapped or hidden:
 - The browser UI shows a persistent **provider badge** (`#provider-badge` in `web/index.html`,
   populated by the `"provider"` data-channel message in `web/app.js`) reading
-  `rime · mistv3 · summit` for the whole session.
+  `rime · mistv3 · thunder` for the whole session.
 - Every session's `timeline.jsonl` (`CONTRACTS.md` §4) logs a `provider` event
-  (`{"ev":"provider","name":"rime","model":"mistv3","speaker":"summit"}`) once at session start,
+  (`{"ev":"provider","name":"rime","model":"mistv3","speaker":"thunder"}`) once at session start,
   and `session.json`'s `config` block (`CONTRACTS.md` §1) records the same values plus the STT
   and LLM model IDs actually in use for that session.
 
@@ -174,8 +188,8 @@ The active speech provider is never silently swapped or hidden:
 - **Interruption stop latency currently misses its target.** Interrupting the coach's spoken
   feedback fires correctly (`session.interrupt()`, no stale judgments spoken, no duplicate
   "heard" marks — measured through a real LiveKit room in `evidence/e2_live_room.py`), but the
-  measured P95 stop latency is **666–744 ms across four tuned runs** (1417 ms before
-  retuning) against a ≤300 ms target. See `RIME_EVIDENCE.md` claim 4, Part C, for the full
+  measured P95 stop latency ranges **666–1400 ms across five tuned runs** (1417 ms before
+  retuning; P50 595–682 ms) against a ≤300 ms target. See `RIME_EVIDENCE.md` claim 4, Part C, for the full
   before/after numbers and why the measurement itself carries a caveat (barge-in retry
   cascades inflate a few outlier trials).
 

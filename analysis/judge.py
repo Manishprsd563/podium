@@ -9,27 +9,68 @@ import json
 import re
 from pathlib import Path
 
+from .metrics import _deck_terms
+from .pronunciation import pick_drill_words
+from .slice import span_for_quote
+
 SKILLS_DIR = Path(__file__).resolve().parent.parent / "skills" / "judge"
 RUBRIC_FILES = ["delivery.md", "clarity.md", "structure.md", "slide-connection.md", "pronunciation.md", "feedback-style.md"]
+
+CURRICULUM_DIR = Path(__file__).resolve().parent.parent / "skills" / "curriculum"
+# CONTRACTS.md §9 fixed ladder, used until skills/curriculum/*.md files exist.
+FIXED_SKILL_IDS = [
+    "hook", "structure", "pacing", "pausing", "fillers", "vocal-variety",
+    "storytelling", "slide-connection", "closing", "articulation",
+]
+# CONTRACTS.md §3: fallback skill per rubric_ref category when the LLM's
+# `skill` isn't one of the valid curriculum ids.
+_SKILL_FALLBACK_BY_CATEGORY = {
+    "delivery": "pacing",
+    "clarity": "articulation",
+    "structure": "structure",
+    "slide-connection": "slide-connection",
+    "pronunciation": "articulation",
+}
 
 _RUBRIC_CACHE: dict[str, str] = {}
 
 _VALID_PAUSE = re.compile(r"<\d+>")
 _ANY_TAG = re.compile(r"<[^>]*>")
 
-SCHEMA_INSTRUCTIONS = (
-    "Return exactly this JSON shape and nothing else:\n"
-    '{"scores":{"delivery":1-5,"clarity":1-5,"structure":1-5,"slide_connection":1-5},'
-    '"summary":"one or two spoken sentences, under 40 words",'
-    '"improvements":[{"quote":"verbatim span copied from TRANSCRIPT",'
-    '"span":{"start":0.0,"end":0.0},"issue":"one spoken sentence naming the problem",'
-    '"rubric_ref":"file.md#anchor","v2_text":"cleaned wording, <=25 words",'
-    '"v3_markup":"same point with <NNN> pause markup, at most 3 markers",'
-    '"alternative":"a different way to open the same idea"}],'
-    '"terms_to_drill":["term", ...]}\n'
-    "Exactly 3 improvements. Every quote MUST be copied verbatim, "
-    "character-for-character, from TRANSCRIPT -- never paraphrase it."
-)
+
+def _skill_ids() -> list[str]:
+    if CURRICULUM_DIR.is_dir():
+        ids = sorted(p.stem for p in CURRICULUM_DIR.glob("*.md"))
+        if ids:
+            return ids
+    return FIXED_SKILL_IDS
+
+
+def _category_from_rubric_ref(ref: str) -> str:
+    file_part = ref.split("#", 1)[0]
+    return file_part[:-3] if file_part.endswith(".md") else file_part
+
+
+def _schema_instructions() -> str:
+    skill_list = ", ".join(_skill_ids())
+    return (
+        "Return exactly this JSON shape and nothing else:\n"
+        '{"scores":{"delivery":1-5,"clarity":1-5,"structure":1-5,"slide_connection":1-5,"pronunciation":1-5},'
+        '"summary":"one or two spoken sentences, under 40 words",'
+        '"improvements":[{"quote":"verbatim span copied from TRANSCRIPT",'
+        '"span":{"start":0.0,"end":0.0},"issue":"one spoken sentence naming the problem",'
+        '"rubric_ref":"file.md#anchor","v2_text":"cleaned wording, <=25 words",'
+        '"v3_markup":"same point with <NNN> pause markup, at most 3 markers",'
+        '"alternative":"a different way to open the same idea",'
+        f'"skill":"one of: {skill_list}","slide":2}}],'
+        '"terms_to_drill":["term", ...]}\n'
+        "Exactly 3 improvements. Every quote MUST be copied verbatim, "
+        "character-for-character, from TRANSCRIPT -- never paraphrase it. "
+        "`span` is a rough guide only; code re-derives it from the transcript. "
+        "`slide` is the slide number the quote was spoken on, or null if unknown. "
+        "`pronunciation` score judges how reliably the words could be understood "
+        "by a listener -- never an accent judgement."
+    )
 
 
 class JudgeError(RuntimeError):
@@ -83,7 +124,7 @@ def _build_prompt(deck: dict, slide: dict | None, transcript_text: str, metrics:
     system = (
         "You are Podium's presentation judge. Score the rehearsal strictly "
         "against the rubric below. Output ONE JSON object and nothing else "
-        "-- no prose, no markdown fences.\n\n" + _full_rubric() + "\n\n" + SCHEMA_INSTRUCTIONS
+        "-- no prose, no markdown fences.\n\n" + _full_rubric() + "\n\n" + _schema_instructions()
     )
     if slide:
         bullets = "; ".join(slide.get("bullets", []))
@@ -209,44 +250,72 @@ def _strip_markup(text: str) -> str:
     return re.sub(r"\s{2,}", " ", _ANY_TAG.sub("", text)).strip()
 
 
-def _validate(obj: dict, transcript_text: str) -> dict:
+def _validate(obj: dict, transcript_text: str, words: list[dict], metrics: dict, deck_terms: list[str]) -> dict:
     scores_in = obj.get("scores") or {}
-    scores = {k: _clamp_score(scores_in.get(k, 3)) for k in ("delivery", "clarity", "structure", "slide_connection")}
+    scores = {
+        k: _clamp_score(scores_in.get(k, 3))
+        for k in ("delivery", "clarity", "structure", "slide_connection", "pronunciation")
+    }
 
     haystack = transcript_text.lower()
     kept = [imp for imp in (obj.get("improvements") or []) if str(imp.get("quote", "")).lower() and str(imp.get("quote", "")).lower() in haystack]
 
+    valid_skills = _skill_ids()
     improvements = []
     for i, imp in enumerate(kept, start=1):
-        span = imp.get("span") or {}
+        quote = str(imp["quote"])
+        derived_span = span_for_quote(quote, words)
+        if derived_span is not None:
+            span = {"start": round(derived_span[0], 2), "end": round(derived_span[1], 2)}
+        else:
+            raw_span = imp.get("span") or {}
+            try:
+                start, end = float(raw_span.get("start", 0.0)), float(raw_span.get("end", 0.0))
+            except (TypeError, ValueError):
+                start, end = 0.0, 0.0
+            span = {"start": start, "end": end}
+
+        rubric_ref = str(imp.get("rubric_ref", "")).strip()
+        skill = str(imp.get("skill", "")).strip()
+        if skill not in valid_skills:
+            category = _category_from_rubric_ref(rubric_ref)
+            skill = _SKILL_FALLBACK_BY_CATEGORY.get(category, valid_skills[0])
+            if skill not in valid_skills:
+                skill = valid_skills[0]
+
+        slide_raw = imp.get("slide")
         try:
-            start, end = float(span.get("start", 0.0)), float(span.get("end", 0.0))
+            slide_val = int(slide_raw) if slide_raw is not None else None
         except (TypeError, ValueError):
-            start, end = 0.0, 0.0
+            slide_val = None
+
         improvements.append({
             "id": f"imp_{i}",
-            "quote": str(imp["quote"]),
-            "span": {"start": start, "end": end},
+            "quote": quote,
+            "span": span,
             "issue": str(imp.get("issue", "")).strip(),
-            "rubric_ref": str(imp.get("rubric_ref", "")).strip(),
+            "rubric_ref": rubric_ref,
             "v2_text": _strip_markup(str(imp.get("v2_text", ""))),
             "v3_markup": _sanitize_v3_markup(str(imp.get("v3_markup", ""))),
             "alternative": str(imp.get("alternative", "")).strip(),
+            "skill": skill,
+            "slide": slide_val,
         })
 
+    pron_block = (metrics or {}).get("pronunciation")
     return {
         "scores": scores,
         "summary": str(obj.get("summary", "")).strip(),
         "improvements": improvements,
         "terms_to_drill": [str(t) for t in (obj.get("terms_to_drill") or [])],
+        "drill_words": pick_drill_words(pron_block, deck_terms),
     }
 
 
 async def judge(deck: dict, slide: dict | None, transcript_text: str, words: list[dict], metrics: dict, *, model: str | None = None) -> dict:
-    """CONTRACTS.md §3. `words` are unused directly (metrics already derives
-    from them) but kept in the signature so callers can pass span-consistency
-    context in future without breaking the call site."""
-    del words
+    """CONTRACTS.md §3. `words` are used to derive each improvement's `span`
+    (never trusted from the LLM) and to fill `drill_words` from the
+    already-computed `metrics["pronunciation"]` block."""
     system, user = _build_prompt(deck, slide, transcript_text, metrics)
     raw = await _call_llm(system, user, model)
     obj = _parse(raw)
@@ -256,4 +325,5 @@ async def judge(deck: dict, slide: dict | None, transcript_text: str, words: lis
         obj = _parse(raw)
     if obj is None:
         raise JudgeError(f"judge LLM did not return parseable JSON after retry: {raw[:200]!r}")
-    return _validate(obj, transcript_text)
+    return _validate(obj, transcript_text, words, metrics, _deck_terms(deck))
+

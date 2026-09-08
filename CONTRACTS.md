@@ -66,7 +66,13 @@ sessions/<session_id>/
   "loudness": { "mean_dbfs": -24.1, "variance_db": 5.2 },
   "time_budget": { "budget_s": 60, "used_s": 62.4, "over_s": 2.4,
                    "per_slide": [{"slide":1,"used_s":41.2,"fair_share_s":30.0}] },
-  "low_confidence_terms": [{"term":"Dijkstra","heard":"dexter","conf":0.42,"start":33.1}]
+  "low_confidence_terms": [{"term":"Dijkstra","heard":"dexter","conf":0.42,"start":33.1}],
+  "pronunciation": {                                   // v2: from per-word Deepgram confidence
+    "intelligibility": 0.87,                           // 1 - (words with conf < 0.6) / words
+    "words_below_0_6": 12,
+    "low_confidence": [{"w":"heads","start":41.2,"end":41.6,"conf":0.28}],  // sorted by conf, <= 12
+    "source": "deepgram_rest" | "stream"               // stream = segment-level conf only (fallback)
+  }
 }
 ```
 
@@ -80,7 +86,7 @@ Definitions frozen so numbers mean one thing everywhere:
 
 ```jsonc
 {
-  "scores": { "delivery": 3, "clarity": 2, "structure": 4, "slide_connection": 3 },
+  "scores": { "delivery": 3, "clarity": 2, "structure": 4, "slide_connection": 3, "pronunciation": 3 },
   "summary": "One or two spoken sentences, under 40 words.",
   "improvements": [
     { "id": "imp_1",
@@ -90,11 +96,19 @@ Definitions frozen so numbers mean one thing everywhere:
       "rubric_ref": "delivery.md#filler-rate",
       "v2_text": "the same point, cleaned wording, <= 25 words",
       "v3_markup": "the same point with <700> pause markup and emphasis",
-      "alternative": "a different way to open the same idea" }
+      "alternative": "a different way to open the same idea",
+      "skill": "pacing",          // v2: a skills/curriculum/<skill>.md id (see §9)
+      "slide": 2 }                // v2: slide the quote was spoken on, or null
   ],
-  "terms_to_drill": ["Dijkstra"]
+  "terms_to_drill": ["Dijkstra"],
+  "drill_words": [{"w":"heads","start":41.2,"end":41.6,"conf":0.28}]   // v2: <= 3 from metrics.pronunciation.low_confidence, deck terms first
 }
 ```
+
+`span` is derived by code from the transcript words (first/last word of `quote`), never
+trusted from the LLM. `pronunciation` is an **intelligibility** score — how reliably a
+recogniser understood the words — and is described to the user as such, never as an
+accent judgement.
 
 Rules: exactly 3 improvements; `quote` must be a verbatim substring of the
 transcript (code verifies and drops any that is not); `v3_markup` may use only
@@ -125,6 +139,10 @@ session start (monotonic).
 | `nudge` | `reason` (`idle`\|`timeout`), `stage` | the coach checked in on a silent user |
 | `no_speech` | `revision`, `words` | rehearsal too short to judge; returned to prep |
 | `agent_speech_text` | `speech_id`, `text` | what an LLM-phrased line actually said (its `agent_speech_start.text` holds the instructions) |
+| `feedback_stage` | `improvement_id`, `stage` | v2: an item's `feedback` message stage was sent (mirrors §5 `feedback.item.stage`) |
+| `tool_error` | `tool`, `error` | v2: a non-fatal tool call failed and a fallback was used |
+| `drill` | `word`, `stage`, `conf_before?`, `conf_after?` | v2: a drill step for a low-confidence word (mirrors §5 `drill`) |
+| `progress` | `level`, `next_focus` | v2: cross-session progress was recorded and spoken at report |
 
 ## 5. Data channel messages
 
@@ -135,12 +153,17 @@ Agent → client:
 {"type":"phase","name":"present","budget_s":60}
 {"type":"deck","deck":{...}}                       // §1 deck
 {"type":"slide","slide":2}
-{"type":"timer","remaining_s":30}
+{"type":"timer","remaining_s":30}                   // prep only; during present the client runs its own clock from phase.budget_s
 {"type":"metrics","revision":1,"metrics":{...}}    // §2
 {"type":"judgment","revision":1,"judgment":{...}}  // §3
-{"type":"feedback","item":{"id":"imp_1","stage":"v2","text":"..."}}
+{"type":"feedback","item":{"id":"imp_1","stage":"v0","text":"..."}}
+                                                    // v2: sent at every step of an item so the UI can cue it. stage ∈
+                                                    // intro | v0 (the user's OWN recording slice) | v2 | v3 | alt | prompt | verdict | resume
 {"type":"clip","improvement_id":"imp_1","variant":"v3","url":"/clips/imp_1_v3_paced.wav"}
-                                                    // variant is v1|v2|v3 or attempt<N> (user's practice take)
+                                                    // variant is v0 (recording slice) | v1 | v2 | v3 | attempt<N>
+{"type":"drill","word":"heads","stage":"you"|"model"|"prompt"|"verdict","conf_before":0.28,"conf_after":0.91,"url":"/sessions/<id>/clips/drill_heads_you.wav"}
+{"type":"progress","client_id":"...","level":"Speaker","levels":["Novice","Speaker","Presenter","Keynote","TEDx-ready"],
+ "skills":{"pacing":{"mastery":0.4,"sessions":2,"last_focus":"2026-09-08"}}, "next_focus":"pausing"}   // §8
 {"type":"countdown","seconds":3}                    // 3-2-1 begins now; client animates locally, present follows
 {"type":"coach","stage":"...","options":[{"name":"proceed","label":"Let's do it"}],
  "improvement_id":"imp_1","index":1,"total":3,"attempt":2,"verdict":{...}}   // §7
@@ -155,8 +178,8 @@ Agent → client:
 
 Option names (client sends `{"type":"command","name":<name>}`; the agent accepts the
 same names by voice): `proceed` (yes, start improvements) · `later` (skip them, go to
-the wrap-up) · `original` (play V1) · `cleaner` (play V2) · `pauses` (play V3) ·
-`alternative` (speak the alternative opening) · `again` (replay V1+V2+V3) · `slower`
+the wrap-up) · `original` (play V0, the user's own recording; falls back to V1) · `cleaner` (play V2) · `pauses` (play V3) ·
+`alternative` (speak the alternative opening) · `again` (replay V0+V2+V3) · `slower`
 (re-render slower, replay) · `why` (rubric reason) · `practice` (prompt the user to
 say it) · `next` (done with this item) · `skip` (move on without marking heard) ·
 `finish` (leave coaching now). A command outside the currently offered `options` is
@@ -164,8 +187,8 @@ ignored with a timeline `voice_intent` entry only.
 
 Client → agent:
 ```jsonc
-{"type":"setup","topic":"self-attention","level":"intermediate","budget_s":60}
-{"type":"deck_upload","slides":[{"index":1,"title":"...","bullets":["..."]}]}
+{"type":"setup","topic":"self-attention","level":"intermediate","budget_s":60,"client_id":"<uuid from localStorage>"}
+{"type":"deck_upload","slides":[{"index":1,"title":"...","bullets":["..."]}],"client_id":"<uuid>"}
 {"type":"client_ready"}     // sent from the start button's click handler once room.startAudio() succeeded;
                             // the agent holds the greeting until it arrives (120 s fallback)
 {"type":"ready"}            // prep finished, start presenting
@@ -210,9 +233,66 @@ LLM. Attempt audio is saved as `clips/<improvement_id>_attempt<N>.wav`.
 | `analysis/judge.py` | §3 from deck + metrics + transcript, loads `skills/judge/*.md` | `agent.llm_config` |
 | `analysis/render.py` | V1/V2/V3 clips via Rime REST, returns paths + durations | — |
 | `analysis/practice.py` | §7 verdict from an attempt's words/metrics vs. the improvement; `looks_like_attempt` | `analysis.metrics` |
+| `analysis/slice.py` | v2: cut the user's own recording by word span (`slice_wav`, `span_for_quote`) | — |
+| `analysis/pronunciation.py` | v2: Deepgram REST per-word confidence (`transcribe_rest`) and the §2 `pronunciation` block (`intelligibility`) | — |
+| `agent/graph.py` | v2: `SessionGraph` temporal coaching graph (§8) + cross-session `Progress` | — |
+| `skills/curriculum/*.md` | v2: the TEDx skill ladder the judge and coach cite (§9) | — |
 | `analysis/deck.py` | generate a deck (§1) from a topic; normalise an uploaded one | `agent.llm_config` |
 | `web/` | UI only; speaks §5 | — |
 | `evidence/` | acceptance tests; may import `analysis.*` | — |
 
 `analysis/*` is pure and importable without LiveKit so evidence scripts can run it
 directly. Nothing in `analysis/` may call `session.say` or touch the room.
+
+## 8. SessionGraph — the temporal coaching graph (`agent/graph.py`)
+
+One in-process graph per session (no external store; the constraint "Rime, Deepgram,
+LiveKit only" stands). Every node and edge carries `t` (seconds since session start).
+`session_agent.py` writes to it at every step and reads the LLM's steering context
+from it, so what the coach says is always derived from the same structure the UI shows.
+
+Nodes `(kind, id, props)`: `slide:<n>`, `revision:<n>`, `improvement:<imp_id>`,
+`clip:<imp_id>:<variant>`, `attempt:<imp_id>#<n>`, `verdict:<imp_id>#<n>`,
+`utterance:<n>` (a user remark/question), `coach_line:<speech_id>`, `skill:<id>`,
+`drill:<word>`.
+Edges `(src, rel, dst, t)`: `improvement -targets-> slide`, `improvement -trains-> skill`,
+`clip -renders-> improvement`, `attempt -practices-> improvement`, `verdict -scores-> attempt`,
+`utterance -about-> improvement|slide`, `coach_line -regarding-> improvement|attempt|utterance`,
+`drill -addresses-> improvement|skill`, `revision -supersedes-> revision`.
+
+```python
+class SessionGraph:
+    def __init__(self, t0_mono: float): ...
+    def add(self, kind: str, id: str, **props) -> str            # node key "kind:id"; upsert
+    def link(self, src: str, rel: str, dst: str, **props) -> None
+    def set_focus(self, node_key: str | None) -> None            # what the coach is on right now
+    def focus(self) -> str | None
+    def mark(self, node_key: str, **props) -> None               # e.g. heard=True, played=["v0","v2"]
+    def context_text(self, max_chars: int = 1200) -> str         # LLM steering: focus, what's played/heard,
+                                                                  # attempts+verdicts, last 3 utterances, remaining items
+    def recap_text(self) -> str                                  # "what have we done so far" for the recap tool
+    def to_json(self) -> dict                                    # persisted under session.json["graph"]
+
+class Progress:                                                  # sessions/progress/<client_id>.json
+    LEVELS = ["Novice", "Speaker", "Presenter", "Keynote", "TEDx-ready"]
+    def __init__(self, client_id: str, root: Path = Path("sessions/progress")): ...
+    def record_session(self, scores: dict, improvements: list[dict], verdicts: list[dict]) -> None
+    def level(self) -> str                                       # from mean mastery across skills
+    def next_focus(self) -> str | None                           # weakest skill with the fewest sessions
+    def to_message(self) -> dict                                 # the §5 progress message
+```
+
+`mastery` per skill is a number in 0..1: an exponential moving average of the judge's
+score for the skill's rubric category (scaled 1..5 → 0..1) and of practice-verdict wins
+on improvements that train the skill. Levels are mean mastery bands: `<0.3` Novice,
+`<0.5` Speaker, `<0.7` Presenter, `<0.85` Keynote, else TEDx-ready.
+
+## 9. Curriculum (`skills/curriculum/<id>.md`)
+
+The ladder from novice to TEDx: `hook`, `structure`, `pacing`, `pausing`, `fillers`,
+`vocal-variety`, `storytelling`, `slide-connection`, `closing`, `articulation`. Each file
+has the same headings so code can cite it: `# <Title>`, `## Why it matters`,
+`## What good looks like`, `## Novice → TEDx` (four one-line levels), `## Drill` (one
+30-second exercise), `## Judge maps to` (the `skills/judge/*.md#anchor` the score comes
+from). The judge's `improvement.skill` must be one of these ids; the coach's `why`
+answer reads `## Why it matters`, and the report's path view reads `## Novice → TEDx`.

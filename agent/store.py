@@ -66,6 +66,10 @@ class Store:
         self.session["deck"] = deck
         self.save()
 
+    def set_graph(self, graph: dict[str, Any]) -> None:
+        self.session["graph"] = graph
+        self.save()
+
     # -- timeline.jsonl -----------------------------------------------------
 
     def log(self, ev: str, **fields: Any) -> None:
@@ -85,6 +89,13 @@ class Store:
     @property
     def current_revision(self) -> int:
         return self._revision_counter
+
+    @property
+    def t0_mono(self) -> float:
+        """The `time.monotonic()` origin `timeline.jsonl` timestamps are relative
+        to -- v2's `SessionGraph` is built against the same origin so its `t`
+        values line up with the timeline."""
+        return self._t0
 
     def new_revision(self, scope: dict[str, Any] | str = "full") -> dict[str, Any]:
         self._revision_counter += 1

@@ -277,6 +277,8 @@ body.wide-view main { max-width: 1160px; }
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
+.timer.over { color: var(--speaking); }
+
 
 .slide-card {
   width: 100%;
@@ -433,3 +435,128 @@ body.wide-view main { max-width: 1160px; }
 .coach-status { font-size: 0.85rem; color: var(--text-dim); }
 
 #new-talk-btn { margin-top: 0.4em; }
+
+/* ---------- Coaching stage (v2) ---------- */
+
+.coach-stepper { display: flex; gap: 0.5em; margin-bottom: 0.8em; }
+.step-dot {
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: var(--bg-raised);
+}
+.step-dot.active {
+  border-color: var(--speaking);
+  color: #241701;
+  background: var(--speaking);
+  animation: step-pulse 1.4s ease-in-out infinite;
+}
+.step-dot.done { border-color: var(--accent-dim); color: var(--accent); background: transparent; }
+@keyframes step-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242, 184, 75, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(242, 184, 75, 0); }
+}
+
+.coach-slide-card { padding: 1em 1.2em; min-height: auto; margin-bottom: 0.7em; }
+.coach-slide-card .slide-title { font-size: 1.3rem; margin-bottom: 0.3em; }
+.coach-slide-card .slide-bullets { font-size: 1rem; }
+
+.improvement-quote.highlighted {
+  background: rgba(79, 209, 197, 0.1);
+  border-left: 3px solid var(--accent);
+  padding: 0.4em 0.7em;
+  border-radius: 0 6px 6px 0;
+  font-style: normal;
+  color: var(--text);
+}
+.improvement-issue.active { color: var(--speaking); font-weight: 600; }
+
+.feedback-pill-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em; margin-top: 0.4em; }
+.feedback-pill {
+  position: relative;
+  padding: 0.35em 0.8em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  overflow: hidden;
+}
+.feedback-pill.active {
+  color: #241701;
+  background: var(--speaking);
+  border-color: var(--speaking);
+}
+.feedback-pill.active::after {
+  content: "";
+  position: absolute;
+  left: -40%;
+  bottom: 0;
+  width: 40%;
+  height: 3px;
+  background: rgba(36, 23, 1, 0.55);
+  animation: pill-underline 1.1s linear infinite;
+}
+@keyframes pill-underline {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+.feedback-pill.played { color: var(--accent); border-color: var(--accent-dim); }
+.pill-check { margin-left: 0.35em; }
+.prompt-pill { border-color: var(--accent); }
+.prompt-pill.active { background: var(--accent); color: #05201d; border-color: var(--accent); }
+.feedback-resume-flash {
+  font-size: 0.78rem;
+  color: var(--speaking);
+  animation: resume-flash 1.4s ease forwards;
+}
+@keyframes resume-flash {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Pronunciation / intelligibility ---------- */
+
+.pronunciation-strip { line-height: 1.7; }
+.low-conf-word {
+  text-decoration: underline;
+  text-decoration-color: var(--speaking);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+/* ---------- Drill card ---------- */
+
+.drill-card { margin-top: 0.8em; }
+.drill-card audio { width: 100%; margin-top: 0.5em; }
+
+/* ---------- Progress / skill path ---------- */
+
+.badge.level { color: #05201d; background: var(--accent); border-color: var(--accent); }
+.level-track { display: flex; gap: 0.4em; margin: 0.6em 0; flex-wrap: wrap; }
+.level-chip {
+  padding: 0.35em 0.8em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  background: var(--bg-raised);
+}
+.level-chip.current { border-color: var(--accent); color: #05201d; background: var(--accent); font-weight: 700; }
+.skill-rows { display: flex; flex-direction: column; gap: 0.5em; margin-top: 0.6em; }
+.skill-row { display: flex; align-items: center; gap: 0.8em; }
+.skill-row.focus .skill-label { color: var(--speaking); font-weight: 700; }
+.skill-label { width: 130px; font-size: 0.85rem; color: var(--text-dim); text-transform: capitalize; }
+.skill-bar-track { flex: 1; height: 8px; background: var(--bg-raised); border-radius: 999px; overflow: hidden; }
+.skill-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+.next-focus { margin-top: 0.6em; }

@@ -268,19 +268,22 @@ interruption settings — to make the effect of the retune visible.**
 | | n trials | P50 | P95 | max | Target | Target met? |
 |---|---|---|---|---|---|---|
 | `baseline_default_interruption` | 12/12 measurable | 1033 ms | 1417 ms | 2432 ms | ≤300 ms | **No** |
-| `tuned_interruption` | 12/12 measurable | 603.5 ms | 666 ms | 2806 ms | ≤300 ms | **No** |
+| `tuned_interruption` | 11/12 measurable | 682 ms | 1400 ms | 1400 ms | ≤300 ms | **No** |
 
 Because this is a live measurement over a real network with real TTS/VAD/STT timing, the tuned
-configuration was run four times; the table holds the run currently committed to
-`results.json`, and the observed spread across the four was **P50 595–666 ms, P95 666–744 ms,
-max 1713–2948 ms**. The baseline row is a single run (see the provenance note below).
+configuration has been run five times; the table holds the run currently committed to
+`results.json` — the first against the v2 conversational coach (own-recording playback,
+signposted items) — and the observed spread across the five was **P50 595–682 ms, P95
+666–1400 ms, max 1400–2948 ms**. In the committed run one of twelve trials found no agent
+speech to interrupt and is reported as unmeasured, so with n = 11 its P95 is simply its
+worst trial. The baseline row is a single run (see the provenance note below).
 
 **The honest headline: shrinking the VAD interruption window (0.5 s → 0.12 s minimum
-duration) and the false-interruption timeout (2.0 s → 1.5 s) cut P50 and P95 by roughly 35–50%
-across runs — but P95 remains about 2.5× the 300 ms target, and the worst single trial did not
-improve reliably (baseline 2432 ms; tuned 1713–2948 ms depending on the run).** This is a real,
-currently-missed target, reported as such rather than hidden or rounded away — it is the
-evidence gap named at the top of this project.
+duration) and the false-interruption timeout (2.0 s → 1.5 s) reliably cut P50 by roughly
+35–40% across runs, but P95 ranges from 2.2× to 4.7× the 300 ms target depending on the run,
+and the worst single trial did not improve reliably (baseline 2432 ms; tuned 1400–2948 ms).**
+This is a real, currently-missed target, reported as such rather than hidden or rounded away —
+it is the evidence gap named at the top of this project.
 
 **Why the numbers aren't a clean per-trial latency measurement.** Both runs' own
 `latency_decomposition.reliable` fields are `false`, with the exact reason recorded:
@@ -288,8 +291,8 @@ evidence gap named at the top of this project.
 and most of the later values cluster tightly around 2300–2500ms ... regardless of when the
 trial actually fired — consistent with `_last_user_speech_start_mono` being a single shared
 reference not refreshed per-utterance during the barge-in retry cascade, not a fresh per-trial
-onset"* (baseline run); the committed tuned run logged 31 agent-side interrupt events for the
-same 12 trials (ratio 2.58×; earlier tuned runs 1.67×) for the same reason. In plain terms: a single interrupt burst can trigger
+onset"* (baseline run); the committed tuned run logged 24 agent-side interrupt events for its
+11 measured trials (ratio 2.18×; earlier tuned runs 1.67–2.58×) for the same reason. In plain terms: a single interrupt burst can trigger
 a cascade of re-interruptions on the agent's retried utterance while the burst audio is still
 arriving, so "one trial → one interrupt event" doesn't hold cleanly, and the multi-second
 outlier trials in both configurations are consistent with that cascade rather than a single

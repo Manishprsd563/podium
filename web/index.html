@@ -23,6 +23,7 @@
   <div id="mic-badge" class="badge hidden">&#127908; mic live</div>
   <div id="agent-badge" class="badge hidden">listening</div>
   <div id="provider-badge" class="badge hidden">&mdash;</div>
+  <div id="level-badge" class="badge hidden">&mdash;</div>
 </header>
 
 <div id="error-banner" class="banner hidden" role="alert"></div>
@@ -117,11 +118,16 @@
           <div id="scorecard"></div>
           <p id="judgment-summary" class="hint"></p>
         </div>
-
         <div class="panel" id="metrics-panel">
           <h2>Metrics</h2>
           <div id="metrics-grid"></div>
           <div id="metrics-perslide" class="hint"></div>
+        </div>
+
+        <div class="panel" id="transcript-panel">
+          <h2>Transcript</h2>
+          <p class="hint">Words your coach's ear (Deepgram) heard with low confidence are underlined &mdash; that is intelligibility, not accent.</p>
+          <div id="coach-transcript-strip" class="transcript-strip pronunciation-strip"></div>
         </div>
       </div>
 
@@ -129,7 +135,8 @@
         <div class="panel coach-panel">
           <h2>Coach</h2>
           <div id="coach-chat-log" class="coach-chat-log"></div>
-          <div id="coach-card" class="coach-card hidden"></div>
+        <div id="coach-card" class="coach-card hidden"></div>
+        <div id="drill-card" class="coach-card drill-card hidden"></div>
           <div id="coach-options" class="command-row"></div>
           <div id="coach-status" class="coach-status">listening &mdash; say it or tap an option</div>
         </div>
@@ -140,6 +147,19 @@
   <!-- ============ REPORT VIEW ============ -->
   <section id="view-report" class="view hidden">
     <h1>Report</h1>
+
+    <div class="panel hidden" id="progress-panel">
+      <h2>Your path</h2>
+      <div id="level-track" class="level-track"></div>
+      <div id="skill-rows" class="skill-rows"></div>
+      <p id="next-focus" class="hint"></p>
+    </div>
+
+    <div class="panel" id="report-transcript-panel">
+      <h2>Transcript</h2>
+      <p class="hint">Underlined words were heard with low confidence.</p>
+      <div id="report-transcript-strip" class="transcript-strip pronunciation-strip"></div>
+    </div>
 
     <div class="panel" id="rerecord-panel">
       <h2>Re-record a slide</h2>

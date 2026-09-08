@@ -208,8 +208,22 @@ def _low_confidence_terms(terms: list[str], words: list[dict]) -> list[dict]:
     return out
 
 
-def compute(words: list[dict], audio_path: str | Path, deck: dict, slide_events: list[dict], budget_s: float) -> dict:
-    """CONTRACTS.md §2. `words` = Deepgram-shaped [{"w","start","end","conf"}, ...]."""
+def compute(
+    words: list[dict],
+    audio_path: str | Path,
+    deck: dict,
+    slide_events: list[dict],
+    budget_s: float,
+    pronunciation: dict | None = None,
+) -> dict:
+    """CONTRACTS.md §2. `words` = Deepgram-shaped [{"w","start","end","conf"}, ...].
+
+    `pronunciation`, when given, is the caller's already-computed §2
+    `pronunciation` block (e.g. from analysis.pronunciation.intelligibility
+    against a Deepgram REST re-transcription). When omitted, a fallback block
+    is computed here from the words' own (segment-level) confidence, tagged
+    `source="stream"`.
+    """
     x, sr = _wav_samples(audio_path)
     duration_s = round(len(x) / sr, 2) if sr else 0.0
     words_sorted = sorted(words, key=lambda w: w["start"])
@@ -220,6 +234,12 @@ def compute(words: list[dict], audio_path: str | Path, deck: dict, slide_events:
     fillers["per_min"] = round(fillers["count"] / minutes, 2) if minutes else 0.0
     crutches["per_min"] = round(crutches["count"] / minutes, 2) if minutes else 0.0
     spans = _slide_spans(slide_events, duration_s)
+    deck_terms = _deck_terms(deck)
+    if pronunciation is not None:
+        pron_block = pronunciation
+    else:
+        from .pronunciation import intelligibility
+        pron_block = intelligibility(words_sorted, deck_terms, source="stream")
     return {
         "duration_s": duration_s,
         "words": len(words_sorted),
@@ -230,5 +250,6 @@ def compute(words: list[dict], audio_path: str | Path, deck: dict, slide_events:
         "pauses": pauses,
         "loudness": _loudness(x, sr),
         "time_budget": _time_budget(spans, duration_s, budget_s),
-        "low_confidence_terms": _low_confidence_terms(_deck_terms(deck), words_sorted),
+        "low_confidence_terms": _low_confidence_terms(deck_terms, words_sorted),
+        "pronunciation": pron_block,
     }

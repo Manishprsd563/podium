@@ -120,3 +120,36 @@ If the build runs to **12 Sept**: same core first, then the cut list restored, l
 2. Approve installs: Python — `livekit-agents`, `livekit-plugins-rime`, `livekit-plugins-deepgram`, `livekit-plugins-openai`, `livekit-plugins-silero`, `numpy`, `python-dotenv`; JS — `vite`, `livekit-client`, `pdfjs-dist`. LiveKit server: Cloud free tier (account) or local `livekit-server` binary.
 3. STT/LLM providers and keys: Deepgram (recommended) and which OpenAI-compatible LLM (fast cloud model preferred for the judge; local Ollama is a fallback, not a demo path).
 4. Rime credentials: organizer key and preflight script available?
+
+## 12. Coaching v2 — from a scripted queue to a coach that keeps context (post-testing)
+
+Human testing of v1 surfaced five problems, each with a concrete root cause found in
+the code rather than assumed:
+
+| Reported | Root cause | v2 answer |
+|---|---|---|
+| Presentation clock frozen | The agent only sends `timer` during prep; `present` never did, so the client showed the last prep value | Client-side clock from `phase.budget_s`, overtime shown in amber |
+| Replies arrive late | LLM starts only after end-of-turn; endpointing was held at 0.9 s for the whole coach phase; clips were rendered *inside* the conversation | `preemptive_generation` (LLM starts on the interim transcript); 0.9 s endpointing only while a practice take is being captured; all clips pre-rendered concurrently while the summary is spoken |
+| Can't tell an "improvement" from small talk | No `feedback` stage message was ever sent, so the UI could not cue what was playing; a barge-in restarted the item from its intro | Signposted items ("Improvement 2 of 3 — pausing, slide 2"), the user's **own recording** played first, a stage cue row in the UI (You · Cleaner · With pauses · Your turn), and resume-from-the-interrupted-step |
+| Coach loses the thread | The LLM was steered with a flat string rebuilt per turn | `SessionGraph` (§CONTRACTS 8): a timestamped in-process graph of slides, improvements, clips, attempts, verdicts, utterances and skills; the LLM's context and the UI derive from the same structure; a `recap` tool answers "what have we done" |
+| Voice is dull | `summit` is polished but flat | `thunder` — Rime's high-energy flagship, pause markup verified |
+
+Two new capabilities ride on the same pass:
+
+- **Pronunciation as intelligibility.** Deepgram's REST endpoint returns real per-word
+  confidence (the live stream does not). After each rehearsal the recording is
+  re-transcribed once (~2 s), giving an intelligibility score, the words a recogniser
+  struggled with, and a drill that plays the user's own word, the coach's model, and
+  measures the confidence again. Described to the user as "how reliably a recogniser
+  understood you" — never as an accent judgement, which we cannot measure honestly.
+- **A curriculum, not a checklist.** Ten skill files (`skills/curriculum/`) define the
+  ladder from novice to TEDx: hook, structure, pacing, pausing, fillers, vocal variety,
+  storytelling, slide connection, closing, articulation. Every improvement is tagged
+  with the skill it trains; a per-user `Progress` record (keyed by a browser-local id)
+  tracks mastery across sessions and names the next focus. Levels: Novice → Speaker →
+  Presenter → Keynote → TEDx-ready.
+
+What deliberately did *not* change: the presentation-mode turn policy, the revision
+fence, the rule that code computes every number, the three-service stack, and the
+measured (and still missed) barge-in stop latency, which is a transport property this
+pass does not claim to fix.

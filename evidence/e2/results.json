@@ -9501,7 +9501,7 @@
     },
     "tuned_interruption": {
       "exercised": true,
-      "room": "podium-e2-live-56fb257e6c",
+      "room": "podium-e2-live-da2f39e039",
       "config": {
         "turn_handling": "TurnHandlingOptions(turn_detection='vad', interruption={'mode': 'vad', 'min_duration': 0.12, 'discard_audio_if_uninterruptible': True, 'resume_false_interruption': True, 'false_interruption_timeout': 1.5})",
         "vad": "silero.VAD.load(min_speech_duration=0.03, min_silence_duration=0.55)",
@@ -9509,17 +9509,15 @@
       },
       "decomposition_not_reported": {
         "reported": false,
-        "agent_interrupt_event_count": 31,
-        "measured_trial_count": 12,
-        "cascade_ratio": 2.58,
-        "reason": "31 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 2.58x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event."
+        "agent_interrupt_event_count": 24,
+        "measured_trial_count": 11,
+        "cascade_ratio": 2.18,
+        "reason": "24 agent-side 'interrupt' events were logged for only 11 successful trials (ratio 2.18x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event. the agent's own reported latency_ms values cluster tightly (mean=2055ms, stdev=26ms, relative spread 0.01) despite trials firing at very different points in the session -- consistent with _last_user_speech_start_mono being a single shared reference that is not being refreshed per-utterance during the barge-in retry cascade, not a fresh per-trial onset."
       },
       "false_interruption_tradeoff": {
-        "trials_affected": [
-          3
-        ],
-        "count": 1,
-        "of": 12,
+        "trials_affected": [],
+        "count": 0,
+        "of": 11,
         "threshold_ms": 1500,
         "mechanism": "resume_false_interruption (SDK default True in both configs)",
         "summary": "The lower interruption.min_duration in the tuned config makes a brief speech dip more likely to register as a tentative interruption that then gets treated as false and resumed -- the honest cost of the sensitivity gain that produced the P50/P95 win."
@@ -9535,17 +9533,17 @@
       },
       "end_to_end_proof": {
         "words_transcribed": 37,
-        "wpm": 199.1,
+        "wpm": 195.4,
         "filler_count": 0,
         "improvement_count": 3,
-        "session_dir": "sessions\\s_20260908_163341"
+        "session_dir": "sessions\\s_20260908_204825"
       },
       "stop_latency": {
-        "n_trials": 12,
+        "n_trials": 11,
         "n_attempted": 12,
-        "p50_ms": 603.5,
-        "p95_ms": 666.0,
-        "max_ms": 2806.0,
+        "p50_ms": 682.0,
+        "p95_ms": 1400.0,
+        "max_ms": 1400.0,
         "target_ms": 300,
         "target_met": false,
         "trials": [
@@ -9553,22 +9551,19 @@
             "trial": 0,
             "offset_label": "early",
             "delay_s": 0.25,
-            "measured": true,
-            "onset_mono": 103897.671,
-            "last_agent_frame_mono": 103897.869,
-            "latency_ms": 198.0,
-            "wav_path": "evidence\\e2\\live_room\\trial_0.wav",
-            "false_interruption_candidate": false,
-            "supporting_dips": []
+            "measured": false,
+            "reason": "no stop observed within 3.5s window",
+            "onset_mono": 119183.281,
+            "wav_path": "evidence\\e2\\live_room\\trial_0.wav"
           },
           {
             "trial": 1,
             "offset_label": "mid",
             "delay_s": 1.4,
             "measured": true,
-            "onset_mono": 103899.562,
-            "last_agent_frame_mono": 103900.041,
-            "latency_ms": 479.0,
+            "onset_mono": 119190.75,
+            "last_agent_frame_mono": 119192.15,
+            "latency_ms": 1400.0,
             "wav_path": "evidence\\e2\\live_room\\trial_1.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9578,9 +9573,9 @@
             "offset_label": "late",
             "delay_s": 3.0,
             "measured": true,
-            "onset_mono": 103908.984,
-            "last_agent_frame_mono": 103909.65,
-            "latency_ms": 666.0,
+            "onset_mono": 119217.343,
+            "last_agent_frame_mono": 119217.478,
+            "latency_ms": 135.0,
             "wav_path": "evidence\\e2\\live_room\\trial_2.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9590,50 +9585,21 @@
             "offset_label": "early",
             "delay_s": 0.35,
             "measured": true,
-            "onset_mono": 103912.25,
-            "last_agent_frame_mono": 103915.056,
-            "latency_ms": 2806.0,
+            "onset_mono": 119232.671,
+            "last_agent_frame_mono": 119232.9,
+            "latency_ms": 229.0,
             "wav_path": "evidence\\e2\\live_room\\trial_3.wav",
-            "false_interruption_candidate": true,
-            "supporting_dips": [
-              {
-                "start_t": 103912.25,
-                "duration_s": 0.135
-              },
-              {
-                "start_t": 103912.875,
-                "duration_s": 0.088
-              },
-              {
-                "start_t": 103913.437,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 103913.703,
-                "duration_s": 0.041
-              },
-              {
-                "start_t": 103914.14,
-                "duration_s": 0.026
-              },
-              {
-                "start_t": 103914.515,
-                "duration_s": 0.057
-              },
-              {
-                "start_t": 103914.656,
-                "duration_s": 0.072
-              }
-            ]
+            "false_interruption_candidate": false,
+            "supporting_dips": []
           },
           {
             "trial": 4,
             "offset_label": "mid",
             "delay_s": 0.9,
             "measured": true,
-            "onset_mono": 103916.484,
-            "last_agent_frame_mono": 103917.072,
-            "latency_ms": 588.0,
+            "onset_mono": 119248.546,
+            "last_agent_frame_mono": 119248.603,
+            "latency_ms": 57.0,
             "wav_path": "evidence\\e2\\live_room\\trial_4.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9643,9 +9609,9 @@
             "offset_label": "late",
             "delay_s": 2.2,
             "measured": true,
-            "onset_mono": 103922.093,
-            "last_agent_frame_mono": 103922.666,
-            "latency_ms": 573.0,
+            "onset_mono": 119284.296,
+            "last_agent_frame_mono": 119285.025,
+            "latency_ms": 729.0,
             "wav_path": "evidence\\e2\\live_room\\trial_5.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9655,9 +9621,9 @@
             "offset_label": "early",
             "delay_s": 0.3,
             "measured": true,
-            "onset_mono": 103925.812,
-            "last_agent_frame_mono": 103926.385,
-            "latency_ms": 573.0,
+            "onset_mono": 119299.437,
+            "last_agent_frame_mono": 119300.119,
+            "latency_ms": 682.0,
             "wav_path": "evidence\\e2\\live_room\\trial_6.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9667,9 +9633,9 @@
             "offset_label": "late",
             "delay_s": 1.8,
             "measured": true,
-            "onset_mono": 103931.031,
-            "last_agent_frame_mono": 103931.51,
-            "latency_ms": 479.0,
+            "onset_mono": 119306.062,
+            "last_agent_frame_mono": 119306.806,
+            "latency_ms": 744.0,
             "wav_path": "evidence\\e2\\live_room\\trial_7.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9679,9 +9645,9 @@
             "offset_label": "early",
             "delay_s": 0.5,
             "measured": true,
-            "onset_mono": 103934.921,
-            "last_agent_frame_mono": 103935.541,
-            "latency_ms": 620.0,
+            "onset_mono": 119321.343,
+            "last_agent_frame_mono": 119322.103,
+            "latency_ms": 760.0,
             "wav_path": "evidence\\e2\\live_room\\trial_8.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9691,9 +9657,9 @@
             "offset_label": "mid",
             "delay_s": 1.1,
             "measured": true,
-            "onset_mono": 103939.421,
-            "last_agent_frame_mono": 103940.056,
-            "latency_ms": 635.0,
+            "onset_mono": 119338.171,
+            "last_agent_frame_mono": 119338.947,
+            "latency_ms": 776.0,
             "wav_path": "evidence\\e2\\live_room\\trial_9.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9703,9 +9669,9 @@
             "offset_label": "late",
             "delay_s": 2.6,
             "measured": true,
-            "onset_mono": 103945.406,
-            "last_agent_frame_mono": 103946.025,
-            "latency_ms": 619.0,
+            "onset_mono": 119376.828,
+            "last_agent_frame_mono": 119377.369,
+            "latency_ms": 541.0,
             "wav_path": "evidence\\e2\\live_room\\trial_10.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9715,9 +9681,9 @@
             "offset_label": "early",
             "delay_s": 0.4,
             "measured": true,
-            "onset_mono": 103949.234,
-            "last_agent_frame_mono": 103949.885,
-            "latency_ms": 651.0,
+            "onset_mono": 119392.062,
+            "last_agent_frame_mono": 119392.681,
+            "latency_ms": 619.0,
             "wav_path": "evidence\\e2\\live_room\\trial_11.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9726,65 +9692,28 @@
         "latency_decomposition": {
           "attempted": true,
           "reliable": false,
-          "agent_interrupt_event_count": 31,
-          "measured_trial_count": 12,
-          "cascade_ratio": 2.58,
+          "agent_interrupt_event_count": 24,
+          "measured_trial_count": 11,
+          "cascade_ratio": 2.18,
           "agent_reported_latency_ms_sample": [
-            12297,
-            19921,
-            20359,
-            2734,
-            2734,
-            2328,
-            2719,
-            2719
+            2031,
+            2031,
+            2015,
+            2094,
+            2047,
+            2078,
+            2078,
+            2047
           ],
-          "reason": "31 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 2.58x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event.",
+          "reason": "24 agent-side 'interrupt' events were logged for only 11 successful trials (ratio 2.18x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event. the agent's own reported latency_ms values cluster tightly (mean=2055ms, stdev=26ms, relative spread 0.01) despite trials firing at very different points in the session -- consistent with _last_user_speech_start_mono being a single shared reference that is not being refreshed per-utterance during the barge-in retry cascade, not a fresh per-trial onset.",
           "conclusion": "per Main's own fallback: the agent's own event timestamps are not usable for a rigorous per-trial detection/drain split here. Reporting only the onset->last-frame headline number (this-process clock only) as the trustworthy per-trial metric."
         },
         "false_interruption_observations": {
-          "trials_affected": [
-            3
-          ],
-          "count": 1,
-          "of": 12,
+          "trials_affected": [],
+          "count": 0,
+          "of": 11,
           "threshold_ms": 1500,
-          "detail": [
-            {
-              "trial": 3,
-              "latency_ms": 2806.0,
-              "supporting_dips": [
-                {
-                  "start_t": 103912.25,
-                  "duration_s": 0.135
-                },
-                {
-                  "start_t": 103912.875,
-                  "duration_s": 0.088
-                },
-                {
-                  "start_t": 103913.437,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 103913.703,
-                  "duration_s": 0.041
-                },
-                {
-                  "start_t": 103914.14,
-                  "duration_s": 0.026
-                },
-                {
-                  "start_t": 103914.515,
-                  "duration_s": 0.057
-                },
-                {
-                  "start_t": 103914.656,
-                  "duration_s": 0.072
-                }
-              ]
-            }
-          ],
+          "detail": [],
           "note": "A trial is flagged when its measured stop latency exceeds 1500ms (5x the 300ms target) -- ordinary drain/network variance does not plausibly explain a multi-second stop, but the SDK's `resume_false_interruption` (default True in both configs) treating a barge-in as non-genuine and continuing the original utterance does. `supporting_dips` lists any brief (<200ms) sub-threshold audio dips inside the flagged window as illustrative evidence, not the trigger -- ordinary continuous speech has frequent transient dips at word/consonant boundaries unrelated to any interruption, so dip presence alone is not a reliable signal by itself. A lower `interruption.min_duration` (as in the tuned config) makes a brief dip more likely to register as a tentative interruption in the first place, which is the real cost of the sensitivity gain: an occasional much-worse outlier trial."
         }
       },
@@ -9798,268 +9727,222 @@
         "duplicate_heard_items": 0,
         "stale_speech_after_interrupt_count": 0,
         "duplicate_speech_end_speech_ids": 0,
-        "interrupted_item_ids": [],
+        "interrupted_item_ids": [
+          "imp_1"
+        ],
         "heard_item_ids": [],
         "truncation_checks": [
           {
-            "speech_id": "speech_6814fe5f5b06",
+            "speech_id": "speech_ddd66b20598b",
             "kind": "ack",
             "item_id": null,
-            "played_s": 0.563
+            "played_s": 0.547
           },
           {
-            "speech_id": "speech_6bb25733d0e0",
+            "speech_id": "speech_8194e5563642",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.265
+            "played_s": 0.281
           },
           {
-            "speech_id": "speech_4aff6e75d955",
+            "speech_id": "speech_da05dd7a52d0",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.438
+            "played_s": 0.922
           },
           {
-            "speech_id": "speech_1740a8d73770",
+            "speech_id": "speech_8a6b58204972",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 0.187
+          },
+          {
+            "speech_id": "speech_b8770ac7571f",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 2.062
+          },
+          {
+            "speech_id": "speech_39a6327182a9",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 0.11
+          },
+          {
+            "speech_id": "speech_4f0f6b48d1c7",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 2.203
+          },
+          {
+            "speech_id": "speech_7c708524937a",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 0.14
+          },
+          {
+            "speech_id": "speech_527e77094bf1",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 1.484
+          },
+          {
+            "speech_id": "speech_7608de7a099f",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 2.25
+          },
+          {
+            "speech_id": "speech_c9b2c25484b8",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 0.094
+          },
+          {
+            "speech_id": "speech_c1119091d0ef",
+            "kind": "feedback",
+            "item_id": "imp_1",
+            "played_s": 4.422
+          },
+          {
+            "speech_id": "speech_4d7973c37520",
             "kind": "clip",
-            "item_id": null,
-            "played_s": 2.375
-          },
-          {
-            "speech_id": "speech_cff618919f56",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
-          },
-          {
-            "speech_id": "speech_e35a23ac6837",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 2.828
-          },
-          {
-            "speech_id": "speech_afcff965fbd3",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.391
-          },
-          {
-            "speech_id": "speech_eb0b3a710154",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
-          },
-          {
-            "speech_id": "speech_3f75a25a7c40",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 1.375
-          },
-          {
-            "speech_id": "speech_9e5b350b2ce1",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 2.516
-          },
-          {
-            "speech_id": "speech_1e9098876450",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.406
-          },
-          {
-            "speech_id": "speech_5c46ca4593b0",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
-          },
-          {
-            "speech_id": "speech_6b53323821b8",
-            "kind": "feedback",
-            "item_id": null,
+            "item_id": "imp_1",
             "played_s": 5.172
           },
           {
-            "speech_id": "speech_e4b68a0cefb5",
+            "speech_id": "speech_3bac6d653aa6",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.437
+            "played_s": 3.125
           },
           {
-            "speech_id": "speech_7b8c8f613dbf",
+            "speech_id": "speech_8c8b1b6e0131",
             "kind": "feedback",
             "item_id": null,
+            "played_s": 0.109
+          },
+          {
+            "speech_id": "speech_1a7b69382908",
+            "kind": "feedback",
+            "item_id": "imp_1",
             "played_s": 0.0
           },
           {
-            "speech_id": "speech_a5cf64c41f77",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 3.313
+            "speech_id": "speech_00bb34b2ebfc",
+            "kind": "clip",
+            "item_id": "imp_1",
+            "played_s": 4.766
           },
           {
-            "speech_id": "speech_af0e4d38fffd",
+            "speech_id": "speech_fb350da10db1",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.406
+            "played_s": 1.031
           },
           {
-            "speech_id": "speech_f0be690157b5",
+            "speech_id": "speech_2975a62f70de",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.0
+            "played_s": 2.266
           },
           {
-            "speech_id": "speech_86e0218bbc91",
+            "speech_id": "speech_28975979527e",
             "kind": "feedback",
-            "item_id": null,
-            "played_s": 4.828
+            "item_id": "imp_1",
+            "played_s": 0.078
           },
           {
-            "speech_id": "speech_6732d3be85c8",
+            "speech_id": "speech_6b5a57d3bbcd",
             "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.375
+            "item_id": "imp_1",
+            "played_s": 3.937
           },
           {
-            "speech_id": "speech_85d22b081222",
+            "speech_id": "speech_e03738e5e1c4",
             "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
+            "item_id": "imp_1",
+            "played_s": 0.11
           },
           {
-            "speech_id": "speech_76ced7006bb2",
+            "speech_id": "speech_761ec9145fb1",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 0.985
+            "played_s": 0.203
           },
           {
-            "speech_id": "speech_0c52da741bec",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 2.5
-          },
-          {
-            "speech_id": "speech_6559599d780f",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.406
-          },
-          {
-            "speech_id": "speech_57c7b05e2bf0",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
-          },
-          {
-            "speech_id": "speech_10cd8f1f7070",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 4.078
-          },
-          {
-            "speech_id": "speech_b69c450d811c",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.406
-          },
-          {
-            "speech_id": "speech_cb62721067c0",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
-          },
-          {
-            "speech_id": "speech_f1692b328687",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 5.594
-          },
-          {
-            "speech_id": "speech_1863f945cc0f",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.453
-          },
-          {
-            "speech_id": "speech_1d5200d20bb9",
-            "kind": "feedback",
-            "item_id": null,
-            "played_s": 0.0
+            "speech_id": "speech_8d2c8f458258",
+            "kind": "clip",
+            "item_id": "imp_1",
+            "played_s": 5.578
           }
         ],
         "cross_checks_our_latency_vs_agent_played_s": [
           {
-            "trial": 0,
-            "our_latency_ms": 198.0,
-            "agent_played_s": 0.563,
-            "agent_speech_id": "speech_6814fe5f5b06"
-          },
-          {
             "trial": 1,
-            "our_latency_ms": 479.0,
-            "agent_played_s": 0.265,
-            "agent_speech_id": "speech_6bb25733d0e0"
+            "our_latency_ms": 1400.0,
+            "agent_played_s": 0.547,
+            "agent_speech_id": "speech_ddd66b20598b"
           },
           {
             "trial": 2,
-            "our_latency_ms": 666.0,
-            "agent_played_s": 0.438,
-            "agent_speech_id": "speech_4aff6e75d955"
+            "our_latency_ms": 135.0,
+            "agent_played_s": 0.281,
+            "agent_speech_id": "speech_8194e5563642"
           },
           {
             "trial": 3,
-            "our_latency_ms": 2806.0,
-            "agent_played_s": 2.375,
-            "agent_speech_id": "speech_1740a8d73770"
+            "our_latency_ms": 229.0,
+            "agent_played_s": 0.922,
+            "agent_speech_id": "speech_da05dd7a52d0"
           },
           {
             "trial": 4,
-            "our_latency_ms": 588.0,
-            "agent_played_s": 0.0,
-            "agent_speech_id": "speech_cff618919f56"
+            "our_latency_ms": 57.0,
+            "agent_played_s": 0.187,
+            "agent_speech_id": "speech_8a6b58204972"
           },
           {
             "trial": 5,
-            "our_latency_ms": 573.0,
-            "agent_played_s": 2.828,
-            "agent_speech_id": "speech_e35a23ac6837"
+            "our_latency_ms": 729.0,
+            "agent_played_s": 2.062,
+            "agent_speech_id": "speech_b8770ac7571f"
           },
           {
             "trial": 6,
-            "our_latency_ms": 573.0,
-            "agent_played_s": 0.391,
-            "agent_speech_id": "speech_afcff965fbd3"
+            "our_latency_ms": 682.0,
+            "agent_played_s": 0.11,
+            "agent_speech_id": "speech_39a6327182a9"
           },
           {
             "trial": 7,
-            "our_latency_ms": 479.0,
-            "agent_played_s": 0.0,
-            "agent_speech_id": "speech_eb0b3a710154"
+            "our_latency_ms": 744.0,
+            "agent_played_s": 2.203,
+            "agent_speech_id": "speech_4f0f6b48d1c7"
           },
           {
             "trial": 8,
-            "our_latency_ms": 620.0,
-            "agent_played_s": 1.375,
-            "agent_speech_id": "speech_3f75a25a7c40"
+            "our_latency_ms": 760.0,
+            "agent_played_s": 0.14,
+            "agent_speech_id": "speech_7c708524937a"
           },
           {
             "trial": 9,
-            "our_latency_ms": 635.0,
-            "agent_played_s": 2.516,
-            "agent_speech_id": "speech_9e5b350b2ce1"
+            "our_latency_ms": 776.0,
+            "agent_played_s": 1.484,
+            "agent_speech_id": "speech_527e77094bf1"
           },
           {
             "trial": 10,
-            "our_latency_ms": 619.0,
-            "agent_played_s": 0.406,
-            "agent_speech_id": "speech_1e9098876450"
+            "our_latency_ms": 541.0,
+            "agent_played_s": 2.25,
+            "agent_speech_id": "speech_7608de7a099f"
           },
           {
             "trial": 11,
-            "our_latency_ms": 651.0,
-            "agent_played_s": 0.0,
-            "agent_speech_id": "speech_5c46ca4593b0"
+            "our_latency_ms": 619.0,
+            "agent_played_s": 0.094,
+            "agent_speech_id": "speech_c9b2c25484b8"
           }
         ],
         "details": "interrupted_items_marked_heard/duplicate_heard_items are computed from the full live timeline.jsonl, not fabricated: an item is 'interrupted' if a real agent_speech_end{interrupted:true} event's matching agent_speech_start text maps back to one of the real judgment's improvements (infer_item_id); 'heard' comes from real feedback_heard events. cross_checks zips each measured trial's own (this-process-clock) latency against the orchestrator's independently measured played_s (agent-process clock) for the same interrupted speech, in chronological order -- agreement between two independently-clocked measurements is the evidence that the interrupted speech's audio genuinely stopped early rather than completing anyway (the exact failure mode evidence/e2_duplex.py Part B could not rule out)."
@@ -10071,7 +9954,7 @@
         "stale_judgment_spoken": false,
         "analyze1_to_rerecord_s": 0.391
       },
-      "timeline_path": "sessions\\s_20260908_163341\\timeline.jsonl",
+      "timeline_path": "sessions\\s_20260908_204825\\timeline.jsonl",
       "not_measured": []
     }
   }

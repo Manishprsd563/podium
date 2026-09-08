@@ -8,6 +8,36 @@ const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/p
 // would rejoin a dead session ("AgentSession isn't running"). `?room=` overrides.
 const ROOM_NAME = new URLSearchParams(location.search).get("room")
   || "podium-" + Math.random().toString(36).slice(2, 10);
+
+// A stable per-browser id so cross-session progress (§8 Progress) can be
+// attributed to the same person without an account system.
+function generateUuid() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+function getClientId() {
+  let id;
+  try {
+    id = localStorage.getItem("podium_client_id");
+  } catch (err) {
+    id = null;
+  }
+  if (!id) {
+    id = generateUuid();
+    try {
+      localStorage.setItem("podium_client_id", id);
+    } catch (err) {
+      // localStorage unavailable (private mode etc.) - keep the in-memory id.
+    }
+  }
+  return id;
+}
+const CLIENT_ID = getClientId();
+
 const state = {
   room: null,
   connected: false,
@@ -17,19 +47,25 @@ const state = {
   deck: null,
   pendingDeckSlides: null,
   currentSlide: 1,
-  remainingS: null,
+  remainingS: null, // prep countdown, agent-driven via `timer`
+  presentStartedAt: null, // present clock, client-driven from `phase.budget_s`
+  presentTimerId: null,
   transcript: new Map(), // segId -> {speaker, text, final}
   lastAgentLine: null, // {text, final}
   lastUserLine: null, // {text, final}
   metrics: null,
   judgment: null,
-  clips: {}, // improvement_id -> {v1,v2,v3,attempt<N>: url}
+  clips: {}, // improvement_id -> {v0,v1,v2,v3,attempt<N>: url}
   provider: null,
   activeImprovementId: null,
   agentSpeaking: false,
   localSpeaking: false,
   coach: null, // {stage, options, improvementId, index, total, attempt, verdict}
   coachHistory: {}, // improvement_id -> [{attempt, verdict}]
+  feedback: null, // {itemId, stage, text} - latest §5 `feedback` message
+  feedbackPlayed: {}, // improvement_id -> Set of stages already cued
+  drill: null, // {word, stage, confBefore, confAfter, url} - latest §5 `drill` message
+  progress: null, // {level, levels, skills, nextFocus} - latest §5 `progress` message
   countdownValue: null,
   countdownTimer: null,
   gateOpen: true,
@@ -38,6 +74,7 @@ const state = {
   analysers: {}, // agent|user -> {analyser, data}
   orbGate: null,
   orbBubble: null,
+  clientId: CLIENT_ID,
 };
 const el = {};
 function q(id) { return document.getElementById(id); }
@@ -49,7 +86,7 @@ function coachName() {
 }
 function cacheEls() {
   [
-    "conn-badge", "mic-badge", "agent-badge", "provider-badge", "error-banner",
+    "conn-badge", "mic-badge", "agent-badge", "provider-badge", "level-badge", "error-banner",
     "astra-indicator", "astra-line", "user-line",
     "gate", "gate-orb", "gate-status", "gate-start-btn", "unmute-pill",
     "view-setup", "view-stage", "view-coach", "view-report",
@@ -60,7 +97,9 @@ function cacheEls() {
     "stage-present", "present-timer", "slide-title", "slide-bullets",
     "slide-next-btn", "present-done-btn", "transcript-strip",
     "scorecard", "judgment-summary", "metrics-grid", "metrics-perslide",
-    "coach-chat-log", "coach-card", "coach-options", "coach-status",
+    "coach-chat-log", "coach-card", "drill-card", "coach-transcript-strip",
+    "coach-options", "coach-status",
+    "progress-panel", "level-track", "skill-rows", "next-focus", "report-transcript-strip",
     "rerecord-slide", "rerecord-btn", "improvement-cards", "new-talk-btn",
     "countdown-overlay", "countdown-number",
   ].forEach((id) => { el[toCamel(id)] = q(id); });
@@ -301,13 +340,35 @@ function levelLoop() {
   requestAnimationFrame(levelLoop);
 }
 
+// ------------------------------------------------------------- present clock
+// The agent only sends `timer` during prep; during present the client owns
+// the clock, seeded from `phase.budget_s`, so a dropped/late `timer` message
+// can never freeze the on-screen time.
+function stopPresentClock() {
+  if (state.presentTimerId) {
+    clearInterval(state.presentTimerId);
+    state.presentTimerId = null;
+  }
+  state.presentStartedAt = null;
+}
+function startPresentClock(budgetS) {
+  stopPresentClock();
+  if (budgetS != null) state.budgetS = budgetS;
+  state.presentStartedAt = Date.now();
+  state.presentTimerId = setInterval(render, 250);
+}
+
 // ---------------------------------------------------------- message router
 function handleMessage(msg) {
   switch (msg.type) {
-    case "phase":
+    case "phase": {
+      const enteringPresent = msg.name === "present";
       state.phase = msg.name;
       if (msg.budget_s != null) state.budgetS = msg.budget_s;
+      if (enteringPresent) startPresentClock(state.budgetS);
+      else stopPresentClock();
       break;
+    }
     case "deck":
       state.deck = msg.deck;
       state.currentSlide = (msg.deck && msg.deck.slides && msg.deck.slides[0] && msg.deck.slides[0].index) || 1;
@@ -324,14 +385,42 @@ function handleMessage(msg) {
     case "judgment":
       state.judgment = msg.judgment;
       break;
-    case "feedback":
-      state.activeImprovementId = (msg.item && msg.item.id) || null;
+    case "feedback": {
+      const itemId = (msg.item && msg.item.id) || null;
+      const stage = (msg.item && msg.item.stage) || null;
+      const prev = state.feedback;
+      if (itemId && (!prev || prev.itemId !== itemId)) {
+        state.feedbackPlayed[itemId] = new Set();
+      } else if (prev && itemId && prev.itemId === itemId && prev.stage && prev.stage !== stage && prev.stage !== "resume") {
+        (state.feedbackPlayed[itemId] || (state.feedbackPlayed[itemId] = new Set())).add(prev.stage);
+      }
+      state.feedback = { itemId, stage, text: (msg.item && msg.item.text) || null };
+      state.activeImprovementId = itemId;
       state.agentSpeaking = true;
       break;
+    }
     case "clip":
       if (!state.clips[msg.improvement_id]) state.clips[msg.improvement_id] = {};
       state.clips[msg.improvement_id][msg.variant] = msg.url;
       state.agentSpeaking = true;
+      break;
+    case "drill":
+      state.drill = {
+        word: msg.word,
+        stage: msg.stage,
+        confBefore: msg.conf_before,
+        confAfter: msg.conf_after,
+        url: msg.url || null,
+      };
+      break;
+    case "progress":
+      state.progress = {
+        clientId: msg.client_id || null,
+        level: msg.level || null,
+        levels: msg.levels || [],
+        skills: msg.skills || {},
+        nextFocus: msg.next_focus || null,
+      };
       break;
     case "coach":
       state.coach = {
@@ -428,6 +517,17 @@ function renderTopbar() {
     el.providerBadge.classList.remove("hidden");
     el.providerBadge.textContent = `${state.provider.name} \u00b7 ${state.provider.model} \u00b7 ${state.provider.speaker}`;
   }
+  renderLevelBadge();
+}
+function renderLevelBadge() {
+  if (!el.levelBadge) return;
+  if (state.progress && state.progress.level) {
+    el.levelBadge.classList.remove("hidden");
+    el.levelBadge.classList.add("level");
+    el.levelBadge.textContent = state.progress.level;
+  } else {
+    el.levelBadge.classList.add("hidden");
+  }
 }
 function renderAstraBubble() {
   const agent = state.lastAgentLine;
@@ -500,7 +600,7 @@ async function handlePdfUpload(file) {
     if (!slides.length) throw new Error("No pages found in PDF");
     state.pendingDeckSlides = slides;
     render();
-    sendMessage({ type: "deck_upload", slides });
+    sendMessage({ type: "deck_upload", slides, client_id: state.clientId });
     el.uploadStatus.textContent = `Sent ${slides.length} slide(s) parsed from PDF.`;
   } catch (err) {
     el.uploadStatus.textContent = "";
@@ -532,6 +632,22 @@ function formatClock(seconds) {
   const rem = s % 60;
   return `${m}:${String(rem).padStart(2, "0")}`;
 }
+function renderPresentTimer() {
+  if (state.presentStartedAt == null) {
+    el.presentTimer.textContent = state.remainingS != null ? formatClock(state.remainingS) : "\u2014";
+    el.presentTimer.classList.remove("over");
+    return;
+  }
+  const elapsed = (Date.now() - state.presentStartedAt) / 1000;
+  const remaining = state.budgetS - elapsed;
+  if (remaining >= 0) {
+    el.presentTimer.textContent = formatClock(remaining);
+    el.presentTimer.classList.remove("over");
+  } else {
+    el.presentTimer.textContent = "+" + formatClock(-remaining);
+    el.presentTimer.classList.add("over");
+  }
+}
 function renderStage() {
   const isPrep = state.phase === "prep";
   el.stagePrep.classList.toggle("hidden", !isPrep);
@@ -543,7 +659,7 @@ function renderStage() {
     el.prepCountdown.textContent = state.remainingS != null ? String(Math.max(0, Math.ceil(state.remainingS))) : "\u2014";
     return;
   }
-  el.presentTimer.textContent = state.remainingS != null ? formatClock(state.remainingS) : "\u2014";
+  renderPresentTimer();
   const slide = currentSlideObj();
   el.slideTitle.textContent = slide ? slide.title : "\u2014";
   el.slideBullets.innerHTML = "";
@@ -560,10 +676,58 @@ function renderTranscript() {
   lines.forEach((line) => {
     const div = document.createElement("div");
     div.className = "line" + (line.final ? "" : " partial");
-    div.textContent = `${line.speaker}: ${line.text}`;
+    const who = line.speaker.startsWith("presenter-") ? "You" : coachName();
+    div.textContent = `${who}: ${stripPauseMarkup(line.text)}`;
     el.transcriptStrip.appendChild(div);
   });
   el.transcriptStrip.scrollTop = el.transcriptStrip.scrollHeight;
+}
+
+// --------------------------------------------------------- Pronunciation
+// The user's own spoken words, reconstructed from the live transcription
+// stream (the only place the client sees the presentation's text). Words
+// that Deepgram's per-word confidence flagged as low are underlined.
+function userTranscriptText() {
+  return Array.from(state.transcript.values())
+    .filter((l) => l.final && l.speaker && l.speaker.startsWith("presenter-"))
+    .map((l) => l.text)
+    .join(" ");
+}
+function normalizeWord(tok) {
+  return (tok || "").toLowerCase().replace(/[^a-z0-9']/g, "");
+}
+function renderPronunciationTranscript(container) {
+  if (!container) return;
+  container.innerHTML = "";
+  const text = userTranscriptText();
+  if (!text) {
+    container.innerHTML = '<span class="hint">Waiting for your transcript\u2026</span>';
+    return;
+  }
+  const low = (state.metrics && state.metrics.pronunciation && state.metrics.pronunciation.low_confidence) || [];
+  const lowMap = new Map();
+  low.forEach((w) => {
+    const key = normalizeWord(w.w);
+    if (key) lowMap.set(key, w.conf);
+  });
+  const tokens = text.split(/(\s+)/);
+  tokens.forEach((tok) => {
+    if (tok === "" ) return;
+    if (/^\s+$/.test(tok)) {
+      container.appendChild(document.createTextNode(tok));
+      return;
+    }
+    const key = normalizeWord(tok);
+    if (key && lowMap.has(key)) {
+      const span = document.createElement("span");
+      span.className = "low-conf-word";
+      span.textContent = tok;
+      span.title = `heard with ${Math.round(lowMap.get(key) * 100)}% confidence`;
+      container.appendChild(span);
+    } else {
+      container.appendChild(document.createTextNode(tok));
+    }
+  });
 }
 
 // -------------------------------------------------------------- Coach view
@@ -572,6 +736,8 @@ function renderCoachView() {
   renderMetrics();
   renderCoachChatLog();
   renderCoachCard();
+  renderDrillCard();
+  renderPronunciationTranscript(el.coachTranscriptStrip);
   renderCoachOptions();
   renderCoachStatus();
 }
@@ -626,6 +792,58 @@ function renderVerdictChips(v) {
   }
   return wrap;
 }
+// The four clip stages the coach cycles through for every improvement, plus
+// a fifth "Your turn" pill for the practice prompt. Order matters: it is the
+// order clips are recorded/rendered in (§1) and the order the coach plays them.
+const FEEDBACK_PILLS = [
+  { stage: "v0", label: "You" },
+  { stage: "v2", label: "Cleaner" },
+  { stage: "v3", label: "With pauses" },
+  { stage: "alt", label: "Another opening" },
+];
+function renderFeedbackPills(container, coach) {
+  container.innerHTML = "";
+  const fb = state.feedback;
+  const activeStage = fb && fb.itemId === coach.improvementId ? fb.stage : null;
+  const played = state.feedbackPlayed[coach.improvementId] || new Set();
+  FEEDBACK_PILLS.forEach(({ stage, label }) => {
+    const pill = document.createElement("div");
+    pill.className = "feedback-pill";
+    if (activeStage === stage) pill.classList.add("active");
+    if (played.has(stage)) pill.classList.add("played");
+    const text = document.createElement("span");
+    text.textContent = label;
+    pill.appendChild(text);
+    if (played.has(stage)) {
+      const check = document.createElement("span");
+      check.className = "pill-check";
+      check.textContent = "\u2713";
+      pill.appendChild(check);
+    }
+    container.appendChild(pill);
+  });
+  const promptPill = document.createElement("div");
+  promptPill.className = "feedback-pill prompt-pill";
+  if (activeStage === "prompt") promptPill.classList.add("active");
+  promptPill.textContent = "Your turn";
+  container.appendChild(promptPill);
+  if (activeStage === "resume") {
+    const flash = document.createElement("div");
+    flash.className = "feedback-resume-flash";
+    flash.textContent = "resuming\u2026";
+    container.appendChild(flash);
+  }
+}
+function renderCoachStepper(container, coach) {
+  container.innerHTML = "";
+  const total = coach.total || 3;
+  for (let i = 1; i <= total; i++) {
+    const dot = document.createElement("div");
+    dot.className = "step-dot" + (i === coach.index ? " active" : i < coach.index ? " done" : "");
+    dot.textContent = String(i);
+    container.appendChild(dot);
+  }
+}
 function renderCoachCard() {
   el.coachCard.innerHTML = "";
   const coach = state.coach;
@@ -639,19 +857,47 @@ function renderCoachCard() {
     return;
   }
   el.coachCard.classList.remove("hidden");
+
   const head = document.createElement("div");
   head.className = "coach-card-head";
   head.textContent = coach.total ? `Improvement ${coach.index} of ${coach.total}` : "Improvement";
+
+  const stepper = document.createElement("div");
+  stepper.className = "coach-stepper";
+  renderCoachStepper(stepper, coach);
+
+  const slideIndex = imp.slide != null ? imp.slide : state.currentSlide;
+  const slides = (state.deck && state.deck.slides) || [];
+  const slideObj = slides.find((s) => s.index === slideIndex) || null;
+  const slideCard = document.createElement("div");
+  slideCard.className = "slide-card coach-slide-card";
+  const slideTitle = document.createElement("div");
+  slideTitle.className = "slide-title";
+  slideTitle.textContent = slideObj ? slideObj.title : (slideIndex != null ? `Slide ${slideIndex}` : "\u2014");
+  const slideBullets = document.createElement("ul");
+  slideBullets.className = "slide-bullets";
+  ((slideObj && slideObj.bullets) || []).forEach((b) => {
+    const li = document.createElement("li");
+    li.textContent = b;
+    slideBullets.appendChild(li);
+  });
+  slideCard.append(slideTitle, slideBullets);
+
   const quote = document.createElement("p");
-  quote.className = "improvement-quote";
+  quote.className = "improvement-quote highlighted";
   quote.textContent = `\u201c${imp.quote}\u201d`;
+
+  const isIntro = state.feedback && state.feedback.itemId === coach.improvementId && state.feedback.stage === "intro";
   const issue = document.createElement("p");
-  issue.className = "improvement-issue";
+  issue.className = "improvement-issue" + (isIntro ? " active" : "");
   issue.textContent = imp.issue;
-  el.coachCard.append(head, quote, issue, labeledLine("Cleaner", stripPauseMarkup(imp.v2_text || "")));
-  if (imp.alternative) {
-    el.coachCard.appendChild(labeledLine("Alternative", imp.alternative));
-  }
+
+  const pillRow = document.createElement("div");
+  pillRow.className = "feedback-pill-row";
+  renderFeedbackPills(pillRow, coach);
+
+  el.coachCard.append(head, stepper, slideCard, quote, issue, pillRow);
+
   if (coach.stage === "verdict" && coach.verdict) {
     el.coachCard.appendChild(renderVerdictChips(coach.verdict));
   }
@@ -668,6 +914,41 @@ function renderCoachCard() {
       box.appendChild(row);
     });
     el.coachCard.appendChild(box);
+  }
+}
+const DRILL_STAGE_LABELS = {
+  you: "how it came through",
+  model: "coach's version",
+  prompt: "say it",
+  verdict: "before / after",
+};
+function renderDrillCard() {
+  if (!el.drillCard) return;
+  const d = state.drill;
+  if (!d || state.phase !== "drill") {
+    el.drillCard.classList.add("hidden");
+    return;
+  }
+  el.drillCard.classList.remove("hidden");
+  el.drillCard.innerHTML = "";
+  const head = document.createElement("div");
+  head.className = "coach-card-head";
+  head.textContent = `Drill: \u201c${d.word}\u201d`;
+  const stageLine = document.createElement("p");
+  stageLine.textContent = DRILL_STAGE_LABELS[d.stage] || d.stage;
+  el.drillCard.append(head, stageLine);
+  if (d.stage === "verdict") {
+    const p = document.createElement("p");
+    const before = d.confBefore != null ? Math.round(d.confBefore * 100) + "%" : "\u2014";
+    const after = d.confAfter != null ? Math.round(d.confAfter * 100) + "%" : "\u2014";
+    p.textContent = `${before} \u2192 ${after}`;
+    el.drillCard.appendChild(p);
+  }
+  if (d.url) {
+    const audio = document.createElement("audio");
+    audio.controls = true;
+    audio.src = d.url;
+    el.drillCard.appendChild(audio);
   }
 }
 const PRIMARY_COMMANDS = new Set(["proceed", "next", "practice"]);
@@ -694,9 +975,17 @@ function renderCoachStatus() {
 
 // ------------------------------------------------------------- Report view
 const SCORE_MAX = 5; // rubric scale per skills/judge/*.md examples in GATE0.md
+// The TEDx skill ladder (§9 curriculum), in the fixed order the path panel
+// always shows all ten in, whether or not the judge has trained them yet.
+const SKILL_IDS = [
+  "hook", "structure", "pacing", "pausing", "fillers",
+  "vocal-variety", "storytelling", "slide-connection", "closing", "articulation",
+];
 function renderReport() {
   renderRerecordSlideOptions();
   renderImprovementCards();
+  renderProgressPanel();
+  renderPronunciationTranscript(el.reportTranscriptStrip);
 }
 function renderScorecard() {
   el.scorecard.innerHTML = "";
@@ -754,6 +1043,9 @@ function renderMetrics() {
       m.time_budget ? `${m.time_budget.used_s.toFixed(0)}s / ${m.time_budget.budget_s}s` : "\u2014"
     )
   );
+  if (m.pronunciation && m.pronunciation.intelligibility != null) {
+    el.metricsGrid.append(metricTile("intelligibility", `${Math.round(m.pronunciation.intelligibility * 100)}%`));
+  }
   if (m.time_budget && m.time_budget.over_s > 0) {
     el.metricsGrid.append(metricTile("over budget", `+${m.time_budget.over_s.toFixed(1)}s`));
   }
@@ -761,6 +1053,37 @@ function renderMetrics() {
     const parts = m.time_budget.per_slide.map((row) => `slide ${row.slide}: ${row.used_s.toFixed(0)}s (fair ${row.fair_share_s.toFixed(0)}s)`);
     el.metricsPerslide.textContent = "Per slide: " + parts.join(" \u00b7 ");
   }
+}
+function renderProgressPanel() {
+  if (!el.progressPanel) return;
+  const p = state.progress;
+  el.progressPanel.classList.toggle("hidden", !p);
+  if (!p) return;
+  el.levelTrack.innerHTML = "";
+  (p.levels || []).forEach((lvl) => {
+    const chip = document.createElement("div");
+    chip.className = "level-chip" + (lvl === p.level ? " current" : "");
+    chip.textContent = lvl;
+    el.levelTrack.appendChild(chip);
+  });
+  el.skillRows.innerHTML = "";
+  SKILL_IDS.forEach((id) => {
+    const s = (p.skills && p.skills[id]) || { mastery: 0 };
+    const row = document.createElement("div");
+    row.className = "skill-row" + (id === p.nextFocus ? " focus" : "");
+    const label = document.createElement("div");
+    label.className = "skill-label";
+    label.textContent = id.replace(/-/g, " ");
+    const track = document.createElement("div");
+    track.className = "skill-bar-track";
+    const fill = document.createElement("div");
+    fill.className = "skill-bar-fill";
+    fill.style.width = `${Math.round(Math.max(0, Math.min(1, s.mastery || 0)) * 100)}%`;
+    track.appendChild(fill);
+    row.append(label, track);
+    el.skillRows.appendChild(row);
+  });
+  el.nextFocus.textContent = p.nextFocus ? `Next up: ${p.nextFocus.replace(/-/g, " ")}` : "";
 }
 function renderRerecordSlideOptions() {
   const slides = (state.deck && state.deck.slides) || [];
@@ -777,7 +1100,8 @@ function renderRerecordSlideOptions() {
   }
   if (state.currentSlide) el.rerecordSlide.value = String(state.currentSlide);
 }
-const CLIP_LABELS = { v1: "You said", v2: "Cleaner", v3: "With pauses" };
+const CLIP_LABELS = { v0: "You (recording)", v1: "You said", v2: "Cleaner", v3: "With pauses" };
+const CLIP_VARIANT_ORDER = ["v0", "v1", "v2", "v3"];
 function renderImprovementCards() {
   el.improvementCards.innerHTML = "";
   const improvements = (state.judgment && state.judgment.improvements) || [];
@@ -796,7 +1120,10 @@ function renderImprovementCards() {
     issue.textContent = imp.issue;
     card.append(quote, issue);
     const clips = state.clips[imp.id] || {};
-    ["v1", "v2", "v3"].forEach((variant) => {
+    CLIP_VARIANT_ORDER.forEach((variant) => {
+      // v0/v2/v3 always render a row (pending clips show "(rendering…)");
+      // v1 is a legacy/optional variant, shown only if it exists.
+      if (variant === "v1" && !clips.v1) return;
       const row = document.createElement("div");
       row.className = "clip-row" + (clips[variant] ? "" : " missing");
       const label = document.createElement("div");
@@ -841,6 +1168,7 @@ function wireEvents() {
       topic: el.setupTopic.value.trim(),
       level: el.setupLevel.value,
       budget_s: Number(el.setupDuration.value),
+      client_id: state.clientId,
     });
   });
   el.uploadInput.addEventListener("change", () => {
