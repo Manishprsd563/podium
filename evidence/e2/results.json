@@ -9501,7 +9501,7 @@
     },
     "tuned_interruption": {
       "exercised": true,
-      "room": "podium-e2-live-b7499933ae",
+      "room": "podium-e2-live-56fb257e6c",
       "config": {
         "turn_handling": "TurnHandlingOptions(turn_detection='vad', interruption={'mode': 'vad', 'min_duration': 0.12, 'discard_audio_if_uninterruptible': True, 'resume_false_interruption': True, 'false_interruption_timeout': 1.5})",
         "vad": "silero.VAD.load(min_speech_duration=0.03, min_silence_duration=0.55)",
@@ -9509,14 +9509,14 @@
       },
       "decomposition_not_reported": {
         "reported": false,
-        "agent_interrupt_event_count": 21,
+        "agent_interrupt_event_count": 31,
         "measured_trial_count": 12,
-        "cascade_ratio": 1.75,
-        "reason": "21 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.75x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event."
+        "cascade_ratio": 2.58,
+        "reason": "31 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 2.58x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event."
       },
       "false_interruption_tradeoff": {
         "trials_affected": [
-          1
+          3
         ],
         "count": 1,
         "of": 12,
@@ -9535,17 +9535,17 @@
       },
       "end_to_end_proof": {
         "words_transcribed": 37,
-        "wpm": 200.0,
+        "wpm": 199.1,
         "filler_count": 0,
         "improvement_count": 3,
-        "session_dir": "sessions\\s_20260908_100318"
+        "session_dir": "sessions\\s_20260908_163341"
       },
       "stop_latency": {
         "n_trials": 12,
         "n_attempted": 12,
-        "p50_ms": 666.0,
-        "p95_ms": 744.0,
-        "max_ms": 1713.0,
+        "p50_ms": 603.5,
+        "p95_ms": 666.0,
+        "max_ms": 2806.0,
         "target_ms": 300,
         "target_met": false,
         "trials": [
@@ -9554,9 +9554,9 @@
             "offset_label": "early",
             "delay_s": 0.25,
             "measured": true,
-            "onset_mono": 80449.718,
-            "last_agent_frame_mono": 80450.103,
-            "latency_ms": 385.0,
+            "onset_mono": 103897.671,
+            "last_agent_frame_mono": 103897.869,
+            "latency_ms": 198.0,
             "wav_path": "evidence\\e2\\live_room\\trial_0.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9566,66 +9566,21 @@
             "offset_label": "mid",
             "delay_s": 1.4,
             "measured": true,
-            "onset_mono": 80456.0,
-            "last_agent_frame_mono": 80457.713,
-            "latency_ms": 1713.0,
+            "onset_mono": 103899.562,
+            "last_agent_frame_mono": 103900.041,
+            "latency_ms": 479.0,
             "wav_path": "evidence\\e2\\live_room\\trial_1.wav",
-            "false_interruption_candidate": true,
-            "supporting_dips": [
-              {
-                "start_t": 80456.25,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 80456.484,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 80456.796,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 80456.984,
-                "duration_s": 0.041
-              },
-              {
-                "start_t": 80457.046,
-                "duration_s": 0.042
-              },
-              {
-                "start_t": 80457.156,
-                "duration_s": 0.025
-              },
-              {
-                "start_t": 80457.281,
-                "duration_s": 0.025
-              },
-              {
-                "start_t": 80457.312,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 80457.484,
-                "duration_s": 0.057
-              },
-              {
-                "start_t": 80457.64,
-                "duration_s": 0.01
-              },
-              {
-                "start_t": 80457.656,
-                "duration_s": 0.041
-              }
-            ]
+            "false_interruption_candidate": false,
+            "supporting_dips": []
           },
           {
             "trial": 2,
             "offset_label": "late",
             "delay_s": 3.0,
             "measured": true,
-            "onset_mono": 80463.109,
-            "last_agent_frame_mono": 80463.119,
-            "latency_ms": 10.0,
+            "onset_mono": 103908.984,
+            "last_agent_frame_mono": 103909.65,
+            "latency_ms": 666.0,
             "wav_path": "evidence\\e2\\live_room\\trial_2.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9635,21 +9590,50 @@
             "offset_label": "early",
             "delay_s": 0.35,
             "measured": true,
-            "onset_mono": 80467.515,
-            "last_agent_frame_mono": 80468.197,
-            "latency_ms": 682.0,
+            "onset_mono": 103912.25,
+            "last_agent_frame_mono": 103915.056,
+            "latency_ms": 2806.0,
             "wav_path": "evidence\\e2\\live_room\\trial_3.wav",
-            "false_interruption_candidate": false,
-            "supporting_dips": []
+            "false_interruption_candidate": true,
+            "supporting_dips": [
+              {
+                "start_t": 103912.25,
+                "duration_s": 0.135
+              },
+              {
+                "start_t": 103912.875,
+                "duration_s": 0.088
+              },
+              {
+                "start_t": 103913.437,
+                "duration_s": 0.01
+              },
+              {
+                "start_t": 103913.703,
+                "duration_s": 0.041
+              },
+              {
+                "start_t": 103914.14,
+                "duration_s": 0.026
+              },
+              {
+                "start_t": 103914.515,
+                "duration_s": 0.057
+              },
+              {
+                "start_t": 103914.656,
+                "duration_s": 0.072
+              }
+            ]
           },
           {
             "trial": 4,
             "offset_label": "mid",
             "delay_s": 0.9,
             "measured": true,
-            "onset_mono": 80472.718,
-            "last_agent_frame_mono": 80473.103,
-            "latency_ms": 385.0,
+            "onset_mono": 103916.484,
+            "last_agent_frame_mono": 103917.072,
+            "latency_ms": 588.0,
             "wav_path": "evidence\\e2\\live_room\\trial_4.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9659,9 +9643,9 @@
             "offset_label": "late",
             "delay_s": 2.2,
             "measured": true,
-            "onset_mono": 80480.078,
-            "last_agent_frame_mono": 80480.791,
-            "latency_ms": 713.0,
+            "onset_mono": 103922.093,
+            "last_agent_frame_mono": 103922.666,
+            "latency_ms": 573.0,
             "wav_path": "evidence\\e2\\live_room\\trial_5.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9671,9 +9655,9 @@
             "offset_label": "early",
             "delay_s": 0.3,
             "measured": true,
-            "onset_mono": 80484.453,
-            "last_agent_frame_mono": 80485.103,
-            "latency_ms": 650.0,
+            "onset_mono": 103925.812,
+            "last_agent_frame_mono": 103926.385,
+            "latency_ms": 573.0,
             "wav_path": "evidence\\e2\\live_room\\trial_6.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9683,9 +9667,9 @@
             "offset_label": "late",
             "delay_s": 1.8,
             "measured": true,
-            "onset_mono": 80489.406,
-            "last_agent_frame_mono": 80490.15,
-            "latency_ms": 744.0,
+            "onset_mono": 103931.031,
+            "last_agent_frame_mono": 103931.51,
+            "latency_ms": 479.0,
             "wav_path": "evidence\\e2\\live_room\\trial_7.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9695,9 +9679,9 @@
             "offset_label": "early",
             "delay_s": 0.5,
             "measured": true,
-            "onset_mono": 80493.093,
-            "last_agent_frame_mono": 80493.494,
-            "latency_ms": 401.0,
+            "onset_mono": 103934.921,
+            "last_agent_frame_mono": 103935.541,
+            "latency_ms": 620.0,
             "wav_path": "evidence\\e2\\live_room\\trial_8.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9707,9 +9691,9 @@
             "offset_label": "mid",
             "delay_s": 1.1,
             "measured": true,
-            "onset_mono": 80497.609,
-            "last_agent_frame_mono": 80498.322,
-            "latency_ms": 713.0,
+            "onset_mono": 103939.421,
+            "last_agent_frame_mono": 103940.056,
+            "latency_ms": 635.0,
             "wav_path": "evidence\\e2\\live_room\\trial_9.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9719,9 +9703,9 @@
             "offset_label": "late",
             "delay_s": 2.6,
             "measured": true,
-            "onset_mono": 80503.687,
-            "last_agent_frame_mono": 80504.088,
-            "latency_ms": 401.0,
+            "onset_mono": 103945.406,
+            "last_agent_frame_mono": 103946.025,
+            "latency_ms": 619.0,
             "wav_path": "evidence\\e2\\live_room\\trial_10.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9731,9 +9715,9 @@
             "offset_label": "early",
             "delay_s": 0.4,
             "measured": true,
-            "onset_mono": 80508.203,
-            "last_agent_frame_mono": 80508.916,
-            "latency_ms": 713.0,
+            "onset_mono": 103949.234,
+            "last_agent_frame_mono": 103949.885,
+            "latency_ms": 651.0,
             "wav_path": "evidence\\e2\\live_room\\trial_11.wav",
             "false_interruption_candidate": false,
             "supporting_dips": []
@@ -9742,77 +9726,61 @@
         "latency_decomposition": {
           "attempted": true,
           "reliable": false,
-          "agent_interrupt_event_count": 21,
+          "agent_interrupt_event_count": 31,
           "measured_trial_count": 12,
-          "cascade_ratio": 1.75,
+          "cascade_ratio": 2.58,
           "agent_reported_latency_ms_sample": [
-            11984,
-            12359,
-            3875,
-            17828,
-            17828,
-            2360,
-            2453,
-            2344
+            12297,
+            19921,
+            20359,
+            2734,
+            2734,
+            2328,
+            2719,
+            2719
           ],
-          "reason": "21 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.75x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event.",
+          "reason": "31 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 2.58x) -- a single burst can trigger a cascade of re-interruptions on the retried utterance while our burst audio is still arriving, so there is no reliable 1:1 mapping from trial to event.",
           "conclusion": "per Main's own fallback: the agent's own event timestamps are not usable for a rigorous per-trial detection/drain split here. Reporting only the onset->last-frame headline number (this-process clock only) as the trustworthy per-trial metric."
         },
         "false_interruption_observations": {
           "trials_affected": [
-            1
+            3
           ],
           "count": 1,
           "of": 12,
           "threshold_ms": 1500,
           "detail": [
             {
-              "trial": 1,
-              "latency_ms": 1713.0,
+              "trial": 3,
+              "latency_ms": 2806.0,
               "supporting_dips": [
                 {
-                  "start_t": 80456.25,
+                  "start_t": 103912.25,
+                  "duration_s": 0.135
+                },
+                {
+                  "start_t": 103912.875,
+                  "duration_s": 0.088
+                },
+                {
+                  "start_t": 103913.437,
                   "duration_s": 0.01
                 },
                 {
-                  "start_t": 80456.484,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 80456.796,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 80456.984,
+                  "start_t": 103913.703,
                   "duration_s": 0.041
                 },
                 {
-                  "start_t": 80457.046,
-                  "duration_s": 0.042
+                  "start_t": 103914.14,
+                  "duration_s": 0.026
                 },
                 {
-                  "start_t": 80457.156,
-                  "duration_s": 0.025
-                },
-                {
-                  "start_t": 80457.281,
-                  "duration_s": 0.025
-                },
-                {
-                  "start_t": 80457.312,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 80457.484,
+                  "start_t": 103914.515,
                   "duration_s": 0.057
                 },
                 {
-                  "start_t": 80457.64,
-                  "duration_s": 0.01
-                },
-                {
-                  "start_t": 80457.656,
-                  "duration_s": 0.041
+                  "start_t": 103914.656,
+                  "duration_s": 0.072
                 }
               ]
             }
@@ -9830,210 +9798,268 @@
         "duplicate_heard_items": 0,
         "stale_speech_after_interrupt_count": 0,
         "duplicate_speech_end_speech_ids": 0,
-        "interrupted_item_ids": [
-          "imp_1"
-        ],
+        "interrupted_item_ids": [],
         "heard_item_ids": [],
         "truncation_checks": [
           {
-            "speech_id": "speech_5c3cf75a6544",
-            "kind": "cue",
-            "item_id": null,
-            "played_s": 12.484
-          },
-          {
-            "speech_id": "speech_6aa5d12b594b",
+            "speech_id": "speech_6814fe5f5b06",
             "kind": "ack",
             "item_id": null,
-            "played_s": 0.625
+            "played_s": 0.563
           },
           {
-            "speech_id": "speech_75ce74a723aa",
-            "kind": "cue",
-            "item_id": null,
-            "played_s": 4.39
-          },
-          {
-            "speech_id": "speech_609a502a5d05",
-            "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 1.906
-          },
-          {
-            "speech_id": "speech_a38458a9f607",
+            "speech_id": "speech_6bb25733d0e0",
             "kind": "feedback",
             "item_id": null,
-            "played_s": 1.906
+            "played_s": 0.265
           },
           {
-            "speech_id": "speech_7059a7e00ebb",
+            "speech_id": "speech_4aff6e75d955",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 2.532
+            "item_id": null,
+            "played_s": 0.438
           },
           {
-            "speech_id": "speech_49b26a9a340a",
-            "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 0.093
+            "speech_id": "speech_1740a8d73770",
+            "kind": "clip",
+            "item_id": null,
+            "played_s": 2.375
           },
           {
-            "speech_id": "speech_8715c00039b1",
+            "speech_id": "speech_cff618919f56",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 6.188
+            "item_id": null,
+            "played_s": 0.0
           },
           {
-            "speech_id": "speech_425894e91545",
+            "speech_id": "speech_e35a23ac6837",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 7.047
+            "item_id": null,
+            "played_s": 2.828
           },
           {
-            "speech_id": "speech_0ff4dcf5111f",
+            "speech_id": "speech_afcff965fbd3",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 4.39
+            "item_id": null,
+            "played_s": 0.391
           },
           {
-            "speech_id": "speech_bacc221f96a3",
+            "speech_id": "speech_eb0b3a710154",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 2.75
+            "item_id": null,
+            "played_s": 0.0
           },
           {
-            "speech_id": "speech_717a60037c15",
+            "speech_id": "speech_3f75a25a7c40",
             "kind": "feedback",
-            "item_id": "imp_1",
+            "item_id": null,
+            "played_s": 1.375
+          },
+          {
+            "speech_id": "speech_9e5b350b2ce1",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 2.516
+          },
+          {
+            "speech_id": "speech_1e9098876450",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.406
+          },
+          {
+            "speech_id": "speech_5c46ca4593b0",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.0
+          },
+          {
+            "speech_id": "speech_6b53323821b8",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 5.172
+          },
+          {
+            "speech_id": "speech_e4b68a0cefb5",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.437
+          },
+          {
+            "speech_id": "speech_7b8c8f613dbf",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.0
+          },
+          {
+            "speech_id": "speech_a5cf64c41f77",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 3.313
+          },
+          {
+            "speech_id": "speech_af0e4d38fffd",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.406
+          },
+          {
+            "speech_id": "speech_f0be690157b5",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.0
+          },
+          {
+            "speech_id": "speech_86e0218bbc91",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 4.828
+          },
+          {
+            "speech_id": "speech_6732d3be85c8",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.375
+          },
+          {
+            "speech_id": "speech_85d22b081222",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.0
+          },
+          {
+            "speech_id": "speech_76ced7006bb2",
+            "kind": "feedback",
+            "item_id": null,
+            "played_s": 0.985
+          },
+          {
+            "speech_id": "speech_0c52da741bec",
+            "kind": "feedback",
+            "item_id": null,
             "played_s": 2.5
           },
           {
-            "speech_id": "speech_2c8b7fc7dfa5",
+            "speech_id": "speech_6559599d780f",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 0.079
+            "item_id": null,
+            "played_s": 0.406
           },
           {
-            "speech_id": "speech_636022d73908",
+            "speech_id": "speech_57c7b05e2bf0",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 7.296
+            "item_id": null,
+            "played_s": 0.0
           },
           {
-            "speech_id": "speech_71b81aaf7687",
+            "speech_id": "speech_10cd8f1f7070",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 4.329
+            "item_id": null,
+            "played_s": 4.078
           },
           {
-            "speech_id": "speech_375611aa1f35",
+            "speech_id": "speech_b69c450d811c",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 4.984
+            "item_id": null,
+            "played_s": 0.406
           },
           {
-            "speech_id": "speech_adb1691635d3",
+            "speech_id": "speech_cb62721067c0",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 1.203
+            "item_id": null,
+            "played_s": 0.0
           },
           {
-            "speech_id": "speech_61148dbf2617",
+            "speech_id": "speech_f1692b328687",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 2.484
+            "item_id": null,
+            "played_s": 5.594
           },
           {
-            "speech_id": "speech_e5bf9350b672",
+            "speech_id": "speech_1863f945cc0f",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 0.188
+            "item_id": null,
+            "played_s": 0.453
           },
           {
-            "speech_id": "speech_f5989943ca55",
+            "speech_id": "speech_1d5200d20bb9",
             "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 4.312
-          },
-          {
-            "speech_id": "speech_549eafb089bb",
-            "kind": "feedback",
-            "item_id": "imp_1",
-            "played_s": 6.094
+            "item_id": null,
+            "played_s": 0.0
           }
         ],
         "cross_checks_our_latency_vs_agent_played_s": [
           {
             "trial": 0,
-            "our_latency_ms": 385.0,
-            "agent_played_s": 12.484,
-            "agent_speech_id": "speech_5c3cf75a6544"
+            "our_latency_ms": 198.0,
+            "agent_played_s": 0.563,
+            "agent_speech_id": "speech_6814fe5f5b06"
           },
           {
             "trial": 1,
-            "our_latency_ms": 1713.0,
-            "agent_played_s": 0.625,
-            "agent_speech_id": "speech_6aa5d12b594b"
+            "our_latency_ms": 479.0,
+            "agent_played_s": 0.265,
+            "agent_speech_id": "speech_6bb25733d0e0"
           },
           {
             "trial": 2,
-            "our_latency_ms": 10.0,
-            "agent_played_s": 4.39,
-            "agent_speech_id": "speech_75ce74a723aa"
+            "our_latency_ms": 666.0,
+            "agent_played_s": 0.438,
+            "agent_speech_id": "speech_4aff6e75d955"
           },
           {
             "trial": 3,
-            "our_latency_ms": 682.0,
-            "agent_played_s": 1.906,
-            "agent_speech_id": "speech_609a502a5d05"
+            "our_latency_ms": 2806.0,
+            "agent_played_s": 2.375,
+            "agent_speech_id": "speech_1740a8d73770"
           },
           {
             "trial": 4,
-            "our_latency_ms": 385.0,
-            "agent_played_s": 1.906,
-            "agent_speech_id": "speech_a38458a9f607"
+            "our_latency_ms": 588.0,
+            "agent_played_s": 0.0,
+            "agent_speech_id": "speech_cff618919f56"
           },
           {
             "trial": 5,
-            "our_latency_ms": 713.0,
-            "agent_played_s": 2.532,
-            "agent_speech_id": "speech_7059a7e00ebb"
+            "our_latency_ms": 573.0,
+            "agent_played_s": 2.828,
+            "agent_speech_id": "speech_e35a23ac6837"
           },
           {
             "trial": 6,
-            "our_latency_ms": 650.0,
-            "agent_played_s": 0.093,
-            "agent_speech_id": "speech_49b26a9a340a"
+            "our_latency_ms": 573.0,
+            "agent_played_s": 0.391,
+            "agent_speech_id": "speech_afcff965fbd3"
           },
           {
             "trial": 7,
-            "our_latency_ms": 744.0,
-            "agent_played_s": 6.188,
-            "agent_speech_id": "speech_8715c00039b1"
+            "our_latency_ms": 479.0,
+            "agent_played_s": 0.0,
+            "agent_speech_id": "speech_eb0b3a710154"
           },
           {
             "trial": 8,
-            "our_latency_ms": 401.0,
-            "agent_played_s": 7.047,
-            "agent_speech_id": "speech_425894e91545"
+            "our_latency_ms": 620.0,
+            "agent_played_s": 1.375,
+            "agent_speech_id": "speech_3f75a25a7c40"
           },
           {
             "trial": 9,
-            "our_latency_ms": 713.0,
-            "agent_played_s": 4.39,
-            "agent_speech_id": "speech_0ff4dcf5111f"
+            "our_latency_ms": 635.0,
+            "agent_played_s": 2.516,
+            "agent_speech_id": "speech_9e5b350b2ce1"
           },
           {
             "trial": 10,
-            "our_latency_ms": 401.0,
-            "agent_played_s": 2.75,
-            "agent_speech_id": "speech_bacc221f96a3"
+            "our_latency_ms": 619.0,
+            "agent_played_s": 0.406,
+            "agent_speech_id": "speech_1e9098876450"
           },
           {
             "trial": 11,
-            "our_latency_ms": 713.0,
-            "agent_played_s": 2.5,
-            "agent_speech_id": "speech_717a60037c15"
+            "our_latency_ms": 651.0,
+            "agent_played_s": 0.0,
+            "agent_speech_id": "speech_5c46ca4593b0"
           }
         ],
         "details": "interrupted_items_marked_heard/duplicate_heard_items are computed from the full live timeline.jsonl, not fabricated: an item is 'interrupted' if a real agent_speech_end{interrupted:true} event's matching agent_speech_start text maps back to one of the real judgment's improvements (infer_item_id); 'heard' comes from real feedback_heard events. cross_checks zips each measured trial's own (this-process-clock) latency against the orchestrator's independently measured played_s (agent-process clock) for the same interrupted speech, in chronological order -- agreement between two independently-clocked measurements is the evidence that the interrupted speech's audio genuinely stopped early rather than completing anyway (the exact failure mode evidence/e2_duplex.py Part B could not rule out)."
@@ -10043,9 +10069,9 @@
         "revision_1_judge_completed": false,
         "stale_dropped_events_revision_1": [],
         "stale_judgment_spoken": false,
-        "analyze1_to_rerecord_s": 0.39
+        "analyze1_to_rerecord_s": 0.391
       },
-      "timeline_path": "sessions\\s_20260908_100318\\timeline.jsonl",
+      "timeline_path": "sessions\\s_20260908_163341\\timeline.jsonl",
       "not_measured": []
     }
   }

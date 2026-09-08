@@ -4,9 +4,17 @@ Phase transitions, the presentation-mode turn policy, the revision fence, and th
 coach's contrastive playback queue all live here. See CONTRACTS.md for the frozen
 shapes this module speaks on the wire and writes to disk.
 
+The coaching half (setup through report) is a voice-first conversation: Astra (the
+capitalised Rime speaker name) greets, acknowledges, summarises, and judges practice
+attempts by *speaking*, not by stepping through a silent queue. Every number she
+says comes from `analysis/metrics.py`, the judge LLM's strict-JSON judgment, or
+`analysis/practice.py` -- the coach LLM only phrases numbers it is handed, via
+`_speak_llm`, and every phrasing call has a scripted, non-LLM fallback so a model
+hiccup never leaves the user without a reply.
+
 `build_agent_and_session()` is the seam that makes this testable without a live
 LiveKit room: it returns a real `AgentSession` + `PodiumOrchestrator` pair. Pass
-`ctx=None` and the orchestrator never touches `ctx.room` — a caller can instead set
+`ctx=None` and the orchestrator never touches `ctx.room` -- a caller can instead set
 `session.input.audio` to a custom `io.AudioInput` (see `livekit.agents.voice.io`)
 and drive phases directly via `orchestrator.on_client({...})`, exercising the real
 manual-turn-detection, fencing, and timeline-logging code with no network involved.
@@ -19,11 +27,13 @@ import logging
 import os
 import re
 import time
+import wave
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from dotenv import load_dotenv
 from livekit import agents, rtc
 from livekit.agents import (
@@ -34,12 +44,14 @@ from livekit.agents import (
     TurnHandlingOptions,
     function_tool,
 )
+from livekit.agents.llm import ChatContext
 from livekit.agents.utils.audio import audio_frames_from_file
 from livekit.plugins import deepgram, rime, silero
 
 import analysis.deck as deck_mod
 import analysis.judge as judge_mod
 import analysis.metrics as metrics_mod
+import analysis.practice as practice_mod
 import analysis.render as render_mod
 from agent.llm_config import COACH_MODEL, JUDGE_MODEL, coach_llm
 from agent.store import Store, WavWriter
@@ -54,43 +66,134 @@ SAMPLE_RATE = 24000
 PREP_DURATION_S = 60  # PLAN.md §4.2: "countdown (default 60 s)"; not in the frozen
                        # client->agent "setup" shape, so it isn't client-configurable.
 
+# The persona's spoken name -- the Rime speaker name, capitalised.
+AGENT_NAME = RIME_SPEAKER.capitalize()
+
 # Below this, treat the recording as "nothing heard" rather than a bad talk.
 MIN_WORDS_TO_JUDGE = 12
 
+# How long an item's practice capture is allowed to sit idle before a "still
+# there?" nudge, and how many nudges before giving up and moving on.
+PRACTICE_WAIT_S = 25.0
+ASK_PROCEED_WAIT_S = 20.0
+MAX_NUDGES_PER_WAIT = 2
+
 COACH_INSTRUCTIONS = (
-    "You are Podium, a warm, direct presentation coach speaking through Rime. "
-    "Keep every reply to one or two short sentences, at most 25 words total. "
-    "Never use markdown, bullet points, numbers, or lists -- you are speaking aloud. "
-    "Call presentation_metrics to answer questions about pace, fillers, or pauses "
-    "before the full judgment is ready. Call explain_rubric when asked why something "
-    "was flagged. Be encouraging but concrete: name the specific thing, not vague praise."
+    f"You are {AGENT_NAME}, a warm, upbeat presentation coach who talks like a sharp friend "
+    "in the user's corner, not a formal assistant. Speak in at most two short sentences "
+    "(about 30 words) unless you are asked to summarise, in which case a few sentences are "
+    "fine. Never use markdown, bullet points, numbers-as-lists, or emojis -- everything you "
+    "say is spoken aloud. Light, kind humour is welcome; never be sarcastic or dismissive "
+    "about the user's ability. If someone asks about something unrelated to rehearsing their "
+    "talk, answer in at most one playful sentence and then steer back to the current step. "
+    "Call presentation_metrics for pace, filler, or pause questions, and explain_rubric when "
+    "asked why something was flagged; never invent a number that did not come from a tool or "
+    "the context you were given. Call generate_slides when the user names a presentation "
+    "topic during setup, start_presenting when they say they are ready during prep, and "
+    "choose to confirm one of the options currently on offer when they phrase it in their "
+    "own words."
 )
+
+GREETING_TEXT = (
+    f"Hi, I'm {AGENT_NAME}, your Podium coach. I'll train you to make your presentation "
+    "better. To begin, type or tell me a topic and I'll build the slides, or upload your "
+    "own deck."
+)
+COUNTDOWN_SPEECH = "Three. <700> Two. <700> One. <500> Go!"
 
 _PRESENT_END_RE = re.compile(r"\b(i'?m\s+done|that'?s\s+it|i'?m\s+finished)\b", re.I)
 _NEXT_SLIDE_RE = re.compile(r"\bnext\s+slide\b", re.I)
 _PAUSE_MARKUP_RE = re.compile(r"<\d+>")
-_COMMAND_PATTERNS: dict[str, re.Pattern[str]] = {
-    "skip": re.compile(r"^\s*skip\.?\s*$", re.I),
-    "again": re.compile(r"^\s*(again|repeat that)\.?\s*$", re.I),
-    "slower": re.compile(r"^\s*(slower|slow (it |that )?down)\.?\s*$", re.I),
-    "why": re.compile(r"^\s*why\.?\??\s*$", re.I),
+_READY_RE = re.compile(r"\b(ready|let'?s go|begin|start|go ahead|i'?m good)\b", re.I)
+
+# CONTRACTS.md §5 option names -> a short voice/regex match. Only names currently
+# offered (`PodiumOrchestrator._offered`) are ever matched against these.
+_INTENT_PATTERNS: dict[str, re.Pattern[str]] = {
+    "proceed": re.compile(r"\b(yes|yeah|yep|sure|ok(?:ay)?|let'?s (?:do it|go)|go ahead)\b", re.I),
+    "later": re.compile(r"\b(no|not now|later|maybe later|skip (?:them|this|it)|straight to the report)\b", re.I),
+    "original": re.compile(r"\b(original|what i said|my version)\b", re.I),
+    "cleaner": re.compile(r"\b(clean(?:er)?|fixed|better version)\b", re.I),
+    "pauses": re.compile(r"\b(pause[sd]?|paced|with pauses)\b", re.I),
+    "alternative": re.compile(r"\b(alternative|another way|different way|other way)\b", re.I),
+    "again": re.compile(r"\b(again|repeat|once more|one more time|play (?:it|that) again)\b", re.I),
+    "slower": re.compile(r"\b(slower|slow down)\b", re.I),
+    "why": re.compile(r"\b(why|reason|explain)\b", re.I),
+    "practice": re.compile(r"\b(my turn|let me try|i'?ll try|i will try|ready to try)\b", re.I),
+    "next": re.compile(r"\b(next|move on|next one|got it,? next)\b", re.I),
+    "skip": re.compile(r"\bskip\b", re.I),
+    "finish": re.compile(r"\b(finish|that'?s enough|wrap(?: it)? up|stop coaching|i'?m done coaching)\b", re.I),
 }
+
+# Short, plain-language phrasing of each option name, used in nudges and in the
+# per-turn steering context handed to the coach LLM.
+_OPTION_LABELS: dict[str, str] = {
+    "proceed": "say let's do it", "later": "say maybe later",
+    "original": "hear what you said", "cleaner": "hear the cleaner version",
+    "pauses": "hear it with pauses", "alternative": "hear another way to open it",
+    "again": "hear it again", "slower": "hear it slower", "why": "ask why",
+    "practice": "say it yourself", "next": "move to the next one",
+    "skip": "skip this one", "finish": "finish up",
+}
+
+_NUDGE_FALLBACK: dict[str, str] = {
+    "setup": "Still there? Tell me a topic whenever you're ready, or upload your own deck.",
+    "prep": "Still with me? No rush -- say ready when you are, or just start talking about your topic.",
+    "coach": "Still with me? No rush -- pick one whenever you're ready.",
+    "drill": "Still there? Just say the word whenever you're ready.",
+}
+
+_ITEM_OPTIONS = [
+    {"name": "original", "label": "What I said"},
+    {"name": "cleaner", "label": "Cleaner"},
+    {"name": "pauses", "label": "With pauses"},
+    {"name": "alternative", "label": "Another opening"},
+    {"name": "again", "label": "Play all again"},
+    {"name": "slower", "label": "Slower"},
+    {"name": "why", "label": "Why?"},
+    {"name": "practice", "label": "My turn"},
+    {"name": "next", "label": "Next"},
+    {"name": "skip", "label": "Skip"},
+    {"name": "finish", "label": "Finish"},
+]
+
+_PRACTICE_PROMPTS = (
+    "Your turn -- say it your way, in one breath.",
+    "Now you: same point, your words.",
+    "Last one -- give it a try in your own words.",
+)
+
 _VARIANT_LABELS = (("v1", "you said"), ("v2", "cleaner"), ("v3", "with pauses"))
+
+# Not a real option: signals the practice loop that `_handle_attempt` already
+# stopped capture, spoke the verdict, and just wants a fresh capture started.
+_ATTEMPT_HANDLED = "_attempt_handled"
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _match_command(text: str) -> str | None:
-    for name, pattern in _COMMAND_PATTERNS.items():
-        if pattern.match(text.strip()):
-            return name
-    return None
-
-
 def _strip_pause_markup(text: str) -> str:
     return _PAUSE_MARKUP_RE.sub(" ", text).strip()
+
+
+def _match_intent(text: str, offered: list[str]) -> str | None:
+    """Deterministic-first voice command match: only names currently offered can
+    match, word-boundary, case-insensitive, longest match wins. A long utterance
+    (more than ~8 words) is treated as a genuine remark for the LLM, never a
+    command, even if it happens to contain a command word somewhere in it."""
+    if len(text.split()) > 8:
+        return None
+    best_name: str | None = None
+    best_len = -1
+    for name in offered:
+        pattern = _INTENT_PATTERNS.get(name)
+        if pattern is None:
+            continue
+        m = pattern.search(text)
+        if m and (m.end() - m.start()) > best_len:
+            best_name, best_len = name, m.end() - m.start()
+    return best_name
 
 
 def _levenshtein_le1(a: str, b: str) -> bool:
@@ -134,6 +237,28 @@ def _close_enough(heard: str, term: str) -> bool:
     return any(_levenshtein_le1(tok, term) for tok in tokens)
 
 
+def _trim_wav_to_words(path: Path, words: list[dict[str, Any]]) -> None:
+    """In-place-rewrite `path` to `[first_word.start-0.3, last_word.end+0.3]`,
+    24 kHz mono int16. No-op if the window would be degenerate."""
+    with wave.open(str(path), "rb") as r:
+        n_frames = r.getnframes()
+        sr = r.getframerate()
+        raw = r.readframes(n_frames)
+    samples = np.frombuffer(raw, dtype=np.int16)
+    if sr <= 0 or len(samples) == 0:
+        return
+    start_s = max(0.0, words[0]["start"] - 0.3)
+    end_s = min(len(samples) / sr, words[-1]["end"] + 0.3)
+    i0 = int(start_s * sr)
+    i1 = max(i0 + 1, int(end_s * sr))
+    trimmed = samples[i0:i1]
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes(trimmed.tobytes())
+
+
 @dataclass
 class ImprovementItem:
     data: dict[str, Any]
@@ -145,8 +270,8 @@ class ImprovementItem:
 
 class PodiumAgent(Agent):
     """Thin LLM-facing shell. Deterministic control flow lives on the orchestrator;
-    this class only owns the persona, the two function tools, and intercepting
-    coach-phase commands / drill answers before the framework's default LLM reply."""
+    this class only owns the persona, the function tools, and steering the default
+    LLM turn with `route_utterance` / `phase_context` before it replies."""
 
     def __init__(self, orchestrator: "PodiumOrchestrator") -> None:
         super().__init__(instructions=COACH_INSTRUCTIONS)
@@ -154,19 +279,58 @@ class PodiumAgent(Agent):
 
     async def on_user_turn_completed(self, turn_ctx: Any, new_message: Any) -> None:
         text = (getattr(new_message, "text_content", None) or "").strip()
-        if not text:
-            return
         orch = self._orch
-        if orch.phase == "drill":
-            orch.deliver_drill_answer(text)
+        if text and orch.route_utterance(text):
             raise StopResponse()
-        if orch.phase == "coach":
-            cmd = _match_command(text)
-            if cmd:
-                orch.trigger_voice_command(cmd)
-                raise StopResponse()
-        # otherwise: fall through to the default LLM reply (may call presentation_metrics
-        # / explain_rubric below for a genuine question, e.g. "how was my pacing?")
+        orch.note_unconsumed_utterance()
+        # `turn_ctx` here is a temporary copy made fresh for this turn only (the
+        # framework never merges edits back into Agent.chat_ctx), so this never
+        # accumulates across turns -- no pruning needed.
+        turn_ctx.add_message(role="system", content=orch.phase_context())
+
+    @function_tool()
+    async def generate_slides(self, context: RunContext, topic: str, level: str = "intermediate",
+                               budget_s: int = 60) -> str:
+        """Generate a slide deck for the user's presentation topic and move into
+        the prep window once it is ready. Setup phase only.
+
+        Args:
+            topic: the presentation topic the user described.
+            level: difficulty/level for the generated slides; "beginner",
+                "intermediate", or "advanced".
+            budget_s: how many seconds their talk should target; default 60.
+        """
+        orch = self._orch
+        if orch.phase != "setup":
+            return "We already have a deck ready -- no need to generate another one right now."
+        asyncio.create_task(orch._handle_setup({"topic": topic, "level": level, "budget_s": budget_s}))
+        return f"Generating slides on {topic}, give me ten seconds."
+
+    @function_tool()
+    async def start_presenting(self, context: RunContext) -> str:
+        """Begin the countdown and presentation right away. Prep phase only."""
+        orch = self._orch
+        if orch.phase != "prep":
+            return "We're not in the prep window right now."
+        orch._start_present_flow()
+        return "Starting the countdown now."
+
+    @function_tool()
+    async def choose(self, context: RunContext, option: str) -> str:
+        """Confirm one of the options currently offered to the user, when they
+        express it in natural language rather than an exact keyword.
+
+        Args:
+            option: one of the option names currently offered (e.g. "proceed",
+                "next", "skip").
+        """
+        orch = self._orch
+        option = option.strip().lower()
+        if option not in orch._offered:
+            choices = ", ".join(orch._offered) or "none right now"
+            return f"That's not one of the choices right now. Options: {choices}."
+        orch._deliver_intent(option, "llm")
+        return "Got it."
 
     @function_tool()
     async def presentation_metrics(self, context: RunContext) -> dict[str, Any]:
@@ -227,6 +391,24 @@ class PodiumOrchestrator:
         self._drill_answer_future: asyncio.Future[str] | None = None
         self._last_user_speech_start_mono: float | None = None
 
+        # -- voice-first conversation state --------------------------------
+        self._audio_subscribed = asyncio.Event()
+        self._offered: list[str] = []
+        self._intent_future: asyncio.Future[str] | None = None
+        self._expect: str | None = None  # "proceed" | "menu" | "drill" | None
+        self._nudges_this_wait: int = 0
+        self._current_item: ImprovementItem | None = None
+        self._attempt_n: int = 0
+        self._attempt_task: asyncio.Task | None = None
+
+        # practice-attempt raw-audio capture -- separate from the
+        # presentation-phase wav_writer/_word_stream above.
+        self._capture_writer: WavWriter | None = None
+        self._capture_stream: Any = None
+        self._capture_task: asyncio.Task | None = None
+        self._capture_words: list[dict[str, Any]] = []
+        self._capture_active = False
+
     # -- wiring -----------------------------------------------------
 
     def wire_session_events(self) -> None:
@@ -249,17 +431,23 @@ class PodiumOrchestrator:
                 self._last_user_speech_start_mono = time.monotonic()
             elif ev.old_state == "speaking" and ev.new_state != "speaking":
                 self.store.log("user_speech_end")
+            if (ev.new_state == "away" and self.phase in ("setup", "prep", "coach", "drill")
+                    and self._is_awaiting_input() and self._nudges_this_wait < MAX_NUDGES_PER_WAIT):
+                self._nudges_this_wait += 1
+                asyncio.create_task(self._nudge(reason="idle"))
 
     def wire_room(self) -> None:
         """Only meaningful with a live room: raw-audio capture for the presentation
-        WAV/word-timed transcript, and the podium data channel. A fixture harness
-        driving this orchestrator with `ctx=None` skips this entirely."""
+        WAV/word-timed transcript, practice-attempt capture, and the podium data
+        channel. A fixture harness driving this orchestrator with `ctx=None` skips
+        this entirely."""
         assert self.ctx is not None
         room = self.ctx.room
 
         @room.on("track_subscribed")
         def _on_track_subscribed(track: rtc.Track, *_: Any) -> None:
             if track.kind == rtc.TrackKind.KIND_AUDIO:
+                self._audio_subscribed.set()
                 asyncio.create_task(self._consume_raw_audio(track))
 
         @room.on("data_received")
@@ -281,7 +469,16 @@ class PodiumOrchestrator:
         )
         self.store.log("provider", name="rime", model=RIME_MODEL, speaker=RIME_SPEAKER)
         self.send({"type": "provider", "name": "rime", "model": RIME_MODEL, "speaker": RIME_SPEAKER})
+
+        if self.ctx is not None:
+            try:
+                await asyncio.wait_for(self._audio_subscribed.wait(), timeout=3.0)
+            except asyncio.TimeoutError:
+                pass
+
         self._set_phase("setup")
+        self._send_coach("greeting")
+        self._say(GREETING_TEXT, kind="ack")
 
     # -- data channel -----------------------------------------------------
 
@@ -330,7 +527,7 @@ class PodiumOrchestrator:
             log.exception("error handling client msg: %s", msg)
             self.send({"type": "error", "message": f"failed to handle {t}"})
 
-    # -- speech helper -----------------------------------------------------
+    # -- speech helpers -----------------------------------------------------
 
     def _say(self, text: str, *, kind: str, allow_interruptions: bool = True,
               add_to_chat_ctx: bool = True, audio: Any = None) -> Any:
@@ -343,19 +540,189 @@ class PodiumOrchestrator:
         asyncio.create_task(self._track_speech(handle, start_mono))
         return handle
 
+    async def _say_and_wait(self, text: str, *, kind: str) -> Any:
+        handle = self._say(text, kind=kind)
+        await handle.wait_for_playout()
+        return handle
+
     async def _track_speech(self, handle: Any, start_mono: float) -> None:
         await handle.wait_for_playout()
         played_s = round(time.monotonic() - start_mono, 3)
         self.store.log("agent_speech_end", speech_id=handle.id, interrupted=handle.interrupted, played_s=played_s)
         if handle.interrupted:
-            onset = self._last_user_speech_start_mono or start_mono
-            latency_ms = max(0, round((time.monotonic() - onset) * 1000))
-            self.store.log("interrupt", speech_id=handle.id, latency_ms=latency_ms)
+            onset = self._last_user_speech_start_mono
+            if onset is not None and onset >= start_mono:
+                latency_ms = max(0, round((time.monotonic() - onset) * 1000))
+                self.store.log("interrupt", speech_id=handle.id, latency_ms=latency_ms)
+            else:
+                # Cut by a button/command or the flow itself: there is no voice
+                # onset to measure from, so never report a number.
+                self.store.log("interrupt", speech_id=handle.id, latency_ms=None, source="client")
+
+    async def _speak_llm(self, instructions: str, fallback: str, *, kind: str) -> Any:
+        """Let the coach LLM phrase `instructions` (which must carry every fact it
+        is allowed to use). Falls back to a scripted `fallback` line, spoken via
+        `_say`, if the LLM call errored, produced no assistant reply, or was cut
+        off before it could finish.
+
+        The request runs in a single-turn context (persona + request) rather than
+        the live conversation: with the whole presentation transcript sitting in
+        history as a user turn, the model answered *that* and ignored the facts."""
+        rule = " Use only the numbers given here; do not invent any. Reply with the spoken line only."
+        ctx = ChatContext.empty()
+        ctx.add_message(role="system", content=COACH_INSTRUCTIONS)
+        ctx.add_message(role="user", content=instructions + rule)
+        handle = self.session.generate_reply(chat_ctx=ctx, tool_choice="none")
+        start_mono = time.monotonic()
+        self.store.log("agent_speech_start", speech_id=handle.id, text=instructions[:200], kind=kind)
+        await self._track_speech(handle, start_mono)
+        spoken = " ".join(
+            (getattr(item, "text_content", None) or "")
+            for item in handle.chat_items if getattr(item, "role", None) == "assistant"
+        ).strip()
+        if spoken:
+            self.store.log("agent_speech_text", speech_id=handle.id, text=spoken[:400])
+        if handle.interrupted:
+            return handle  # the user cut in deliberately; never re-speak it
+        if handle.exception() is not None or not spoken:
+            return await self._say_and_wait(fallback, kind=kind)
+        return handle
 
     def _set_phase(self, phase: str) -> None:
         self.phase = phase
+        self._nudges_this_wait = 0
         self.store.log("phase", name=phase)
         self.send({"type": "phase", "name": phase, "budget_s": self.budget_s})
+
+    def _send_coach(self, stage: str, *, options: list[dict[str, str]] | None = None, **extra: Any) -> None:
+        options = options if options is not None else []
+        self._offered = [o["name"] for o in options]
+        log_fields = {k: v for k, v in extra.items() if k in ("improvement_id", "attempt")}
+        self.store.log("coach_stage", stage=stage, **log_fields)
+        self.send({"type": "coach", "stage": stage, "options": options, **extra})
+
+    # -- intent routing -----------------------------------------------------
+
+    def route_utterance(self, text: str) -> bool:
+        """Deterministic-first: True means the utterance was consumed and the
+        caller must raise StopResponse (no default LLM reply)."""
+        if self.phase == "drill":
+            self.deliver_drill_answer(text)
+            return True
+        if self.phase == "prep" and len(text.split()) <= 8 and _READY_RE.search(text):
+            self._start_present_flow()
+            return True
+        if self._expect in ("proceed", "menu"):
+            name = _match_intent(text, self._offered)
+            if name is not None:
+                self._deliver_intent(name, "regex")
+                return True
+            if (self._expect == "menu" and self._capture_active and self._current_item is not None
+                    and practice_mod.looks_like_attempt(text, self._current_item.data)):
+                self._attempt_task = asyncio.create_task(self._handle_attempt(text))
+                return True
+        return False
+
+    def note_unconsumed_utterance(self) -> None:
+        """The LLM is about to answer a remark made during a practice wait: the
+        remark's audio is already in the capture, so discard it and start clean."""
+        if self._expect == "menu" and self._capture_active and self._current_item is not None:
+            asyncio.create_task(self._restart_capture())
+
+    async def _restart_capture(self) -> None:
+        item, n = self._current_item, self._attempt_n
+        await self._stop_capture()
+        if item is not None and self._current_item is item and self._expect == "menu":
+            await self._start_capture(item, n)
+
+    def _deliver_intent(self, name: str, source: str) -> None:
+        self.store.log("voice_intent", name=name, source=source)
+        if name not in self._offered:
+            return
+        if self._intent_future is not None and not self._intent_future.done():
+            self._intent_future.set_result(name)
+            # A button press while Astra is still talking (verdict, prompt,
+            # question) should cut her off; a voice intent already did via VAD.
+            self.session.interrupt()
+            return
+        # Astra is mid-speech (announcing an item / playing the trio) -- mirror
+        # the old trigger_voice_command barge-in path.
+        self._pending_command = name
+        self.session.interrupt()
+
+    async def _await_intent(self, timeout_s: float) -> str | None:
+        """Wait for the next resolved intent, nudging up to MAX_NUDGES_PER_WAIT
+        times on silence before giving up (caller applies its own default)."""
+        self._nudges_this_wait = 0
+        while True:
+            # A command that arrived while Astra was mid-speech parked itself
+            # in _pending_command (see _deliver_intent); honour it before waiting.
+            parked, self._pending_command = self._pending_command, None
+            if parked in self._offered:
+                return parked
+            self._intent_future = asyncio.get_event_loop().create_future()
+            try:
+                return await asyncio.wait_for(self._intent_future, timeout=timeout_s)
+            except asyncio.TimeoutError:
+                if self._nudges_this_wait >= MAX_NUDGES_PER_WAIT:
+                    return None
+                self._nudges_this_wait += 1
+                await self._nudge(reason="timeout")
+            finally:
+                self._intent_future = None
+
+    def _is_awaiting_input(self) -> bool:
+        if self.phase in ("setup", "prep"):
+            return True
+        if self.phase == "coach":
+            return self._intent_future is not None
+        if self.phase == "drill":
+            return self._drill_answer_future is not None
+        return False
+
+    async def _nudge(self, *, reason: str) -> None:
+        stage = self.phase
+        self.store.log("nudge", reason=reason, stage=stage)
+        if self._offered:
+            hint = " or ".join(_OPTION_LABELS.get(n, n) for n in self._offered)
+        elif stage == "setup":
+            hint = "tell me a topic, or upload your own deck"
+        elif stage == "prep":
+            hint = "say ready when you want to begin"
+        else:
+            hint = "just tell me what's on your mind"
+        instructions = (
+            f"The user has gone quiet during {stage}. In one short, warm, lightly funny line, "
+            f"check in on them and remind them they can {hint}. Keep it under twenty words."
+        )
+        fallback = _NUDGE_FALLBACK.get(stage, "Still with me? Take your time.")
+        await self._speak_llm(instructions, fallback, kind="ack")
+
+    def phase_context(self) -> str:
+        """A short paragraph handed to the coach LLM as steering for the current
+        turn: phase, deck, what the user can do right now, the active
+        improvement's facts, and the metrics summary when available."""
+        parts = [f"Current phase: {self.phase}."]
+        if self.deck:
+            titles = ", ".join(s.get("title", "") for s in self.deck.get("slides", []))
+            parts.append(f"Topic: {self.deck.get('topic')}. Slides: {titles}.")
+        if self._offered:
+            labels = ", ".join(f"{n} ({_OPTION_LABELS.get(n, n)})" for n in self._offered)
+            parts.append(f"Right now the user can: {labels}.")
+        elif self.phase == "setup":
+            parts.append("The user can tell you a topic to generate slides for, or upload their own deck.")
+        elif self.phase == "prep":
+            parts.append("The user can say ready to begin, or keep preparing.")
+        item = self._current_item
+        if item is not None:
+            d = item.data
+            parts.append(
+                f"Current improvement: issue={d.get('issue')!r} quote={d.get('quote')!r} "
+                f"cleaner={d.get('v2_text')!r} alternative={d.get('alternative')!r}."
+            )
+        if self.current_metrics:
+            parts.append(f"Metrics summary: {self.current_metrics_summary()}.")
+        return " ".join(parts)
 
     # -- setup -----------------------------------------------------
 
@@ -383,8 +750,14 @@ class PodiumOrchestrator:
         self.store.set_deck(deck)
         self.send({"type": "deck", "deck": deck})
         topic = deck.get("topic") or "your topic"
-        self._say(f"Let's talk about {topic}. You have {PREP_DURATION_S} seconds to prepare, then you're on.",
-                   kind="ack")
+        self._send_coach("deck_ack")
+        instructions = (
+            f"Acknowledge in one warm sentence that they chose to talk about {topic}, "
+            "mentioning one specific, accurate detail about it, then tell them they can take "
+            "up to a minute to prepare or say ready to begin right away. Under 35 words total."
+        )
+        fallback = f"So you've chosen {topic}, nice. Take a minute to prepare, or say ready to begin right away."
+        await self._speak_llm(instructions, fallback, kind="ack")
         self._enter_prep()
 
     # -- prep -----------------------------------------------------
@@ -419,6 +792,9 @@ class PodiumOrchestrator:
 
     async def _run_flow(self, *, scope: dict[str, Any] | str, rerecord: bool, slide: int | None) -> None:
         try:
+            self.send({"type": "countdown", "seconds": 3})
+            cue = self._say(COUNTDOWN_SPEECH, kind="cue", allow_interruptions=False, add_to_chat_ctx=False)
+            await cue.wait_for_playout()
             revision = await self._enter_present(scope=scope, rerecord=rerecord, slide=slide)
             wav_path, text, words = await self._finish_present(revision)
             await self._enter_analyze(revision, wav_path, text, words)
@@ -548,6 +924,10 @@ class PodiumOrchestrator:
                     self.wav_writer.write_frame(frame)
                 if self._word_stream is not None:
                     self._word_stream.push_frame(frame)
+                if self._capture_writer is not None:
+                    self._capture_writer.write_frame(frame)
+                if self._capture_stream is not None:
+                    self._capture_stream.push_frame(frame)
         finally:
             await audio_stream.aclose()
 
@@ -574,6 +954,60 @@ class PodiumOrchestrator:
             raise
         except Exception:
             log.exception("word stream consumer crashed")
+
+    # -- practice-attempt raw-audio capture -----------------------------------------------------
+
+    async def _start_capture(self, item: ImprovementItem, n: int) -> None:
+        path = self.store.clips_dir / f"{item.data['id']}_attempt{n}.wav"
+        self._capture_writer = WavWriter(path, sample_rate=SAMPLE_RATE)
+        self._capture_words = []
+        self._capture_stream = self._word_stt.stream()
+        self._capture_task = asyncio.create_task(self._consume_capture_stream(self._capture_stream))
+        self._capture_active = True
+
+    async def _consume_capture_stream(self, stream: Any) -> None:
+        from livekit.agents.stt import SpeechEventType
+
+        try:
+            async for ev in stream:
+                if ev.type != SpeechEventType.FINAL_TRANSCRIPT or not ev.alternatives:
+                    continue
+                alt = ev.alternatives[0]
+                conf = round(float(alt.confidence), 3)
+                for w in (alt.words or []):
+                    self._capture_words.append({
+                        "w": str(w), "start": round(float(w.start_time), 3),
+                        "end": round(float(w.end_time), 3), "conf": conf,
+                    })
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            log.exception("practice capture stream crashed")
+
+    async def _stop_capture(self) -> tuple[Path | None, list[dict[str, Any]]]:
+        self._capture_active = False
+        writer, self._capture_writer = self._capture_writer, None
+        stream, self._capture_stream = self._capture_stream, None
+        if stream is not None:
+            await stream.aclose()
+        task, self._capture_task = self._capture_task, None
+        if task is not None:
+            try:
+                await asyncio.wait_for(task, timeout=1.5)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                task.cancel()
+        words = list(self._capture_words)
+        self._capture_words = []
+        if writer is None:
+            return None, words
+        wav_path = writer.finalize()
+        if not words:
+            # Nothing was said into this capture (a menu command or the item
+            # moving on): keep the session directory free of silent takes.
+            wav_path.unlink(missing_ok=True)
+            return None, words
+        _trim_wav_to_words(wav_path, words)
+        return wav_path, words
 
     # -- analyze -----------------------------------------------------
 
@@ -652,14 +1086,65 @@ class PodiumOrchestrator:
 
     async def _enter_coach(self, revision: int, judgment: dict[str, Any]) -> None:
         self._set_phase("coach")
-        self._say(judgment.get("summary", ""), kind="feedback")
+        self.session.update_options(endpointing_opts={"min_delay": 0.9})
+        try:
+            await self._coach_summary_and_items(revision, judgment)
+        finally:
+            await self._leave_coach()
+        await self._enter_drill()
+
+    def _cancel_attempt_task(self) -> None:
+        task, self._attempt_task = self._attempt_task, None
+        if task is not None and not task.done():
+            task.cancel()
+
+    async def _leave_coach(self) -> None:
+        self._cancel_attempt_task()
+        await self._stop_capture()
+        self.session.update_options(endpointing_opts={"min_delay": 0.5})
+        self._expect = None
+        self._offered = []
+        self._intent_future = None
+        self._current_item = None
+
+    async def _coach_summary_and_items(self, revision: int, judgment: dict[str, Any]) -> None:
+        self._send_coach("summary")
+        m = self.current_metrics or {}
+        scores = judgment.get("scores", {})
+        facts = (
+            f"summary={judgment.get('summary', '')!r} scores={scores} wpm={m.get('wpm')} "
+            f"filler_count={m.get('fillers', {}).get('count')} filler_per_min={m.get('fillers', {}).get('per_min')} "
+            f"longest_pause_s={m.get('pauses', {}).get('longest_s')} "
+            f"time_used_s={m.get('time_budget', {}).get('used_s')} budget_s={self.budget_s}"
+        )
+        instructions = (
+            "Give a warm two to three sentence summary of how the talk went, using only these "
+            f"facts: {facts}. Mention at least one specific number naturally, the way a friend would."
+        )
+        fallback = judgment.get("summary", "") or "Nice work out there."
+        await self._speak_llm(instructions, fallback, kind="feedback")
 
         self.improvement_queue = [ImprovementItem(data=imp, revision=revision)
                                    for imp in judgment.get("improvements", [])]
         self.drill_terms = list(judgment.get("terms_to_drill", []))
-        await self._run_coach_queue()
 
-    async def _run_coach_queue(self) -> None:
+        if not self.improvement_queue:
+            return
+
+        n = len(self.improvement_queue)
+        self._send_coach("ask_proceed", options=[
+            {"name": "proceed", "label": "Let's do it"},
+            {"name": "later", "label": "Maybe later"},
+        ])
+        self._expect = "proceed"
+        self._say(f"Want to work through the {n} improvements together?", kind="feedback")
+        intent = await self._await_intent(ASK_PROCEED_WAIT_S)
+        if intent is None or intent == "proceed":
+            await self._run_items_loop()
+        else:
+            self._say("No problem, we'll save those for later.", kind="feedback")
+
+    async def _run_items_loop(self) -> None:
         idx = 0
         while idx < len(self.improvement_queue):
             item = self.improvement_queue[idx]
@@ -669,20 +1154,20 @@ class PodiumOrchestrator:
                 idx += 1
                 continue
 
-            outcome = await self._deliver_improvement(item)
-            if outcome == "heard":
-                item.heard = True
-                self.store.log("feedback_heard", improvement_id=item.data["id"])
+            outcome = await self._deliver_improvement_flow(item, idx)
+            if outcome in ("next", "skip"):
                 idx += 1
-            elif outcome == "skip":
-                idx += 1
+            elif outcome == "finish":
+                break
             # "retry": re-offer the same item, idx unchanged
 
-        await self._enter_drill()
-
-    async def _deliver_improvement(self, item: ImprovementItem) -> str:
+    async def _deliver_improvement_flow(self, item: ImprovementItem, idx: int) -> str:
         imp = item.data
-        handle = self._say(f"Here's one thing to work on: {imp['issue']}", kind="feedback")
+        total = len(self.improvement_queue)
+        self._current_item = item
+        self._send_coach("item", options=_ITEM_OPTIONS, improvement_id=imp["id"], index=idx + 1, total=total)
+        self._expect = "menu"
+        handle = self._say(f"Number {idx + 1} of {total}: {imp['issue']}", kind="feedback")
         await handle.wait_for_playout()
         if handle.interrupted:
             return await self._resolve_interruption(item)
@@ -693,16 +1178,19 @@ class PodiumOrchestrator:
                 return "skip"  # fenced: revision went stale mid-render, already logged
             item.clips = clips
 
-        for variant, label in _VARIANT_LABELS:
-            ok = await self._play_variant(item, variant, label)
-            if not ok:
-                return await self._resolve_interruption(item)
-        return "heard"
+        if not await self._play_trio(item):
+            return await self._resolve_interruption(item)
+
+        if not item.heard:
+            item.heard = True
+            self.store.log("feedback_heard", improvement_id=imp["id"])
+
+        return await self._practice_loop(item, idx, total)
 
     async def _resolve_interruption(self, item: ImprovementItem) -> str:
         cmd, self._pending_command = self._pending_command, None
-        if cmd == "skip":
-            return "skip"
+        if cmd in ("skip", "next", "finish"):
+            return cmd
         if cmd == "slower":
             item.clips = None
             item.slower = True
@@ -744,18 +1232,112 @@ class PodiumOrchestrator:
         await clip_handle.wait_for_playout()
         return not clip_handle.interrupted
 
-    def trigger_voice_command(self, cmd: str) -> None:
-        self._pending_command = cmd
-        self.session.interrupt()
+    async def _play_trio(self, item: ImprovementItem) -> bool:
+        for variant, label in _VARIANT_LABELS:
+            if not await self._play_variant(item, variant, label):
+                return False
+        return True
 
     async def _handle_command(self, name: str) -> None:
-        if self.phase not in ("coach", "drill"):
+        self._deliver_intent(name, "button")
+
+    # -- practice loop -----------------------------------------------------
+
+    async def _practice_loop(self, item: ImprovementItem, idx: int, total: int) -> str:
+        imp = item.data
+        prompt = _PRACTICE_PROMPTS[min(idx, len(_PRACTICE_PROMPTS) - 1)]
+        self._say(prompt, kind="feedback")
+        self._send_coach("practice", options=_ITEM_OPTIONS, improvement_id=imp["id"], index=idx + 1, total=total)
+        self._expect = "menu"
+        self._attempt_n = 1
+        await self._start_capture(item, self._attempt_n)
+
+        while True:
+            intent = await self._await_intent(PRACTICE_WAIT_S)
+            if intent is None:
+                intent = "next"
+            if intent in ("next", "skip", "finish"):
+                self._cancel_attempt_task()
+                await self._stop_capture()
+                return intent
+            if intent != _ATTEMPT_HANDLED:
+                await self._handle_menu_intent(item, intent)
+                if self._pending_command is not None:
+                    # A command landed mid-replay and interrupted it; the next
+                    # _await_intent picks it up before opening a fresh capture.
+                    continue
+            self._attempt_n += 1
+            await self._start_capture(item, self._attempt_n)
+
+    async def _handle_menu_intent(self, item: ImprovementItem, intent: str) -> None:
+        imp = item.data
+        await self._stop_capture()
+        if intent == "original":
+            await self._play_variant(item, "v1", "you said")
+        elif intent == "cleaner":
+            await self._play_variant(item, "v2", "cleaner")
+        elif intent == "pauses":
+            await self._play_variant(item, "v3", "with pauses")
+        elif intent == "alternative":
+            await self._say_and_wait(f"Another way in: {imp.get('alternative', '')}", kind="feedback")
+        elif intent == "again":
+            await self._play_trio(item)
+        elif intent == "slower":
+            item.clips = None
+            item.slower = True
+            clips = await self._render_clips(item)
+            if clips is not None:
+                item.clips = clips
+                await self._play_trio(item)
+        elif intent == "why":
+            await self._say_and_wait(judge_mod.rubric_text(imp["rubric_ref"])[:180], kind="answer")
+        elif intent == "practice":
+            await self._say_and_wait("Go ahead, I'm listening.", kind="feedback")
+
+    async def _handle_attempt(self, text: str) -> None:
+        item = self._current_item
+        if item is None:
             return
-        if name not in ("skip", "again", "slower", "why"):
-            self.send({"type": "error", "message": f"unknown command: {name}"})
-            return
-        self._pending_command = name
-        self.session.interrupt()
+        n = self._attempt_n
+        wav_path, words = await self._stop_capture()
+        metrics = None
+        if words and wav_path is not None:
+            metrics = metrics_mod.compute(words=words, audio_path=str(wav_path), deck=self.deck or {},
+                                           slide_events=[], budget_s=self.budget_s)
+        verdict = practice_mod.evaluate_attempt(item.data, attempt=n, text=text, words=words, metrics=metrics)
+        self.store.log("practice_attempt", improvement_id=item.data["id"], attempt=n,
+                        fillers=verdict["fillers"]["count"], longest_pause_s=verdict["pauses"]["longest_s"],
+                        wpm=verdict["wpm"], on_point=verdict["on_point"])
+        if wav_path is not None:
+            self.send({"type": "clip", "improvement_id": item.data["id"], "variant": f"attempt{n}",
+                       "url": f"/sessions/{self.store.session_id}/clips/{wav_path.name}"})
+
+        idx = next(i for i, x in enumerate(self.improvement_queue) if x is item)
+        total = len(self.improvement_queue)
+        self._send_coach("verdict", options=_ITEM_OPTIONS, improvement_id=item.data["id"],
+                          index=idx + 1, total=total, attempt=n, verdict=verdict)
+        # Let the practice loop open the next take's capture now, so a user who
+        # goes straight into another attempt while the verdict is still being
+        # spoken is recorded rather than routed to the LLM.
+        if self._intent_future is not None and not self._intent_future.done():
+            self._intent_future.set_result(_ATTEMPT_HANDLED)
+
+        facts = (
+            f"attempt={n} words={verdict['words']} wpm={verdict['wpm']} "
+            f"fillers_before={verdict['original_fillers']} fillers_after={verdict['fillers']['count']} "
+            f"pause_landed={verdict['pauses']['landed']} longest_pause_s={verdict['pauses']['longest_s']} "
+            f"on_point={verdict['on_point']} pace_band={verdict['pace_band']} "
+            f"wins={verdict['wins']} next_focus={verdict['next_focus']}"
+        )
+        instructions = (
+            "The user just repeated the point themselves. Phrase these numbers as a friend "
+            "would: mention fillers before versus after, whether the pause landed, and their "
+            f"pace, using only these facts: {facts}. End with a short encouraging line."
+        )
+        fallback = practice_mod.scripted_verdict(verdict, item.data)
+        handle = await self._speak_llm(instructions, fallback, kind="feedback")
+        if not handle.interrupted and self._current_item is item:
+            self._say("Again, or next?", kind="feedback")
 
     # -- drill -----------------------------------------------------
 
@@ -764,6 +1346,7 @@ class PodiumOrchestrator:
             await self._enter_report()
             return
         self._set_phase("drill")
+        self._send_coach("drill")
         for term in self.drill_terms:
             await self._drill_term(term)
         await self._enter_report()
@@ -783,12 +1366,8 @@ class PodiumOrchestrator:
         await self._say_and_wait(f"Recognisers still stumble on {term}; worth flagging to your audience.",
                                   kind="feedback")
 
-    async def _say_and_wait(self, text: str, *, kind: str) -> Any:
-        handle = self._say(text, kind=kind)
-        await handle.wait_for_playout()
-        return handle
-
     async def _await_drill_answer(self, timeout: float) -> str | None:
+        self._expect = "drill"
         self._drill_answer_future = asyncio.get_event_loop().create_future()
         try:
             return await asyncio.wait_for(self._drill_answer_future, timeout=timeout)
@@ -796,6 +1375,7 @@ class PodiumOrchestrator:
             return None
         finally:
             self._drill_answer_future = None
+            self._expect = None
 
     def deliver_drill_answer(self, text: str) -> None:
         if self._drill_answer_future is not None and not self._drill_answer_future.done():
@@ -805,10 +1385,12 @@ class PodiumOrchestrator:
 
     async def _enter_report(self) -> None:
         self._set_phase("report")
+        self._send_coach("wrap")
         heard = sum(1 for i in self.improvement_queue if i.heard)
         total = len(self.improvement_queue)
         self._say(f"That's a wrap. We worked through {heard} of {total} improvements together.", kind="feedback")
-        self._say("Re-record any slide whenever you want another pass. Good luck out there.", kind="feedback")
+        self._say("Re-record any slide whenever you want another pass, or start a brand new talk. "
+                  "Good luck out there.", kind="feedback")
 
     # -- rerecord -----------------------------------------------------
 

@@ -114,11 +114,17 @@ session start (monotonic).
 | `user_transcript` | `text`, `final` | STT result |
 | `agent_speech_start` | `speech_id`, `text`, `kind` (`ack`\|`cue`\|`feedback`\|`clip`\|`answer`) | Rime output began |
 | `agent_speech_end` | `speech_id`, `interrupted`, `played_s` | playout finished or was cut |
-| `interrupt` | `speech_id`, `latency_ms` | user interruption onset → audio stop |
+| `interrupt` | `speech_id`, `latency_ms`, `source?` | user interruption onset → audio stop; `latency_ms` is `null` with `source: "client"` when the cut came from a button/flow, not a voice onset |
 | `tool_start` / `tool_end` | `tool`, `revision`, `ms` | judge or render call |
 | `stale_dropped` | `tool`, `revision`, `current_revision` | a result was fenced and never spoken |
 | `feedback_heard` | `improvement_id` | item marked heard after full playout |
 | `provider` | `name`, `model`, `speaker` | active speech provider |
+| `coach_stage` | `stage`, `improvement_id?`, `attempt?` | conversational coach moved to a stage (§5 `coach` message) |
+| `voice_intent` | `name`, `source` (`regex`\|`llm`\|`button`) | a user choice was recognised |
+| `practice_attempt` | `improvement_id`, `attempt`, `fillers`, `longest_pause_s`, `wpm`, `on_point` | the user repeated a point; §7 verdict computed |
+| `nudge` | `reason` (`idle`\|`timeout`), `stage` | the coach checked in on a silent user |
+| `no_speech` | `revision`, `words` | rehearsal too short to judge; returned to prep |
+| `agent_speech_text` | `speech_id`, `text` | what an LLM-phrased line actually said (its `agent_speech_start.text` holds the instructions) |
 
 ## 5. Data channel messages
 
@@ -134,9 +140,27 @@ Agent → client:
 {"type":"judgment","revision":1,"judgment":{...}}  // §3
 {"type":"feedback","item":{"id":"imp_1","stage":"v2","text":"..."}}
 {"type":"clip","improvement_id":"imp_1","variant":"v3","url":"/clips/imp_1_v3_paced.wav"}
+                                                    // variant is v1|v2|v3 or attempt<N> (user's practice take)
+{"type":"countdown","seconds":3}                    // 3-2-1 begins now; client animates locally, present follows
+{"type":"coach","stage":"...","options":[{"name":"proceed","label":"Let's do it"}],
+ "improvement_id":"imp_1","index":1,"total":3,"attempt":2,"verdict":{...}}   // §7
 {"type":"provider","name":"rime","model":"mistv3","speaker":"astra"}
 {"type":"error","message":"..."}
 ```
+
+`coach.stage` ∈ `greeting` | `deck_ack` | `summary` | `ask_proceed` | `item` | `practice` | `verdict` | `drill` | `wrap`.
+`options` is the exact set of buttons the client should show right now (may be empty);
+`improvement_id`/`index`/`total` accompany `item`/`practice`/`verdict`; `attempt` and
+`verdict` accompany `verdict`. Clients must tolerate unknown stages.
+
+Option names (client sends `{"type":"command","name":<name>}`; the agent accepts the
+same names by voice): `proceed` (yes, start improvements) · `later` (skip them, go to
+the wrap-up) · `original` (play V1) · `cleaner` (play V2) · `pauses` (play V3) ·
+`alternative` (speak the alternative opening) · `again` (replay V1+V2+V3) · `slower`
+(re-render slower, replay) · `why` (rubric reason) · `practice` (prompt the user to
+say it) · `next` (done with this item) · `skip` (move on without marking heard) ·
+`finish` (leave coaching now). A command outside the currently offered `options` is
+ignored with a timeline `voice_intent` entry only.
 
 Client → agent:
 ```jsonc
@@ -146,8 +170,33 @@ Client → agent:
 {"type":"slide_next"}
 {"type":"present_end"}
 {"type":"rerecord","slide":2}
-{"type":"command","name":"skip"|"again"|"slower"|"why"}
+{"type":"command","name":"proceed"|"later"|"original"|"cleaner"|"pauses"|"alternative"|"again"|"slower"|"why"|"practice"|"next"|"skip"|"finish"}
 ```
+
+## 7. Practice verdict (computed by `analysis/practice.py`, never by the LLM)
+
+After the user repeats an improvement's point, code compares the attempt with the
+original span. The coach LLM may only *phrase* these numbers, never change them.
+
+```jsonc
+{
+  "attempt": 2,
+  "text": "what the recogniser heard",
+  "words": 14,
+  "wpm": 142.0,                       // null when no word timings arrived
+  "fillers": {"count": 0, "items": ["um"]},
+  "original_fillers": 2,              // fillers in the original quote (§2 filler set)
+  "pauses": {"count": 1, "longest_s": 0.72, "landed": true},  // landed: any pause >= 0.4 s
+  "on_point": 0.71,                   // token overlap with quote ∪ v2_text, 0..1
+  "pace_band": "good" | "fast" | "slow" | "unknown",   // good = 110..170 wpm
+  "wins": ["no fillers", "pause landed"],
+  "next_focus": "pace" | "fillers" | "pause" | null
+}
+```
+
+`looks_like_attempt(text, improvement)` decides whether a user utterance during a
+practice wait is a repetition (≥ 3 words and `on_point` ≥ 0.25) or a question for the
+LLM. Attempt audio is saved as `clips/<improvement_id>_attempt<N>.wav`.
 
 ## 6. Module boundaries
 
@@ -158,6 +207,7 @@ Client → agent:
 | `analysis/metrics.py` | §2 from words + audio | — |
 | `analysis/judge.py` | §3 from deck + metrics + transcript, loads `skills/judge/*.md` | `agent.llm_config` |
 | `analysis/render.py` | V1/V2/V3 clips via Rime REST, returns paths + durations | — |
+| `analysis/practice.py` | §7 verdict from an attempt's words/metrics vs. the improvement; `looks_like_attempt` | `analysis.metrics` |
 | `analysis/deck.py` | generate a deck (§1) from a topic; normalise an uploaded one | `agent.llm_config` |
 | `web/` | UI only; speaks §5 | — |
 | `evidence/` | acceptance tests; may import `analysis.*` | — |

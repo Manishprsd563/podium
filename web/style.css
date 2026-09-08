@@ -103,7 +103,60 @@ kbd {
   font-size: 0.9rem;
 }
 
+.astra-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  padding: 0.7em 1.2em;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+.astra-indicator {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 0.35em;
+  border-radius: 50%;
+  background: var(--listening);
+  box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.15);
+  transition: all 0.15s ease;
+}
+.astra-indicator.speaking {
+  background: var(--speaking);
+  box-shadow: 0 0 0 4px rgba(242, 184, 75, 0.18);
+}
+.astra-lines { flex: 1; min-width: 0; }
+.astra-line {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.astra-line.partial { color: var(--text-dim); font-style: italic; font-weight: 500; }
+.user-line {
+  margin-top: 0.25em;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.user-line.partial { font-style: italic; }
+
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 15, 20, 0.92);
+}
+.countdown-number {
+  font-size: 9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
 main { max-width: 880px; margin: 0 auto; padding: 1.4em 1.2em 4em; }
+body.wide-view main { max-width: 1160px; }
 
 .panel {
   background: var(--bg-panel);
@@ -273,3 +326,61 @@ main { max-width: 880px; margin: 0 auto; padding: 1.4em 1.2em 4em; }
   background: var(--bg-raised);
   border-top: 1px solid var(--border);
 }
+
+/* ---------- Coach view ---------- */
+
+.coach-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2em;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .coach-layout { grid-template-columns: 1fr; }
+}
+
+.coach-panel { display: flex; flex-direction: column; gap: 0.9em; }
+
+.coach-chat-log {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8em 1em;
+}
+.chat-line { font-size: 0.92rem; line-height: 1.4; }
+.chat-line .chat-who { font-weight: 700; margin-right: 0.4em; }
+.chat-line.astra .chat-who { color: var(--accent); }
+.chat-line.you .chat-who { color: var(--text-dim); }
+.chat-line.partial { color: var(--text-dim); font-style: italic; }
+
+.coach-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1em 1.1em;
+  background: var(--bg-raised);
+}
+.coach-card-head { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5em; }
+.coach-card p { margin: 0 0 0.6em; }
+
+.verdict-chip-row { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.6em; }
+.verdict-chip {
+  font-size: 0.78rem;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+}
+.verdict-wins { width: 100%; font-size: 0.85rem; color: var(--accent); margin-top: 0.3em; }
+
+.coach-history { margin-top: 0.8em; border-top: 1px solid var(--border); padding-top: 0.6em; }
+.coach-history-row { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.2em; }
+
+.coach-status { font-size: 0.85rem; color: var(--text-dim); }
+
+#new-talk-btn { margin-top: 0.4em; }

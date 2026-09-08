@@ -268,11 +268,11 @@ interruption settings — to make the effect of the retune visible.**
 | | n trials | P50 | P95 | max | Target | Target met? |
 |---|---|---|---|---|---|---|
 | `baseline_default_interruption` | 12/12 measurable | 1033 ms | 1417 ms | 2432 ms | ≤300 ms | **No** |
-| `tuned_interruption` | 12/12 measurable | 666 ms | 744 ms | 1713 ms | ≤300 ms | **No** |
+| `tuned_interruption` | 12/12 measurable | 603.5 ms | 666 ms | 2806 ms | ≤300 ms | **No** |
 
 Because this is a live measurement over a real network with real TTS/VAD/STT timing, the tuned
-configuration was run three times; the table holds the run currently committed to
-`results.json`, and the observed spread across the three was **P50 595–666 ms, P95 667–744 ms,
+configuration was run four times; the table holds the run currently committed to
+`results.json`, and the observed spread across the four was **P50 595–666 ms, P95 666–744 ms,
 max 1713–2948 ms**. The baseline row is a single run (see the provenance note below).
 
 **The honest headline: shrinking the VAD interruption window (0.5 s → 0.12 s minimum
@@ -288,8 +288,8 @@ evidence gap named at the top of this project.
 and most of the later values cluster tightly around 2300–2500ms ... regardless of when the
 trial actually fired — consistent with `_last_user_speech_start_mono` being a single shared
 reference not refreshed per-utterance during the barge-in retry cascade, not a fresh per-trial
-onset"* (baseline run); the tuned run logged 20 agent-side interrupt events for the same 12
-trials (ratio 1.67×) for the same reason. In plain terms: a single interrupt burst can trigger
+onset"* (baseline run); the committed tuned run logged 31 agent-side interrupt events for the
+same 12 trials (ratio 2.58×; earlier tuned runs 1.67×) for the same reason. In plain terms: a single interrupt burst can trigger
 a cascade of re-interruptions on the agent's retried utterance while the burst audio is still
 arriving, so "one trial → one interrupt event" doesn't hold cleanly, and the multi-second
 outlier trials in both configurations are consistent with that cascade rather than a single

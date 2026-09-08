@@ -13,25 +13,40 @@ in [`CONTRACTS.md`](CONTRACTS.md).
 
 ## What it does
 
-1. **Setup** — say or type a topic ("quiz me on transformers, intermediate, 90 seconds") and
-   the LLM generates a slide deck, or upload a PDF (exported from your slides; PPTX is not
-   supported, see Limitations).
-2. **Prep** — a short countdown while you look over the deck.
-3. **Present** — you talk through the slides; the agent listens without interrupting your
-   thinking pauses (this is the presentation-mode turn policy, see below) and advances slides
-   on your voice or a keypress.
-4. **Analyze** — code (not the LLM) computes pace, filler rate, pause taxonomy, loudness
+Podium is voice-first: the coach, **Astra** (the Rime speaker name), talks you through the
+whole session, and every button on screen has a spoken equivalent.
+
+1. **Welcome** — on connect Astra introduces herself and offers two ways in: say or type a
+   topic ("a 90-second talk on DNS for beginners") and the LLM generates a slide deck, or
+   upload a PDF (exported from your slides; PPTX is not supported, see Limitations).
+2. **Prep** — Astra acknowledges the topic with one specific detail about it, then a 60 s
+   countdown; say "ready" or press *Begin now* to skip it.
+3. **Three, two, one, go** — counted aloud with Rime `<NNN>` pause markup, mirrored by an
+   on-screen overlay.
+4. **Present** — you talk through the slides; the agent listens without interrupting your
+   thinking pauses (the presentation-mode turn policy, see below), speaks a T−30 s cue over
+   you without taking your turn, and advances slides on your voice or a keypress.
+5. **Analyze** — code (not the LLM) computes pace, filler rate, pause taxonomy, loudness
    variance and time budget from the audio and transcript; the judge LLM scores four rubric
    categories against `skills/judge/*.md` and picks up to 3 concrete improvements.
-5. **Coach** — for each improvement, Podium speaks the as-delivered line (V1), the cleaned
-   line (V2), then the cleaned line with a deliberate pause before the key phrase (V3) — same
-   Rime model and speaker throughout.
-6. **Drill** — low-confidence terms get a short pronunciation-focused follow-up.
-7. **Report** — a summary view with metrics, judgment, and clip playback.
+6. **Coach, as a conversation** — the dashboard appears while Astra summarises the numbers
+   in her own words and asks whether to work through the improvements. Each one is a short
+   exchange: she names the issue, plays the as-delivered line (V1), the cleaned line (V2),
+   then the cleaned line with a deliberate pause before the key phrase (V3) — same Rime
+   model and speaker throughout — and asks you to say it yourself. Your take is recorded,
+   `analysis/practice.py` computes fillers before→after, whether the pause landed, and pace,
+   and Astra phrases the verdict as a friend would. Buttons and voice both accept *what I
+   said / cleaner / with pauses / another opening / again / slower / why / my turn / next /
+   skip / finish*.
+7. **Drill** — low-confidence terms get a short recogniser-focused follow-up.
+8. **Report** — metrics, judgment, clip playback including your practice takes, re-record.
 
-You can interrupt the coach at any point, ask for a slower repeat, or re-record a slide; a
-revision fence guarantees a stale judgment from a superseded recording is never spoken (see
-`RIME_EVIDENCE.md` claim 4).
+Astra keeps the tone of a friend in your corner: if you go quiet she checks in with a light
+line rather than a timeout, and an off-topic question gets one playful sentence and a steer
+back. Every number she speaks comes from code — the coach LLM only phrases facts it is
+handed. You can interrupt her at any point or re-record a slide; a revision fence guarantees
+a stale judgment from a superseded recording is never spoken (see `RIME_EVIDENCE.md`
+claim 4).
 
 ## Third-party services and exact configuration
 
@@ -159,7 +174,7 @@ The active speech provider is never silently swapped or hidden:
 - **Interruption stop latency currently misses its target.** Interrupting the coach's spoken
   feedback fires correctly (`session.interrupt()`, no stale judgments spoken, no duplicate
   "heard" marks — measured through a real LiveKit room in `evidence/e2_live_room.py`), but the
-  measured P95 stop latency is **667–744 ms across three tuned runs** (1417 ms before
+  measured P95 stop latency is **666–744 ms across four tuned runs** (1417 ms before
   retuning) against a ≤300 ms target. See `RIME_EVIDENCE.md` claim 4, Part C, for the full
   before/after numbers and why the measurement itself carries a caveat (barge-in retry
   cascades inflate a few outlier trials).

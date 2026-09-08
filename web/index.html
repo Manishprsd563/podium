@@ -17,11 +17,20 @@
 
 <div id="error-banner" class="banner hidden" role="alert"></div>
 
+<div id="astra-bubble" class="astra-bubble">
+  <div id="astra-indicator" class="astra-indicator listening"></div>
+  <div class="astra-lines">
+    <div id="astra-line" class="astra-line">Astra is connecting&hellip;</div>
+    <div id="user-line" class="user-line hidden"></div>
+  </div>
+</div>
+
 <main>
 
   <!-- ============ SETUP VIEW ============ -->
   <section id="view-setup" class="view">
-    <h1>Set up your talk</h1>
+    <h1>Say a topic, or type it</h1>
+    <p class="hint">Astra listens too &mdash; just tell her your topic out loud.</p>
 
     <form id="setup-form" class="panel">
       <label>
@@ -71,7 +80,7 @@
     <div id="stage-prep" class="hidden">
       <h1>Get ready</h1>
       <div id="prep-countdown" class="countdown">&mdash;</div>
-      <button id="prep-ready-btn" type="button">I&rsquo;m ready</button>
+      <button id="prep-ready-btn" type="button">Begin now</button>
     </div>
 
     <div id="stage-present" class="hidden">
@@ -89,21 +98,38 @@
 
   </section>
 
+  <!-- ============ COACH VIEW (analyze + coach + drill) ============ -->
+  <section id="view-coach" class="view hidden">
+    <div class="coach-layout">
+      <div class="coach-left">
+        <div class="panel" id="scorecard-panel">
+          <h2>Scorecard</h2>
+          <div id="scorecard"></div>
+          <p id="judgment-summary" class="hint"></p>
+        </div>
+
+        <div class="panel" id="metrics-panel">
+          <h2>Metrics</h2>
+          <div id="metrics-grid"></div>
+          <div id="metrics-perslide" class="hint"></div>
+        </div>
+      </div>
+
+      <div class="coach-right">
+        <div class="panel coach-panel">
+          <h2>Coach</h2>
+          <div id="coach-chat-log" class="coach-chat-log"></div>
+          <div id="coach-card" class="coach-card hidden"></div>
+          <div id="coach-options" class="command-row"></div>
+          <div id="coach-status" class="coach-status">listening &mdash; say it or tap an option</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ REPORT VIEW ============ -->
   <section id="view-report" class="view hidden">
     <h1>Report</h1>
-
-    <div class="panel" id="scorecard-panel">
-      <h2>Scorecard</h2>
-      <div id="scorecard"></div>
-      <p id="judgment-summary" class="hint"></p>
-    </div>
-
-    <div class="panel" id="metrics-panel">
-      <h2>Metrics</h2>
-      <div id="metrics-grid"></div>
-      <div id="metrics-perslide" class="hint"></div>
-    </div>
 
     <div class="panel" id="rerecord-panel">
       <h2>Re-record a slide</h2>
@@ -117,7 +143,13 @@
       <h2>Improvements</h2>
       <div id="improvement-cards"></div>
     </div>
+
+    <button id="new-talk-btn" type="button" class="secondary">New talk</button>
   </section>
+
+<div id="countdown-overlay" class="countdown-overlay hidden">
+  <div id="countdown-number" class="countdown-number">3</div>
+</div>
 
 <footer id="shortcuts">Space = next slide (while presenting) &middot; Enter = done</footer>
 

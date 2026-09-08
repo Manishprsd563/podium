@@ -18,20 +18,27 @@ const state = {
   currentSlide: 1,
   remainingS: null,
   transcript: new Map(), // segId -> {speaker, text, final}
+  lastAgentLine: null, // {text, final}
+  lastUserLine: null, // {text, final}
   metrics: null,
   judgment: null,
-  clips: {}, // improvement_id -> {v1,v2,v3: url}
+  clips: {}, // improvement_id -> {v1,v2,v3,attempt<N>: url}
   provider: null,
   activeImprovementId: null,
   agentSpeaking: false,
   localSpeaking: false,
+  coach: null, // {stage, options, improvementId, index, total, attempt, verdict}
+  coachHistory: {}, // improvement_id -> [{attempt, verdict}]
+  countdownValue: null,
+  countdownTimer: null,
 };
 const el = {};
 function q(id) { return document.getElementById(id); }
 function cacheEls() {
   [
     "conn-badge", "mic-badge", "agent-badge", "provider-badge", "error-banner",
-    "view-setup", "view-stage", "view-report",
+    "astra-indicator", "astra-line", "user-line",
+    "view-setup", "view-stage", "view-coach", "view-report",
     "setup-form", "setup-topic", "setup-level", "setup-duration",
     "upload-input", "upload-status", "upload-error",
     "setup-deck-preview", "deck-preview-list",
@@ -39,11 +46,16 @@ function cacheEls() {
     "stage-present", "present-timer", "slide-title", "slide-bullets",
     "slide-next-btn", "present-done-btn", "transcript-strip",
     "scorecard", "judgment-summary", "metrics-grid", "metrics-perslide",
-    "rerecord-slide", "rerecord-btn", "improvement-cards",
+    "coach-chat-log", "coach-card", "coach-options", "coach-status",
+    "rerecord-slide", "rerecord-btn", "improvement-cards", "new-talk-btn",
+    "countdown-overlay", "countdown-number",
   ].forEach((id) => { el[toCamel(id)] = q(id); });
 }
 function toCamel(id) {
   return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+}
+function stripPauseMarkup(text) {
+  return (text || "").replace(/<\d+>/g, "");
 }
 
 // ---------------------------------------------------------------- connect
@@ -127,9 +139,15 @@ function sendMessage(msg) {
 }
 function upsertTranscriptLine(segId, speaker, text, isFinal) {
   state.transcript.set(segId, { speaker, text, final: isFinal });
-  if (state.transcript.size > 40) {
+  if (state.transcript.size > 60) {
     const firstKey = state.transcript.keys().next().value;
     state.transcript.delete(firstKey);
+  }
+  const isAstra = !speaker.startsWith("presenter-");
+  if (isAstra) {
+    state.lastAgentLine = { text, final: isFinal };
+  } else {
+    state.lastUserLine = { text, final: isFinal };
   }
 }
 
@@ -165,6 +183,27 @@ function handleMessage(msg) {
       state.clips[msg.improvement_id][msg.variant] = msg.url;
       state.agentSpeaking = true;
       break;
+    case "coach":
+      state.coach = {
+        stage: msg.stage,
+        options: msg.options || [],
+        improvementId: msg.improvement_id != null ? msg.improvement_id : null,
+        index: msg.index != null ? msg.index : null,
+        total: msg.total != null ? msg.total : null,
+        attempt: msg.attempt != null ? msg.attempt : null,
+        verdict: msg.verdict || null,
+      };
+      state.activeImprovementId = state.coach.improvementId;
+      if (msg.stage === "verdict" && msg.improvement_id && msg.verdict) {
+        const hist = state.coachHistory[msg.improvement_id] || (state.coachHistory[msg.improvement_id] = []);
+        if (!hist.some((h) => h.attempt === msg.attempt)) {
+          hist.push({ attempt: msg.attempt, verdict: msg.verdict });
+        }
+      }
+      break;
+    case "countdown":
+      startCountdown(msg.seconds);
+      break;
     case "provider":
       state.provider = { name: msg.name, model: msg.model, speaker: msg.speaker };
       break;
@@ -178,22 +217,53 @@ function handleMessage(msg) {
   render();
 }
 
+// ------------------------------------------------------------ countdown overlay
+function clearCountdownTimer() {
+  if (state.countdownTimer) {
+    clearInterval(state.countdownTimer);
+    state.countdownTimer = null;
+  }
+}
+function startCountdown(seconds) {
+  clearCountdownTimer();
+  state.countdownValue = seconds;
+  el.countdownOverlay.classList.remove("hidden");
+  el.countdownNumber.textContent = String(seconds);
+  let n = seconds;
+  state.countdownTimer = setInterval(() => {
+    n -= 1;
+    if (n > 0) {
+      el.countdownNumber.textContent = String(n);
+    } else if (n === 0) {
+      el.countdownNumber.textContent = "Go!";
+    } else {
+      clearCountdownTimer();
+      el.countdownOverlay.classList.add("hidden");
+    }
+  }, 900);
+}
+
 // ------------------------------------------------------------------ render
 function viewForPhase(phase) {
   if (phase === "prep" || phase === "present") return "stage";
-  if (phase === "analyze" || phase === "coach" || phase === "drill" || phase === "report") return "report";
+  if (phase === "analyze" || phase === "coach" || phase === "drill") return "coach";
+  if (phase === "report") return "report";
   return "setup";
 }
 function showView(name) {
   el.viewSetup.classList.toggle("hidden", name !== "setup");
   el.viewStage.classList.toggle("hidden", name !== "stage");
+  el.viewCoach.classList.toggle("hidden", name !== "coach");
   el.viewReport.classList.toggle("hidden", name !== "report");
+  document.body.classList.toggle("wide-view", name === "coach");
 }
 function render() {
   showView(viewForPhase(state.phase));
   renderTopbar();
+  renderAstraBubble();
   if (state.phase === "setup") renderSetup();
   else if (state.phase === "prep" || state.phase === "present") renderStage();
+  else if (state.phase === "analyze" || state.phase === "coach" || state.phase === "drill") renderCoachView();
   else renderReport();
 }
 function renderTopbar() {
@@ -206,6 +276,21 @@ function renderTopbar() {
   if (state.provider) {
     el.providerBadge.classList.remove("hidden");
     el.providerBadge.textContent = `${state.provider.name} \u00b7 ${state.provider.model} \u00b7 ${state.provider.speaker}`;
+  }
+}
+function renderAstraBubble() {
+  const agent = state.lastAgentLine;
+  if (agent) {
+    el.astraLine.textContent = stripPauseMarkup(agent.text);
+    el.astraLine.classList.toggle("partial", !agent.final);
+  }
+  el.astraIndicator.classList.toggle("speaking", state.agentSpeaking);
+  el.astraIndicator.classList.toggle("listening", !state.agentSpeaking);
+  const user = state.lastUserLine;
+  el.userLine.classList.toggle("hidden", !user);
+  if (user) {
+    el.userLine.textContent = user.text;
+    el.userLine.classList.toggle("partial", !user.final);
   }
 }
 function setConnBadge(text, cls) {
@@ -332,11 +417,135 @@ function renderTranscript() {
   el.transcriptStrip.scrollTop = el.transcriptStrip.scrollHeight;
 }
 
+// -------------------------------------------------------------- Coach view
+function renderCoachView() {
+  renderScorecard();
+  renderMetrics();
+  renderCoachChatLog();
+  renderCoachCard();
+  renderCoachOptions();
+  renderCoachStatus();
+}
+function renderCoachChatLog() {
+  el.coachChatLog.innerHTML = "";
+  const lines = Array.from(state.transcript.values()).slice(-60);
+  lines.forEach((line) => {
+    const isAstra = !line.speaker.startsWith("presenter-");
+    const div = document.createElement("div");
+    div.className = "chat-line " + (isAstra ? "astra" : "you") + (line.final ? "" : " partial");
+    const who = document.createElement("span");
+    who.className = "chat-who";
+    who.textContent = isAstra ? "Astra" : "You";
+    const txt = document.createElement("span");
+    txt.className = "chat-text";
+    txt.textContent = stripPauseMarkup(line.text);
+    div.append(who, txt);
+    el.coachChatLog.appendChild(div);
+  });
+  el.coachChatLog.scrollTop = el.coachChatLog.scrollHeight;
+}
+function labeledLine(label, text) {
+  const p = document.createElement("p");
+  const strong = document.createElement("strong");
+  strong.textContent = label + ": ";
+  p.appendChild(strong);
+  p.appendChild(document.createTextNode(text));
+  return p;
+}
+function renderVerdictChips(v) {
+  const wrap = document.createElement("div");
+  wrap.className = "verdict-chip-row";
+  const originalFillers = v.original_fillers != null ? v.original_fillers : "\u2014";
+  const fillerCount = v.fillers ? v.fillers.count : "\u2014";
+  const chips = [
+    `fillers ${originalFillers} \u2192 ${fillerCount}`,
+    v.pauses && v.pauses.landed ? "pause landed" : "no pause",
+    `pace: ${v.pace_band || "unknown"}`,
+    `on point ${v.on_point != null ? Math.round(v.on_point * 100) + "%" : "\u2014"}`,
+  ];
+  chips.forEach((text) => {
+    const chip = document.createElement("span");
+    chip.className = "verdict-chip";
+    chip.textContent = text;
+    wrap.appendChild(chip);
+  });
+  if (v.wins && v.wins.length) {
+    const wins = document.createElement("div");
+    wins.className = "verdict-wins";
+    wins.textContent = "Wins: " + v.wins.join(", ");
+    wrap.appendChild(wins);
+  }
+  return wrap;
+}
+function renderCoachCard() {
+  el.coachCard.innerHTML = "";
+  const coach = state.coach;
+  if (!coach || !coach.improvementId) {
+    el.coachCard.classList.add("hidden");
+    return;
+  }
+  const imp = ((state.judgment && state.judgment.improvements) || []).find((i) => i.id === coach.improvementId);
+  if (!imp) {
+    el.coachCard.classList.add("hidden");
+    return;
+  }
+  el.coachCard.classList.remove("hidden");
+  const head = document.createElement("div");
+  head.className = "coach-card-head";
+  head.textContent = coach.total ? `Improvement ${coach.index} of ${coach.total}` : "Improvement";
+  const quote = document.createElement("p");
+  quote.className = "improvement-quote";
+  quote.textContent = `\u201c${imp.quote}\u201d`;
+  const issue = document.createElement("p");
+  issue.className = "improvement-issue";
+  issue.textContent = imp.issue;
+  el.coachCard.append(head, quote, issue, labeledLine("Cleaner", stripPauseMarkup(imp.v2_text || "")));
+  if (imp.alternative) {
+    el.coachCard.appendChild(labeledLine("Alternative", imp.alternative));
+  }
+  if (coach.stage === "verdict" && coach.verdict) {
+    el.coachCard.appendChild(renderVerdictChips(coach.verdict));
+  }
+  const hist = state.coachHistory[coach.improvementId] || [];
+  if (hist.length) {
+    const box = document.createElement("div");
+    box.className = "coach-history";
+    hist.forEach((h) => {
+      const row = document.createElement("div");
+      row.className = "coach-history-row";
+      const onPoint = h.verdict.on_point != null ? Math.round(h.verdict.on_point * 100) + "% on point" : "";
+      const wins = h.verdict.wins && h.verdict.wins.length ? h.verdict.wins.join(", ") : onPoint;
+      row.textContent = `Attempt ${h.attempt}: ${wins || "recorded"}`;
+      box.appendChild(row);
+    });
+    el.coachCard.appendChild(box);
+  }
+}
+const PRIMARY_COMMANDS = new Set(["proceed", "next", "practice"]);
+function renderCoachOptions() {
+  el.coachOptions.innerHTML = "";
+  const options = (state.coach && state.coach.options) || [];
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    if (!PRIMARY_COMMANDS.has(opt.name)) btn.className = "secondary";
+    btn.textContent = opt.label;
+    btn.addEventListener("click", () => sendMessage({ type: "command", name: opt.name }));
+    el.coachOptions.appendChild(btn);
+  });
+}
+function renderCoachStatus() {
+  const stage = state.coach && state.coach.stage;
+  if (stage === "summary") {
+    el.coachStatus.textContent = "Astra is summarising\u2026";
+    return;
+  }
+  el.coachStatus.textContent = state.agentSpeaking ? "Astra is speaking" : "listening \u2014 say it or tap an option";
+}
+
 // ------------------------------------------------------------- Report view
 const SCORE_MAX = 5; // rubric scale per skills/judge/*.md examples in GATE0.md
 function renderReport() {
-  renderScorecard();
-  renderMetrics();
   renderRerecordSlideOptions();
   renderImprovementCards();
 }
@@ -453,17 +662,23 @@ function renderImprovementCards() {
       }
       card.appendChild(row);
     });
-    const cmds = document.createElement("div");
-    cmds.className = "command-row";
-    ["again", "slower", "why", "skip"].forEach((name) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "secondary";
-      btn.textContent = name;
-      btn.addEventListener("click", () => sendMessage({ type: "command", name }));
-      cmds.appendChild(btn);
+    const attemptKeys = Object.keys(clips)
+      .filter((k) => /^attempt\d+$/.test(k))
+      .sort((a, b) => Number(a.slice(7)) - Number(b.slice(7)));
+    attemptKeys.forEach((key) => {
+      const n = key.slice(7);
+      const row = document.createElement("div");
+      row.className = "clip-row";
+      const label = document.createElement("div");
+      label.className = "clip-label";
+      label.textContent = `Your take ${n}`;
+      row.appendChild(label);
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.src = clips[key];
+      row.appendChild(audio);
+      card.appendChild(row);
     });
-    card.appendChild(cmds);
     el.improvementCards.appendChild(card);
   });
 }
@@ -487,6 +702,7 @@ function wireEvents() {
   el.slideNextBtn.addEventListener("click", () => sendMessage({ type: "slide_next" }));
   el.presentDoneBtn.addEventListener("click", () => sendMessage({ type: "present_end" }));
   el.rerecordBtn.addEventListener("click", () => sendMessage({ type: "rerecord", slide: Number(el.rerecordSlide.value) }));
+  el.newTalkBtn.addEventListener("click", () => location.reload());
   window.addEventListener("keydown", (e) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;

@@ -697,27 +697,50 @@ async def run_session(room: rtc.Room, agent_participant: rtc.RemoteParticipant,
           f"fillers={metrics.get('fillers', {}).get('count')}")
     print(f"  judgment: {len(judgment.get('improvements', []))} improvements")
 
+    # -- with the conversational coach gate, item playback only begins once
+    # Astra's ask_proceed prompt is answered -- send the CONTRACTS §5 "proceed"
+    # command as soon as we observe that stage, so the trio keeps playing.
+    ask_proceed_seen = False
+    for _ in range(80):
+        if any(msg.get("type") == "coach" and msg.get("stage") == "ask_proceed"
+               for _, msg in data_messages[idx:]):
+            ask_proceed_seen = True
+            break
+        await asyncio.sleep(0.25)
+    if ask_proceed_seen:
+        await send_msg({"type": "command", "name": "proceed"})
+    print(f"  ask_proceed observed: {ask_proceed_seen}")
+
     # -- interrupt trials --------------------------------------------------------
     trials: list[dict[str, Any]] = []
     for i, delay in enumerate(TRIAL_DELAYS_S[:N_TRIALS]):
         onset_t: float | None = None
-        for _attempt in range(8):
-            deadline = time.monotonic() + 15.0
-            while sink.speech_onset_t() is None and time.monotonic() < deadline:
-                await asyncio.sleep(0.01)
-            t0 = sink.speech_onset_t()
-            if t0 is None:
-                break
-            target = t0 + delay
-            while time.monotonic() < target:
-                if sink.genuine_stop_before(t0, time.monotonic()):
+        for _round in range(2):  # bounded: initial pass + one "again"-triggered retry
+            for _attempt in range(8):
+                deadline = time.monotonic() + 15.0
+                while sink.speech_onset_t() is None and time.monotonic() < deadline:
+                    await asyncio.sleep(0.01)
+                t0 = sink.speech_onset_t()
+                if t0 is None:
                     break
-                await asyncio.sleep(0.02)
-            now = time.monotonic()
-            if now >= target and not sink.genuine_stop_before(t0, now):
-                onset_t = now
+                target = t0 + delay
+                while time.monotonic() < target:
+                    if sink.genuine_stop_before(t0, time.monotonic()):
+                        break
+                    await asyncio.sleep(0.02)
+                now = time.monotonic()
+                if now >= target and not sink.genuine_stop_before(t0, now):
+                    onset_t = now
+                    break
+                # utterance genuinely ended before our delay elapsed -- retry on the next onset
+            if onset_t is not None:
                 break
-            # utterance genuinely ended before our delay elapsed -- retry on the next onset
+            if _round == 0:
+                # With the conversational coach gate, "no ongoing speech" usually just
+                # means the trio already finished playing -- ask for it again and
+                # re-wait once, bounded, instead of giving up on the trial immediately.
+                await send_msg({"type": "command", "name": "again"})
+                await asyncio.sleep(0.3)
         if onset_t is None:
             trials.append({"trial": i, "offset_label": offset_label(delay), "delay_s": delay,
                             "measured": False, "reason": "no ongoing agent speech found to interrupt"})
