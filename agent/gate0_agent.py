@@ -24,7 +24,7 @@ load_dotenv()
 log = logging.getLogger("gate0")
 
 RIME_MODEL = os.environ.get("RIME_MODEL", "mistv3")
-RIME_SPEAKER = os.environ.get("RIME_SPEAKER", "astra")
+RIME_SPEAKER = os.environ.get("RIME_SPEAKER", "summit")
 
 
 class Gate0(Agent):

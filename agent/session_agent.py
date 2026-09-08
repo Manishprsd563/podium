@@ -60,7 +60,7 @@ load_dotenv()
 log = logging.getLogger("podium.session_agent")
 
 RIME_MODEL = os.environ.get("RIME_MODEL", "mistv3")
-RIME_SPEAKER = os.environ.get("RIME_SPEAKER", "astra")
+RIME_SPEAKER = os.environ.get("RIME_SPEAKER", "summit")
 RIME_LANG = "eng"
 SAMPLE_RATE = 24000
 PREP_DURATION_S = 60  # PLAN.md §4.2: "countdown (default 60 s)"; not in the frozen

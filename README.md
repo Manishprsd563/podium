@@ -13,13 +13,13 @@ in [`CONTRACTS.md`](CONTRACTS.md).
 
 ## What it does
 
-Podium is voice-first: the coach, **Astra** (the Rime speaker name), talks you through the
+Podium is voice-first: the coach, **Summit** (named after the Rime speaker in use), talks you through the
 whole session, and every button on screen has a spoken equivalent.
 
-1. **Welcome** — on connect Astra introduces herself and offers two ways in: say or type a
+1. **Welcome** — on connect Summit introduces himself and offers two ways in: say or type a
    topic ("a 90-second talk on DNS for beginners") and the LLM generates a slide deck, or
    upload a PDF (exported from your slides; PPTX is not supported, see Limitations).
-2. **Prep** — Astra acknowledges the topic with one specific detail about it, then a 60 s
+2. **Prep** — Summit acknowledges the topic with one specific detail about it, then a 60 s
    countdown; say "ready" or press *Begin now* to skip it.
 3. **Three, two, one, go** — counted aloud with Rime `<NNN>` pause markup, mirrored by an
    on-screen overlay.
@@ -29,22 +29,22 @@ whole session, and every button on screen has a spoken equivalent.
 5. **Analyze** — code (not the LLM) computes pace, filler rate, pause taxonomy, loudness
    variance and time budget from the audio and transcript; the judge LLM scores four rubric
    categories against `skills/judge/*.md` and picks up to 3 concrete improvements.
-6. **Coach, as a conversation** — the dashboard appears while Astra summarises the numbers
-   in her own words and asks whether to work through the improvements. Each one is a short
-   exchange: she names the issue, plays the as-delivered line (V1), the cleaned line (V2),
+6. **Coach, as a conversation** — the dashboard appears while Summit summarises the numbers
+   in his own words and asks whether to work through the improvements. Each one is a short
+   exchange: he names the issue, plays the as-delivered line (V1), the cleaned line (V2),
    then the cleaned line with a deliberate pause before the key phrase (V3) — same Rime
    model and speaker throughout — and asks you to say it yourself. Your take is recorded,
    `analysis/practice.py` computes fillers before→after, whether the pause landed, and pace,
-   and Astra phrases the verdict as a friend would. Buttons and voice both accept *what I
+   and Summit phrases the verdict as a friend would. Buttons and voice both accept *what I
    said / cleaner / with pauses / another opening / again / slower / why / my turn / next /
    skip / finish*.
 7. **Drill** — low-confidence terms get a short recogniser-focused follow-up.
 8. **Report** — metrics, judgment, clip playback including your practice takes, re-record.
 
-Astra keeps the tone of a friend in your corner: if you go quiet she checks in with a light
+Summit keeps the tone of a friend in your corner: if you go quiet he checks in with a light
 line rather than a timeout, and an off-topic question gets one playful sentence and a steer
-back. Every number she speaks comes from code — the coach LLM only phrases facts it is
-handed. You can interrupt her at any point or re-record a slide; a revision fence guarantees
+back. Every number he speaks comes from code — the coach LLM only phrases facts it is
+handed. You can interrupt him at any point or re-record a slide; a revision fence guarantees
 a stale judgment from a superseded recording is never spoken (see `RIME_EVIDENCE.md`
 claim 4).
 
@@ -55,7 +55,7 @@ Every value below is read from `agent/session_agent.py`, `analysis/render.py`, a
 
 | Service | Role | Model / config |
 |---|---|---|
-| **Rime** — live coach speech | TTS, streaming | Model `mistv3`, speaker `astra`, `lang=eng`, **WebSocket `/ws3`**, `sample_rate=24000` (24 kHz), `pause_between_brackets=true`. LiveKit `rime.TTS` plugin, `use_websocket=True`. |
+| **Rime** — live coach speech | TTS, streaming | Model `mistv3`, speaker `summit` (flagship male voice, catalog description "friendly, professional American male voice, warm and polished"), `lang=eng`, **WebSocket `/ws3`**, `sample_rate=24000` (24 kHz), `pause_between_brackets=true`. LiveKit `rime.TTS` plugin, `use_websocket=True`. The E1/E3 evidence clips were measured on speaker `astra` before the coach was given a male voice; pause markup is a Mist v3 model property, and a spot check on `summit` added +929 ms for a requested `<700>` (same line rendered in the four candidate voices under `evidence/voices/`), so the claims carry over. |
 | **Rime** — offline contrastive clips (V1/V2/V3) | TTS, one-shot | Same model/speaker/lang, **REST `POST https://users.rime.ai/v1/rime-tts`**, `Accept: audio/wav`, `samplingRate=24000`, `pauseBetweenBrackets=true`. Used by `analysis/render.py` and the evidence scripts, never by the live agent. |
 | **Deepgram** | STT | Model `nova-3`, `language=en`, `filler_words=true`, `punctuate=true`, `sample_rate=24000`. `filler_words=true` is load-bearing: a Whisper-class recognizer strips "um"/"uh" and blinds the core filler metric (GATE0.md). |
 | **LiveKit Inference — coach LLM** | Fast conversational turns | `google/gemma-4-31b-it` |
@@ -83,14 +83,14 @@ flowchart LR
     STT[Deepgram nova-3]
     LLM1[LiveKit Inference\ncoach: gemma-4-31b-it]
     LLM2[LiveKit Inference\njudge: gpt-5.4-mini]
-    TTS_WS[Rime mistv3/astra\nWebSocket /ws3, live speech]
+    TTS_WS[Rime mistv3/summit\nWebSocket /ws3, live speech]
   end
   subgraph Analysis[analysis/*, pure, no LiveKit]
     Metrics[metrics.py]
     Judge[judge.py + skills/judge/*.md]
     Render[render.py\nV1/V2/V3 clips]
   end
-  TTS_REST[Rime mistv3/astra\nREST /v1/rime-tts, offline clips]
+  TTS_REST[Rime mistv3/summit\nREST /v1/rime-tts, offline clips]
 
   UI <-- WebRTC audio + data channel --> Room
   Room <-- WebRTC --> Orch
@@ -147,9 +147,9 @@ the plugin wiring; it also supports `console` mode for a room-free local mic/spe
 The active speech provider is never silently swapped or hidden:
 - The browser UI shows a persistent **provider badge** (`#provider-badge` in `web/index.html`,
   populated by the `"provider"` data-channel message in `web/app.js`) reading
-  `rime · mistv3 · astra` for the whole session.
+  `rime · mistv3 · summit` for the whole session.
 - Every session's `timeline.jsonl` (`CONTRACTS.md` §4) logs a `provider` event
-  (`{"ev":"provider","name":"rime","model":"mistv3","speaker":"astra"}`) once at session start,
+  (`{"ev":"provider","name":"rime","model":"mistv3","speaker":"summit"}`) once at session start,
   and `session.json`'s `config` block (`CONTRACTS.md` §1) records the same values plus the STT
   and LLM model IDs actually in use for that session.
 

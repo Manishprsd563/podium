@@ -179,7 +179,7 @@ def _calibrated_slower_render(text: str, model: str, speaker: str, sampling_rate
     return samples, sr, factor
 
 
-async def render_variants(improvement: dict, out_dir: Path, *, slower: bool = False, model: str = "mistv3", speaker: str = "astra") -> dict[str, dict]:
+async def render_variants(improvement: dict, out_dir: Path, *, slower: bool = False, model: str = "mistv3", speaker: str = "summit") -> dict[str, dict]:
     """CONTRACTS.md §1 clips/. `improvement` needs "id", "quote", "v2_text",
     "v3_markup" (CONTRACTS §3 shape); optional "pauses" for V1 reinsertion."""
     out_dir = Path(out_dir)

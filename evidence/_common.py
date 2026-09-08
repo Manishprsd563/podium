@@ -22,7 +22,7 @@ RIME_KEY = os.environ["RIME_API_KEY"]
 DG_KEY = os.environ.get("DEEPGRAM_API_KEY", "")
 
 RIME_MODEL = "mistv3"
-RIME_SPEAKER = "astra"
+RIME_SPEAKER = "summit"
 RIME_LANG = "eng"
 SAMPLE_RATE = 24000
 

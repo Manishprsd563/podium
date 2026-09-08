@@ -34,6 +34,12 @@ const state = {
 };
 const el = {};
 function q(id) { return document.getElementById(id); }
+// The coach is named after the active Rime speaker (the agent does the same),
+// so a speaker change never leaves a stale name on screen.
+function coachName() {
+  const s = state.provider && state.provider.speaker;
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Coach";
+}
 function cacheEls() {
   [
     "conn-badge", "mic-badge", "agent-badge", "provider-badge", "error-banner",
@@ -435,7 +441,7 @@ function renderCoachChatLog() {
     div.className = "chat-line " + (isAstra ? "astra" : "you") + (line.final ? "" : " partial");
     const who = document.createElement("span");
     who.className = "chat-who";
-    who.textContent = isAstra ? "Astra" : "You";
+    who.textContent = isAstra ? coachName() : "You";
     const txt = document.createElement("span");
     txt.className = "chat-text";
     txt.textContent = stripPauseMarkup(line.text);
@@ -537,10 +543,10 @@ function renderCoachOptions() {
 function renderCoachStatus() {
   const stage = state.coach && state.coach.stage;
   if (stage === "summary") {
-    el.coachStatus.textContent = "Astra is summarising\u2026";
+    el.coachStatus.textContent = `${coachName()} is summarising\u2026`;
     return;
   }
-  el.coachStatus.textContent = state.agentSpeaking ? "Astra is speaking" : "listening \u2014 say it or tap an option";
+  el.coachStatus.textContent = state.agentSpeaking ? `${coachName()} is speaking` : "listening \u2014 say it or tap an option";
 }
 
 // ------------------------------------------------------------- Report view
