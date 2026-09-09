@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 WEB_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = WEB_ROOT.parent
 SESSIONS_ROOT = REPO_ROOT / "sessions"
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 8090  # 8080 collides with Docker Desktop's backend on this machine
 
 load_dotenv(REPO_ROOT / ".env")
 

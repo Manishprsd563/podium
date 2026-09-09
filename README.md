@@ -138,7 +138,7 @@ All commands use the project-scoped virtualenv interpreter directly (no `activat
 
 # 2. Web client (static files + /token endpoint), in a second terminal
 .venv\Scripts\python.exe web\serve.py
-# then open http://127.0.0.1:8080/ in a browser, allow microphone access
+# then open http://127.0.0.1:8090/ in a browser, allow microphone access
 
 # 3. Evidence suite (does not need a browser or a running agent worker)
 .venv\Scripts\python.exe evidence\run_all.py
