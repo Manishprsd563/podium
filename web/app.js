@@ -101,7 +101,7 @@ function cacheEls() {
     "coach-chat-log", "coach-card", "drill-card", "coach-transcript-strip",
     "coach-options", "coach-status",
     "progress-panel", "level-track", "skill-rows", "next-focus",
-    "rerecord-slide", "rerecord-btn", "improvement-cards",
+    "rerecord-slide", "rerecord-btn", "improvement-cards", "new-talk-btn",
     "countdown-overlay", "countdown-loading", "countdown-orb", "countdown-loading-title",
     "countdown-playing", "countdown-number", "countdown-status",
     "countdown-error", "countdown-error-message", "countdown-retry-btn",
@@ -1210,6 +1210,7 @@ const SKILL_IDS = [
   "hook", "structure", "pacing", "pausing", "fillers",
   "vocal-variety", "storytelling", "slide-connection", "closing", "articulation",
 ];
+
 function renderScorecard() {
   el.scorecard.innerHTML = "";
   const scores = (state.judgment && state.judgment.scores) || null;
@@ -1408,6 +1409,7 @@ function wireEvents() {
     if (cur.errorKind === "autoplay") retryAutoplay(cur);
     else requestBegin();
   });
+  el.newTalkBtn.addEventListener("click", () => location.reload());
   el.gateStartBtn.addEventListener("click", () => startSession());
   el.unmutePill.addEventListener("click", async () => {
     try {

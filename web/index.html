@@ -3,33 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f9fa">
 <title>Podium</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="gate" class="gate">
   <div class="gate-inner">
-    <canvas id="gate-orb" class="gate-orb-canvas"></canvas>
+    <div class="gate-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 15.5V9a6 6 0 0 1 12 0v6.5M9 18h6M12 15v6M9.5 9.5v2a2.5 2.5 0 0 0 5 0v-2"/></svg>
+    </div>
+    <canvas id="gate-orb" class="gate-orb-canvas" aria-hidden="true"></canvas>
+    <p class="eyebrow">Voice-first presentation coaching</p>
     <h1 class="gate-title">Podium</h1>
-    <p id="gate-status" class="gate-status">Connecting your coach&hellip;</p>
-    <button id="gate-start-btn" type="button" disabled>Start session</button>
+    <p id="gate-status" class="gate-status" role="status" aria-live="polite">Connecting your coach&hellip;</p>
+    <button id="gate-start-btn" type="button" disabled>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 7 7 5-7 5V7Z"/></svg>
+      Start session
+    </button>
   </div>
 </div>
-<div id="unmute-pill" class="unmute-pill hidden" role="button" tabindex="0">Tap to unmute your coach</div>
+
+<div id="unmute-pill" class="unmute-pill hidden" role="button" tabindex="0">
+  <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V7a3 3 0 0 0-3-3Z"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg>
+  Tap to unmute your coach
+</div>
 
 <header id="topbar">
-  <div id="brand">Podium</div>
-  <div id="conn-badge" class="badge muted">connecting&hellip;</div>
-  <div id="mic-badge" class="badge hidden">&#127908; mic live</div>
-  <div id="agent-badge" class="badge hidden">listening</div>
-  <div id="provider-badge" class="badge hidden">&mdash;</div>
-  <div id="level-badge" class="badge hidden">&mdash;</div>
+  <div id="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M8 15V9a4 4 0 0 1 8 0v6M6 15h12M9 19h6M12 15v4"/></svg>
+    </span>
+    <span>Podium</span>
+  </div>
+  <div class="topbar-status" aria-label="Session status">
+    <div id="conn-badge" class="badge muted" role="status">connecting&hellip;</div>
+    <div id="mic-badge" class="badge hidden">mic live</div>
+    <div id="agent-badge" class="badge hidden">listening</div>
+    <div id="provider-badge" class="badge hidden">&mdash;</div>
+    <div id="level-badge" class="badge hidden">&mdash;</div>
+  </div>
 </header>
 
 <div id="error-banner" class="banner hidden" role="alert"></div>
 
-<div id="astra-bubble" class="astra-bubble">
-  <canvas id="astra-indicator" class="astra-indicator"></canvas>
+<div id="astra-bubble" class="astra-bubble" aria-live="polite">
+  <canvas id="astra-indicator" class="astra-indicator" aria-hidden="true"></canvas>
   <div class="astra-lines">
     <div id="astra-line" class="astra-line">Your coach is connecting&hellip;</div>
     <div id="user-line" class="user-line hidden"></div>
@@ -37,128 +56,235 @@
 </div>
 
 <main>
+  <section id="view-setup" class="view setup-view" aria-labelledby="setup-heading">
+    <header class="view-heading setup-heading">
+      <p class="eyebrow">Your rehearsal room</p>
+      <h1 id="setup-heading">What are you presenting?</h1>
+      <p>Say your topic aloud or shape the session below. Podium builds a focused reference deck, then listens while you rehearse.</p>
+    </header>
 
-  <!-- ============ SETUP VIEW ============ -->
-  <section id="view-setup" class="view">
-    <h1>Say a topic, or type it</h1>
-    <p class="hint">Your coach listens too &mdash; just say your topic out loud.</p>
+    <div class="setup-grid">
+      <form id="setup-form" class="panel setup-form">
+        <div class="panel-heading">
+          <span class="section-icon icon-cyan" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 4a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V7a3 3 0 0 0-3-3Z"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg>
+          </span>
+          <div>
+            <h2>Start with a topic</h2>
+            <p class="hint">Your coach is listening. Typing works too.</p>
+          </div>
+        </div>
+        <label class="field field-topic">
+          <span>Topic</span>
+          <input id="setup-topic" type="text" placeholder="e.g. How self-attention works" autocomplete="off" required>
+        </label>
+        <div class="row setup-options">
+          <label class="field">
+            <span>Audience level</span>
+            <select id="setup-level">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Practice length</span>
+            <select id="setup-duration">
+              <option value="60" selected>60 seconds</option>
+              <option value="90">90 seconds</option>
+              <option value="120">2 minutes</option>
+            </select>
+          </label>
+        </div>
+        <button id="setup-generate" type="submit" class="button-wide">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4h9l3 3v13H6V4Z"/><path d="M14 4v4h4M9 12h6M9 16h4"/></svg>
+          Generate reference slides
+        </button>
+      </form>
 
-    <form id="setup-form" class="panel">
-      <label>
-        Topic
-        <input id="setup-topic" type="text" placeholder="e.g. self-attention" required>
-      </label>
-      <div class="row">
-        <label>
-          Level
-          <select id="setup-level">
-            <option value="beginner">beginner</option>
-            <option value="intermediate" selected>intermediate</option>
-            <option value="advanced">advanced</option>
-          </select>
+      <div class="panel upload-panel">
+        <div class="panel-heading">
+          <span class="section-icon icon-lilac" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V5M8 9l4-4 4 4M5 15v4h14v-4"/></svg>
+          </span>
+          <div>
+            <h2>Bring your own deck</h2>
+            <p class="hint">Choose a PDF export. It is parsed locally until you confirm.</p>
+          </div>
+        </div>
+        <label class="file-picker" for="upload-input">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h4M10 13h5M10 17h5"/></svg>
+          <span><strong>Choose a PDF</strong><small>or drag it into this window</small></span>
         </label>
-        <label>
-          Duration
-          <select id="setup-duration">
-            <option value="60" selected>60 s</option>
-            <option value="90">90 s</option>
-            <option value="120">120 s</option>
-          </select>
-        </label>
+        <input id="upload-input" class="visually-native-file" type="file" accept="application/pdf">
+        <div id="upload-status" class="hint" role="status" aria-live="polite"></div>
+        <div id="upload-error" class="error hidden" role="alert"></div>
       </div>
-      <button id="setup-generate" type="submit">Generate slides</button>
-    </form>
-
-    <div class="panel">
-      <h2>Or upload a deck</h2>
-      <p class="hint">A PDF export of your slides. Parsed in the browser &mdash; nothing is sent until you confirm.</p>
-      <input id="upload-input" type="file" accept="application/pdf">
-      <div id="upload-status" class="hint"></div>
-      <div id="upload-error" class="error hidden"></div>
     </div>
 
-    <div id="setup-deck-preview" class="panel hidden">
-      <h2>Deck ready</h2>
+    <div id="setup-deck-preview" class="panel deck-preview-panel hidden">
+      <div class="panel-heading">
+        <span class="section-icon icon-coral" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14v12H5V6Z"/><path d="M8 10h8M8 14h5"/></svg>
+        </span>
+        <div><h2>Deck ready</h2><p class="hint">Review the outline before you begin.</p></div>
+      </div>
       <div id="deck-preview-list"></div>
     </div>
   </section>
 
-  <!-- ============ STAGE VIEW (prep + present) ============ -->
-  <section id="view-stage" class="view hidden">
-
-    <div id="stage-status" class="status-pill">listening</div>
-
-    <div id="stage-prep" class="hidden">
-      <h1>Get ready</h1>
-      <div id="prep-countdown" class="countdown">&mdash;</div>
-      <button id="prep-ready-btn" type="button">Begin now</button>
+  <section id="view-stage" class="view stage-view hidden" aria-label="Presentation rehearsal">
+    <div class="stage-context">
+      <div id="stage-status" class="status-pill" role="status">listening</div>
     </div>
 
-    <div id="stage-present" class="hidden">
-      <div id="present-timer" class="timer">&mdash;</div>
-      <div id="slide-card" class="slide-card">
+    <div id="stage-prep" class="stage-prep hidden">
+      <p class="eyebrow">Reference deck ready</p>
+      <h1>Take a breath. Start when you feel settled.</h1>
+      <div id="prep-countdown" class="countdown" aria-live="polite">&mdash;</div>
+      <button id="prep-ready-btn" type="button">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 7 7 5-7 5V7Z"/></svg>
+        Begin now
+      </button>
+    </div>
+
+    <div id="stage-present" class="stage-present hidden">
+      <div class="stage-utility" aria-label="Presentation controls">
+        <div class="stage-label">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5h14v11H5V5Z"/><path d="M9 20h6M12 16v4"/></svg>
+          <span>Reference slide</span>
+        </div>
+        <div id="present-timer" class="timer" aria-label="Time remaining">&mdash;</div>
+      </div>
+
+      <div id="slide-card" class="slide-card" aria-live="polite">
         <div id="slide-title" class="slide-title">&mdash;</div>
         <ul id="slide-bullets" class="slide-bullets"></ul>
       </div>
+
       <div class="stage-controls">
-        <button id="slide-next-btn" type="button">Next slide <kbd>Space</kbd></button>
-        <button id="present-done-btn" type="button">Done <kbd>Enter</kbd></button>
-      </div>
-      <div id="transcript-strip" class="transcript-strip"></div>
-    </div>
-
-  </section>
-
-  <!-- ============ COACH VIEW (analyze + coach + drill + report) ============ -->
-  <section id="view-coach" class="view hidden">
-    <div class="coach-layout">
-      <div class="coach-left">
-        <div class="panel" id="scorecard-panel">
-          <h2>Scorecard</h2>
-          <div id="scorecard"></div>
-          <p id="judgment-summary" class="hint"></p>
-        </div>
-        <div class="panel" id="metrics-panel">
-          <h2>Metrics</h2>
-          <div id="metrics-grid"></div>
-          <div id="metrics-perslide" class="hint"></div>
-        </div>
-
-        <div class="panel" id="transcript-panel">
-          <h2>Transcript</h2>
-          <p class="hint">Words your coach's ear (Deepgram) heard with low confidence are underlined &mdash; that is intelligibility, not accent.</p>
-          <div id="coach-transcript-strip" class="transcript-strip pronunciation-strip"></div>
-        </div>
-
-        <details class="panel" id="recordings-panel">
-          <summary>Recordings</summary>
-          <div class="row">
-            <select id="rerecord-slide"></select>
-            <button id="rerecord-btn" type="button" class="secondary">Re-record this slide</button>
-          </div>
-          <div id="improvement-cards"></div>
-        </details>
-
-        <details class="panel hidden" id="progress-panel">
-          <summary>Your path</summary>
-          <div id="level-track" class="level-track"></div>
-          <div id="skill-rows" class="skill-rows"></div>
-          <p id="next-focus" class="hint"></p>
-        </details>
+        <button id="slide-next-btn" type="button">
+          Next slide
+          <svg class="icon icon-end" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          <kbd>Space</kbd>
+        </button>
+        <button id="present-done-btn" type="button" class="secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+          Finish rehearsal <kbd>Enter</kbd>
+        </button>
       </div>
 
-      <div class="coach-right">
-        <div class="panel coach-panel">
-          <h2>Coach</h2>
-          <div id="coach-chat-log" class="coach-chat-log"></div>
-        <div id="coach-card" class="coach-card hidden"></div>
-        <div id="drill-card" class="coach-card drill-card hidden"></div>
-          <div id="coach-options" class="command-row"></div>
-          <div id="coach-status" class="coach-status">listening &mdash; say it or tap an option</div>
-        </div>
+      <div class="caption-window" aria-label="Live captions">
+        <div class="caption-label"><span aria-hidden="true"></span>Live transcript</div>
+        <div id="transcript-strip" class="transcript-strip" aria-live="polite"></div>
       </div>
     </div>
   </section>
+
+  <section id="view-coach" class="view coach-view hidden" aria-labelledby="coach-heading">
+    <header class="view-heading coach-heading">
+      <p class="eyebrow">Guided review</p>
+      <h1 id="coach-heading">Turn the rehearsal into a stronger talk.</h1>
+      <p>Work through the most useful improvement first. Your reference slide stays in view while your coach explains what to change.</p>
+    </header>
+
+    <div class="panel coach-panel coach-review-panel">
+      <div class="panel-heading coach-panel-heading">
+        <span class="section-icon icon-lilac" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14v10H9l-4 4V6Z"/><path d="M9 10h6M9 13h4"/></svg>
+        </span>
+        <div><h2>Improvement conversation</h2><p class="hint">Listen, respond, or choose a prompt.</p></div>
+      </div>
+      <div id="coach-card" class="coach-card hidden"></div>
+      <div class="conversation-window">
+        <div id="coach-chat-log" class="coach-chat-log" aria-live="polite"></div>
+      </div>
+      <div class="coach-command-bar">
+        <div id="coach-options" class="command-row" aria-label="Coach response options"></div>
+        <div id="coach-status" class="coach-status" role="status">listening &mdash; say it or tap an option</div>
+      </div>
+      <div id="drill-card" class="coach-card drill-card hidden"></div>
+    </div>
+
+    <div class="coach-support-grid">
+      <div class="panel" id="transcript-panel">
+        <div class="panel-heading compact">
+          <span class="section-icon icon-cyan" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M7 4v16M12 7v10M17 5v14M4 9v6M20 9v6"/></svg>
+          </span>
+          <div><h2>Presentation transcript</h2><p class="hint">Underlined words were heard with low confidence, which can signal intelligibility&mdash;not accent.</p></div>
+        </div>
+        <div id="coach-transcript-strip" class="transcript-strip pronunciation-strip"></div>
+      </div>
+
+      <div class="panel" id="metrics-panel">
+        <div class="panel-heading compact">
+          <span class="section-icon icon-coral" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 19V9M12 19V5M19 19v-7"/></svg>
+          </span>
+          <div><h2>Delivery signals</h2><p class="hint">A compact view of pace, fluency, and coverage.</p></div>
+        </div>
+        <div id="metrics-grid"></div>
+        <div id="metrics-perslide" class="hint"></div>
+      </div>
+    </div>
+
+    <div class="coach-report-grid">
+      <div class="panel hidden" id="progress-panel">
+        <div class="panel-heading compact">
+          <span class="section-icon icon-lilac" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="m5 16 4-4 3 3 7-8"/><path d="M15 7h4v4"/></svg>
+          </span>
+          <div><h2>Your practice path</h2><p class="hint">Progress compounds one focused rehearsal at a time.</p></div>
+        </div>
+        <div id="level-track" class="level-track"></div>
+        <div id="skill-rows" class="skill-rows"></div>
+        <p id="next-focus" class="hint next-focus"></p>
+      </div>
+
+      <div class="panel" id="rerecord-panel">
+        <div class="panel-heading compact">
+          <span class="section-icon icon-cyan" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 8a4 4 0 1 1-4 4"/><path d="M5 8v5h5M12 4a8 8 0 0 1 7.4 11"/></svg>
+          </span>
+          <div><h2>Try that slide again</h2><p class="hint">Apply one improvement while it is fresh.</p></div>
+        </div>
+        <div class="row rerecord-row">
+          <label class="field visually-labeled"><span>Slide</span><select id="rerecord-slide" aria-label="Slide to re-record"></select></label>
+          <button id="rerecord-btn" type="button" class="secondary">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V7a3 3 0 0 0-3-3Z"/><path d="M6 12a6 6 0 0 0 12 0"/></svg>
+            Re-record slide
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel improvements-panel">
+      <div class="panel-heading compact">
+        <span class="section-icon icon-coral" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v5c0 4.4 3.4 7.5 8 9 4.6-1.5 8-4.6 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-5"/></svg>
+        </span>
+        <div><h2>Improvement library</h2><p class="hint">Replay examples and revisit each recommendation.</p></div>
+      </div>
+      <div id="improvement-cards"></div>
+    </div>
+
+    <button id="new-talk-btn" type="button" class="secondary new-talk-button">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      Start a new talk
+    </button>
+
+    <div class="panel score-dock" id="scorecard-panel">
+      <div class="score-dock-heading">
+        <span class="section-icon icon-cyan" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 9.5 8 4 9l4 4-.9 6L12 16l4.9 3L16 13l4-4-5.5-1L12 3Z"/></svg>
+        </span>
+        <div><h2>Session scores</h2><p id="judgment-summary" class="hint"></p></div>
+      </div>
+      <div id="scorecard"></div>
+    </div>
+  </section>
+</main>
 
 <div id="countdown-overlay" class="countdown-overlay hidden">
   <div id="countdown-loading" class="countdown-loading hidden">
@@ -176,7 +302,7 @@
   </div>
 </div>
 
-<footer id="shortcuts">Space = next slide (while presenting) &middot; Enter = done</footer>
+<footer id="shortcuts">Presenting: <kbd>Space</kbd> next slide <span aria-hidden="true">&middot;</span> <kbd>Enter</kbd> finish</footer>
 
 <script type="module" src="app.js"></script>
 </body>
