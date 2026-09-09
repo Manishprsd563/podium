@@ -89,7 +89,7 @@ function cacheEls() {
     "conn-badge", "mic-badge", "agent-badge", "provider-badge", "level-badge", "error-banner",
     "astra-indicator", "astra-line", "user-line",
     "gate", "gate-orb", "gate-status", "gate-start-btn", "unmute-pill",
-    "view-setup", "view-stage", "view-coach", "view-report",
+    "view-setup", "view-stage", "view-coach",
     "setup-form", "setup-topic", "setup-level", "setup-duration",
     "upload-input", "upload-status", "upload-error",
     "setup-deck-preview", "deck-preview-list",
@@ -99,7 +99,7 @@ function cacheEls() {
     "scorecard", "judgment-summary", "metrics-grid", "metrics-perslide",
     "coach-chat-log", "coach-card", "drill-card", "coach-transcript-strip",
     "coach-options", "coach-status",
-    "progress-panel", "level-track", "skill-rows", "next-focus", "report-transcript-strip",
+    "progress-panel", "level-track", "skill-rows", "next-focus",
     "rerecord-slide", "rerecord-btn", "improvement-cards", "new-talk-btn",
     "countdown-overlay", "countdown-number",
   ].forEach((id) => { el[toCamel(id)] = q(id); });
@@ -486,15 +486,13 @@ function startCountdown(seconds) {
 // ------------------------------------------------------------------ render
 function viewForPhase(phase) {
   if (phase === "prep" || phase === "present") return "stage";
-  if (phase === "analyze" || phase === "coach" || phase === "drill") return "coach";
-  if (phase === "report") return "report";
+  if (phase === "analyze" || phase === "coach" || phase === "drill" || phase === "report") return "coach";
   return "setup";
 }
 function showView(name) {
   el.viewSetup.classList.toggle("hidden", name !== "setup");
   el.viewStage.classList.toggle("hidden", name !== "stage");
   el.viewCoach.classList.toggle("hidden", name !== "coach");
-  el.viewReport.classList.toggle("hidden", name !== "report");
   document.body.classList.toggle("wide-view", name === "coach");
 }
 function render() {
@@ -503,8 +501,7 @@ function render() {
   renderAstraBubble();
   if (state.phase === "setup") renderSetup();
   else if (state.phase === "prep" || state.phase === "present") renderStage();
-  else if (state.phase === "analyze" || state.phase === "coach" || state.phase === "drill") renderCoachView();
-  else renderReport();
+  else renderCoachView();
 }
 function renderTopbar() {
   el.micBadge.classList.toggle("hidden", !state.micEnabled);
@@ -740,6 +737,9 @@ function renderCoachView() {
   renderPronunciationTranscript(el.coachTranscriptStrip);
   renderCoachOptions();
   renderCoachStatus();
+  renderRerecordSlideOptions();
+  renderImprovementCards();
+  renderProgressPanel();
 }
 function renderCoachChatLog() {
   el.coachChatLog.innerHTML = "";
@@ -981,12 +981,7 @@ const SKILL_IDS = [
   "hook", "structure", "pacing", "pausing", "fillers",
   "vocal-variety", "storytelling", "slide-connection", "closing", "articulation",
 ];
-function renderReport() {
-  renderRerecordSlideOptions();
-  renderImprovementCards();
-  renderProgressPanel();
-  renderPronunciationTranscript(el.reportTranscriptStrip);
-}
+
 function renderScorecard() {
   el.scorecard.innerHTML = "";
   const scores = (state.judgment && state.judgment.scores) || null;
