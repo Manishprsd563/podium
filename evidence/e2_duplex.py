@@ -55,6 +55,8 @@ import asyncio
 import json
 import shutil
 import sys
+import time
+import wave
 from pathlib import Path
 
 import numpy as np
@@ -218,15 +220,59 @@ def _read_timeline(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
 
 
+def _fake_countdown_render(out_dir, *, model="mistv3", speaker="thunder"):
+    """Deterministic countdown clips for the CONTRACTS §5 handshake -- this
+    harness tests the turn policy and the revision fence, not clip synthesis,
+    so the render is a fixture (same convention as Part B's judge mock)."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    clips = {}
+    for label in ("3", "2", "1", "Begin"):
+        path = out / f"countdown_{label.lower()}.wav"
+        n = int(SAMPLE_RATE * 0.3)
+        tone = (12000 * np.sin(2 * np.pi * 220 * np.arange(n) / SAMPLE_RATE)).astype(np.int16)
+        with wave.open(str(path), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(SAMPLE_RATE)
+            w.writeframes(tone.tobytes())
+        clips[label] = {"path": str(path), "duration_s": 0.3, "text": label}
+    return clips
+
+
+async def _drive_countdown(orch, timeout_s: float = 20.0) -> None:
+    """Plays the browser's half of the countdown handshake (this harness has no
+    media elements): wait for the staged ready clips, then ack completion. There
+    is no timeout-success fallback agent-side -- a missing ack simply never
+    starts the recording, so the harness must drive the real handshake."""
+    deadline = time.monotonic() + timeout_s
+    while not orch._countdown_ready.is_set():
+        if time.monotonic() > deadline:
+            raise RuntimeError("countdown clips never became ready")
+        await asyncio.sleep(0.05)
+    cid = orch._countdown_id
+    assert cid, "countdown id missing while clips are ready"
+    orch.on_client({"type": "countdown_complete", "id": cid})
+
+
+def _patch_countdown_render():
+    """Swaps the countdown render for a deterministic fixture; returns a restore
+    callable (used with try/finally in each part)."""
+    import agent.session_agent as sa_mod
+    real = sa_mod.render_mod.render_countdown
+    sa_mod.render_mod.render_countdown = _fake_countdown_render
+
+    def restore():
+        sa_mod.render_mod.render_countdown = real
+
+    return restore
+
+
 async def _cancel_orchestrator_tasks(orch) -> None:
-    """Leftover background tasks (coach queue, judge/render calls) would otherwise log
-    'AgentSession isn't running' once we close the session mid-scenario; cancel them first."""
-    tasks = [t for t in (getattr(orch, "_flow_task", None), getattr(orch, "_post_analyze_task", None),
-                          getattr(orch, "_prep_task", None)) if t and not t.done()]
-    for t in tasks:
-        t.cancel()
-    if tasks:
-        await asyncio.gather(*tasks, return_exceptions=True)
+    """Leftover background tasks (coach queue, judge/render calls, the countdown
+    handshake/render) would otherwise log 'AgentSession isn't running' once we
+    close the session mid-scenario; cancel them first."""
+    await orch._cancel_stale_tasks(exclude_current=False)
 
 
 # ---------------------------------------------------------------------------
@@ -247,6 +293,7 @@ async def run_live_presentation_policy(fixtures: list[dict]) -> dict:
         shutil.rmtree(session_root)
     per_fixture, premature = {}, 0
 
+    restore = _patch_countdown_render()
     for fx in fixtures:
         try:
             store = Store(session_id=fx["id"], root=session_root)
@@ -255,7 +302,10 @@ async def run_live_presentation_policy(fixtures: list[dict]) -> dict:
                 audio_in = _make_audio_input(fx["sr"])
                 session.input.audio = audio_in
                 await session.start(agent)
+                # The countdown handshake is real (CONTRACTS §5); only its clip
+                # synthesis is a fixture. _drive_countdown plays the browser half.
                 orch._start_present_flow()  # bypass deck/prep only; present-phase policy is real
+                await _drive_countdown(orch)
 
                 feed_task = asyncio.create_task(audio_in.feed_file(fx["path"]))
                 bad = False
@@ -272,6 +322,7 @@ async def run_live_presentation_policy(fixtures: list[dict]) -> dict:
                 await _cancel_orchestrator_tasks(orch)
                 await session.aclose()
         except Exception as exc:
+            restore()
             return {"exercised": False, "reason": f"live harness failed on {fx['id']}: {exc}",
                     "target": 0}
 
@@ -280,6 +331,7 @@ async def run_live_presentation_policy(fixtures: list[dict]) -> dict:
         per_fixture[fx["id"]] = {"timeline_path": str(timeline_path), "premature_end": bad,
                                   "n_events": len(_read_timeline(timeline_path))}
 
+    restore()
     return {"exercised": True, "premature_ends": premature, "of": len(fixtures), "target": 0,
             "per_fixture": per_fixture}
 
@@ -433,6 +485,7 @@ async def run_live_duplex() -> dict:
         }
     finally:
         sa_mod.judge_mod.judge = real_judge
+        sa_mod.render_mod.render_countdown = real_countdown
 
 
 def _part_b_not_exercised(reason: str) -> dict:

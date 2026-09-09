@@ -164,7 +164,10 @@ Agent → client:
 {"type":"drill","word":"heads","stage":"you"|"model"|"prompt"|"verdict","conf_before":0.28,"conf_after":0.91,"url":"/sessions/<id>/clips/drill_heads_you.wav"}
 {"type":"progress","client_id":"...","level":"Speaker","levels":["Novice","Speaker","Presenter","Keynote","TEDx-ready"],
  "skills":{"pacing":{"mastery":0.4,"sessions":2,"last_focus":"2026-09-08"}}, "next_focus":"pausing"}   // §8
-{"type":"countdown","seconds":3}                    // 3-2-1 begins now; client animates locally, present follows
+{"type":"countdown","id":"<unique-token>","status":"loading"}
+{"type":"countdown","id":"<same-token>","status":"ready","clips":[{"label":"3","url":"/sessions/<id>/clips/countdown_3.wav"},{"label":"2","url":"..."},{"label":"1","url":"..."},{"label":"Begin","url":"..."}]}
+{"type":"countdown","id":"<same-token>","status":"error","message":"..."}
+{"type":"reset"}                                   // clear current talk UI; keep room, microphone, provider and user progress
 {"type":"coach","stage":"...","options":[{"name":"proceed","label":"Let's do it"}],
  "improvement_id":"imp_1","index":1,"total":3,"attempt":2,"verdict":{...}}   // §7
 {"type":"provider","name":"rime","model":"mistv3","speaker":"astra"}
@@ -182,8 +185,13 @@ the wrap-up) · `original` (play V0, the user's own recording; falls back to V1)
 `alternative` (speak the alternative opening) · `again` (replay V0+V2+V3) · `slower`
 (re-render slower, replay) · `why` (rubric reason) · `practice` (prompt the user to
 say it) · `next` (done with this item) · `skip` (move on without marking heard) ·
-`finish` (leave coaching now). A command outside the currently offered `options` is
-ignored with a timeline `voice_intent` entry only.
+`finish` (leave the current improvement loop). At `coach.stage=wrap`, the dashboard
+offers `more` (practice the existing improvements again), `rerecord` (try the selected
+slide), and `new_talk` (return to the topic/PDF form on the same connection). The internal
+phase `report` remains a dashboard continuation state, not a separate report page.
+Silence does not choose a continuation. Repeated practice does not create extra
+progress credit for the same presentation revision. Commands outside the currently
+offered options are ignored.
 
 Client → agent:
 ```jsonc
@@ -191,12 +199,21 @@ Client → agent:
 {"type":"deck_upload","slides":[{"index":1,"title":"...","bullets":["..."]}],"client_id":"<uuid>"}
 {"type":"client_ready"}     // sent from the start button's click handler once room.startAudio() succeeded;
                             // the agent holds the greeting until it arrives (120 s fallback)
-{"type":"ready"}            // prep finished, start presenting
+{"type":"ready"}            // begin audio preparation, NOT presentation recording
+{"type":"countdown_complete","id":"<matching-token>"} // only after all four local audio clips emitted ended
+{"type":"countdown_failed","id":"<matching-token>"}   // actual playback failure; never start a presentation as fallback
 {"type":"slide_next"}
 {"type":"present_end"}
 {"type":"rerecord","slide":2}
-{"type":"command","name":"proceed"|"later"|"original"|"cleaner"|"pauses"|"alternative"|"again"|"slower"|"why"|"practice"|"next"|"skip"|"finish"}
+{"type":"command","name":"proceed"|"later"|"original"|"cleaner"|"pauses"|"alternative"|"again"|"slower"|"why"|"practice"|"next"|"skip"|"finish"|"more"|"rerecord"|"new_talk"}
 ```
+
+Countdown audio is rendered once per live session in the active Rime voice and played
+by the browser, not queued again on the agent speech stream. Each numeral is shown on
+its media element `playing` event; only `ended` advances to the next clip. Buffering or
+blocked playback keeps the loading overlay visible. `phase:present` is sent only after
+the matching completion acknowledgement and hides the overlay. Duplicate or stale
+acknowledgements cannot start another recording. A failure returns to preparation.
 
 ## 7. Practice verdict (computed by `analysis/practice.py`, never by the LLM)
 

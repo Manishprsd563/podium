@@ -1,0 +1,217 @@
+[08:22:11] building/caching speech fixtures via Rime REST (once per text)...
+[08:22:11]   fixtures ready
+[08:22:11] == missing_and_delayed_ack ==
+[08:22:19] PASS (7.2s): no revision while unacked; late ack opened revision 1
+[08:22:19] == duplicate_ready_and_acks ==
+[08:22:24] PASS (5.9s): duplicate ready/acks ignored; one phase=present, one revision
+[08:22:24] == countdown_failed_and_error ==
+[08:22:33] PASS (8.3s): failed/error -> prep, never records; retry reaches present
+[08:22:33] == not_ready_negative ==
+[08:22:36] PASS (3.7s): 'not ready' started no countdown and no flow; 'ready' does
+[08:22:36] == wrap_more_reuse ==
+[08:22:37]   run_to_wrap: deck_upload
+[08:22:38]   run_to_wrap: feeding presentation speech
+[08:22:58]   run_to_wrap: present_end
+[08:22:58]   run_to_wrap: waiting for coach
+[08:27:51] building/caching speech fixtures via Rime REST (once per text)...
+[08:27:51]   fixtures ready
+[08:27:51] == missing_and_delayed_ack ==
+[08:27:57] PASS (6.3s): no revision while unacked; late ack opened revision 1
+[08:27:57] == duplicate_ready_and_acks ==
+[08:28:03] PASS (5.4s): duplicate ready/acks ignored; one phase=present, one revision
+[08:28:03] == countdown_failed_and_error ==
+[08:28:10] PASS (7.2s): failed/error -> prep, never records; retry reaches present
+[08:28:10] == not_ready_negative ==
+[08:28:14] PASS (3.7s): 'not ready' started no countdown and no flow; 'ready' does
+[08:28:14] == wrap_more_reuse ==
+[08:28:14]   run_to_wrap: deck_upload
+[08:28:15]   run_to_wrap: feeding presentation speech
+[08:28:36]   run_to_wrap: present_end
+[08:28:36]   run_to_wrap: waiting for coach
+[08:32:38] FAIL: AssertionError('timeout (240.0s) waiting for phase=coach')
+[08:32:38] == wrap_rerecord_and_scope ==
+[08:32:39]   run_to_wrap: deck_upload
+[08:32:40]   run_to_wrap: feeding presentation speech
+[08:33:01]   run_to_wrap: present_end
+[08:33:01]   run_to_wrap: waiting for coach
+[08:37:03] FAIL: AssertionError('timeout (240.0s) waiting for phase=coach')
+[08:37:03] == new_talk_and_fence ==
+[08:37:03]   run_to_wrap: deck_upload
+[08:37:05]   run_to_wrap: feeding presentation speech
+[08:37:26]   run_to_wrap: present_end
+[08:37:26]   run_to_wrap: waiting for coach
+[08:40:58] building/caching speech fixtures via Rime REST (once per text)...
+[08:40:58]   fixtures ready
+[08:40:58] == missing_and_delayed_ack ==
+[08:41:04] PASS (6.4s): no revision while unacked; late ack opened revision 1
+[08:41:04] == duplicate_ready_and_acks ==
+[08:41:10] PASS (5.4s): duplicate ready/acks ignored; one phase=present, one revision
+[08:41:10] == countdown_failed_and_error ==
+[08:41:17] PASS (7.2s): failed/error -> prep, never records; retry reaches present
+[08:41:17] == not_ready_negative ==
+[08:41:21] PASS (3.8s): 'not ready' started no countdown and no flow; 'ready' does
+[08:41:21] == wrap_more_reuse ==
+[08:41:21]   run_to_wrap: deck_upload
+[08:41:22]   run_to_wrap: feeding presentation speech
+[08:41:43]   run_to_wrap: present_end
+[08:41:43]   run_to_wrap: waiting for coach
+[08:41:43]   run_to_wrap: waiting for ask_proceed
+[08:41:43]   run_to_wrap: command proceed
+[08:41:43]   run_to_wrap: waiting for wrap
+[08:42:19]   run_to_wrap: at wrap
+[08:42:21]   more pass 1: waiting for practice capture
+[08:43:23] FAIL: AssertionError('timeout (60.0s) waiting for practice capture open (pass 1)')
+[08:43:23] == wrap_rerecord_and_scope ==
+[08:43:23]   run_to_wrap: deck_upload
+[08:43:25]   run_to_wrap: feeding presentation speech
+[08:43:45]   run_to_wrap: present_end
+[08:43:46]   run_to_wrap: waiting for coach
+[08:43:46]   run_to_wrap: waiting for ask_proceed
+[08:43:46]   run_to_wrap: command later
+[08:43:46]   run_to_wrap: waiting for wrap
+[08:43:46]   run_to_wrap: at wrap
+[08:44:20] FAIL: AssertionError('timeout (30.0s) waiting for phase=present (rerecord)')
+[08:44:20] == new_talk_and_fence ==
+[08:44:20]   run_to_wrap: deck_upload
+[08:44:22]   run_to_wrap: feeding presentation speech
+[08:44:42]   run_to_wrap: present_end
+[08:44:42]   run_to_wrap: waiting for coach
+[08:44:42]   run_to_wrap: waiting for ask_proceed
+[08:44:43]   run_to_wrap: command later
+[08:44:43]   run_to_wrap: waiting for wrap
+[08:44:43]   run_to_wrap: at wrap
+[08:44:45] FAIL: AttributeError("'Store' object has no attribute 'store'")
+[08:44:45] == epoch_fence_direct ==
+[08:44:49] PASS (3.9s): in-flight render dropped with stale_dropped after epoch bump
+[08:44:49] == disconnect_style_cancel ==
+[08:44:53] PASS (4.4s): cancel-stale-tasks mid-countdown: no revision, prep kept, flow dead
+[08:44:53] results -> evidence\e2\countdown_regression_results.json ; 6/9 cases passed
+[08:46:47]   run_to_wrap: deck_upload
+[08:46:49]   run_to_wrap: feeding presentation speech
+[08:47:09]   run_to_wrap: present_end
+[08:47:11]   run_to_wrap: waiting for coach
+[08:47:11]   run_to_wrap: waiting for ask_proceed
+[08:47:12]   run_to_wrap: command proceed
+[08:47:12]   run_to_wrap: waiting for wrap
+[08:47:36]   run_to_wrap: at wrap
+[08:47:38]   more pass 1: waiting for practice capture
+[08:50:01]   run_to_wrap: deck_upload
+[08:50:03]   run_to_wrap: feeding presentation speech
+[08:50:24]   run_to_wrap: present_end
+[08:50:26]   run_to_wrap: waiting for coach
+[08:50:26]   run_to_wrap: waiting for ask_proceed
+[08:50:28]   run_to_wrap: command proceed
+[08:50:28]   run_to_wrap: waiting for wrap
+[08:50:52]   run_to_wrap: at wrap
+[08:50:53]   more pass 1: waiting for practice capture
+[08:54:43]   run_to_wrap: deck_upload
+[08:54:45]   run_to_wrap: feeding presentation speech
+[08:55:06]   run_to_wrap: present_end
+[08:55:08]   run_to_wrap: waiting for coach
+[08:55:08]   run_to_wrap: waiting for ask_proceed
+[08:55:09]   run_to_wrap: command proceed
+[08:55:09]   run_to_wrap: waiting for wrap
+[08:55:33]   run_to_wrap: at wrap
+[08:55:35]   more pass 1: waiting for practice capture
+[08:57:31] building/caching speech fixtures via Rime REST (once per text)...
+[08:57:31]   fixtures ready
+[08:57:31] == missing_and_delayed_ack ==
+[08:57:37] PASS (6.8s): no revision while unacked; late ack opened revision 1
+[08:57:37] == duplicate_ready_and_acks ==
+[08:57:43] PASS (5.8s): duplicate ready/acks ignored; one phase=present, one revision
+[08:57:43] == countdown_failed_and_error ==
+[08:57:51] PASS (8.2s): failed/error -> prep, never records; retry reaches present
+[08:57:51] == not_ready_negative ==
+[08:57:56] PASS (4.3s): 'not ready' started no countdown and no flow; 'ready' does
+[08:57:56] == wrap_more_reuse ==
+[08:57:56]   run_to_wrap: deck_upload
+[08:57:57]   run_to_wrap: feeding presentation speech
+[08:58:17]   run_to_wrap: present_end
+[08:58:17]   run_to_wrap: waiting for coach
+[08:58:17]   run_to_wrap: waiting for ask_proceed
+[08:58:17]   run_to_wrap: command proceed
+[08:58:17]   run_to_wrap: waiting for wrap
+[08:58:41]   run_to_wrap: at wrap
+[08:58:42]   more pass 1: waiting for practice capture
+[08:58:46]   more pass 1: attempt audio fed
+[08:59:18] FAIL: AssertionError('timeout (30.0s) waiting for practice_attempt logged (pass 1)')
+[08:59:18] == wrap_rerecord_and_scope ==
+[08:59:18]   run_to_wrap: deck_upload
+[08:59:19]   run_to_wrap: feeding presentation speech
+[08:59:39]   run_to_wrap: present_end
+[08:59:39]   run_to_wrap: waiting for coach
+[08:59:39]   run_to_wrap: waiting for ask_proceed
+[08:59:41]   run_to_wrap: command later
+[08:59:41]   run_to_wrap: waiting for wrap
+[08:59:41]   run_to_wrap: at wrap
+[08:59:44] FAIL: TypeError("'NoneType' object is not subscriptable")
+[08:59:44] == new_talk_and_fence ==
+[08:59:45]   run_to_wrap: deck_upload
+[08:59:46]   run_to_wrap: feeding presentation speech
+[09:00:06]   run_to_wrap: present_end
+[09:00:06]   run_to_wrap: waiting for coach
+[09:00:06]   run_to_wrap: waiting for ask_proceed
+[09:00:06]   run_to_wrap: command later
+[09:00:06]   run_to_wrap: waiting for wrap
+[09:00:06]   run_to_wrap: at wrap
+[09:00:11] PASS (26.7s): new_talk -> reset message, setup phase, cleared deck/judgment/queue/focus/buffers, epoch+1, offer spoken, countdown clips and progress kept, old recordings preserved, next setup works
+[09:00:11] == epoch_fence_direct ==
+[09:00:15] PASS (4.1s): in-flight render dropped with stale_dropped after epoch bump
+[09:00:15] == disconnect_style_cancel ==
+[09:00:19] PASS (3.7s): cancel-stale-tasks mid-countdown: no revision, prep kept, flow dead
+[09:00:19] results -> evidence\e2\countdown_regression_results.json ; 7/9 cases passed
+[09:03:07]   run_to_wrap: deck_upload
+[09:03:09]   run_to_wrap: feeding presentation speech
+[09:03:29]   run_to_wrap: present_end
+[09:03:31]   run_to_wrap: waiting for coach
+[09:03:31]   run_to_wrap: waiting for ask_proceed
+[09:03:32]   run_to_wrap: command later
+[09:03:32]   run_to_wrap: waiting for wrap
+[09:03:32]   run_to_wrap: at wrap
+[09:04:49] building/caching speech fixtures via Rime REST (once per text)...
+[09:04:49]   fixtures ready
+[09:04:49] == missing_and_delayed_ack ==
+[09:04:56] PASS (6.5s): no revision while unacked; late ack opened revision 1
+[09:04:56] == duplicate_ready_and_acks ==
+[09:05:01] PASS (5.2s): duplicate ready/acks ignored; one phase=present, one revision
+[09:05:01] == countdown_failed_and_error ==
+[09:05:09] PASS (8.0s): failed/error -> prep, never records; retry reaches present
+[09:05:09] == not_ready_negative ==
+[09:05:13] PASS (3.8s): 'not ready' started no countdown and no flow; 'ready' does
+[09:05:13] == wrap_more_reuse ==
+[09:05:13]   run_to_wrap: deck_upload
+[09:05:14]   run_to_wrap: feeding presentation speech
+[09:05:34]   run_to_wrap: present_end
+[09:05:35]   run_to_wrap: waiting for coach
+[09:05:35]   run_to_wrap: waiting for ask_proceed
+[09:05:36]   run_to_wrap: command proceed
+[09:05:36]   run_to_wrap: waiting for wrap
+[09:06:00]   run_to_wrap: at wrap
+[09:06:01]   more pass 1: waiting for practice capture
+[09:06:05]   more pass 1: attempt audio fed
+[09:06:37] FAIL: AssertionError('timeout (30.0s) waiting for practice_attempt logged (pass 1)')
+[09:06:37] == wrap_rerecord_and_scope ==
+[09:06:37]   run_to_wrap: deck_upload
+[09:06:38]   run_to_wrap: feeding presentation speech
+[09:06:58]   run_to_wrap: present_end
+[09:06:59]   run_to_wrap: waiting for coach
+[09:06:59]   run_to_wrap: waiting for ask_proceed
+[09:06:59]   run_to_wrap: command later
+[09:06:59]   run_to_wrap: waiting for wrap
+[09:06:59]   run_to_wrap: at wrap
+[09:07:03] PASS (26.2s): bad slide 99 rejected with error, no revision; wrap rerecord ran the handshake then presented with scope {'slide': 1}
+[09:07:03] == new_talk_and_fence ==
+[09:07:03]   run_to_wrap: deck_upload
+[09:07:04]   run_to_wrap: feeding presentation speech
+[09:07:24]   run_to_wrap: present_end
+[09:07:25]   run_to_wrap: waiting for coach
+[09:07:25]   run_to_wrap: waiting for ask_proceed
+[09:07:25]   run_to_wrap: command later
+[09:07:25]   run_to_wrap: waiting for wrap
+[09:07:25]   run_to_wrap: at wrap
+[09:07:28] PASS (25.2s): new_talk -> reset message, setup phase, cleared deck/judgment/queue/focus/buffers, epoch+1, offer spoken, countdown clips and progress kept, old recordings preserved, next setup works
+[09:07:28] == epoch_fence_direct ==
+[09:07:32] PASS (4.1s): in-flight render dropped with stale_dropped after epoch bump
+[09:07:32] == disconnect_style_cancel ==
+[09:07:36] PASS (3.7s): cancel-stale-tasks mid-countdown: no revision, prep kept, flow dead
+[09:07:36] results -> evidence\e2\countdown_regression_results.json ; 8/9 cases passed

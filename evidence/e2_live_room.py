@@ -606,6 +606,60 @@ def find_message(data_messages: list[tuple[float, dict]], mtype: str, since_idx:
     return None
 
 
+
+async def wait_for_countdown_ready(data_messages: list[tuple[float, dict]], since_idx: int,
+                                    timeout_s: float) -> tuple[int, str | None, list[dict]]:
+    """Waits for the staged countdown `status=ready` message (CONTRACTS §5/§6) at
+    index >= since_idx. Returns (message index, countdown id, clip list). Raises
+    on a staged error or timeout -- there is no timeout-success fallback
+    agent-side, so this harness must drive the real handshake."""
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        for i in range(since_idx, len(data_messages)):
+            msg = data_messages[i][1]
+            if msg.get("type") != "countdown":
+                continue
+            if msg.get("status") == "ready":
+                return i, msg.get("id"), list(msg.get("clips") or [])
+            if msg.get("status") == "error":
+                raise RuntimeError(f"agent staged a countdown error: {msg.get('message')}")
+        await asyncio.sleep(0.1)
+    raise TimeoutError(f"never observed countdown ready within {timeout_s}s")
+
+
+async def play_countdown_clips(clips: list[dict], session_dir: Path | None) -> float:
+    """Simulates the browser countdown: for each staged clip in order, waits the
+    clip's REAL rendered duration (read from the session's clips directory, same
+    durations the browser's media elements would pace through) -- the agent-side
+    `ended`-event timeline this harness has no media elements for. Returns the
+    total playback seconds."""
+    total = 0.0
+    for clip in clips:
+        dur = 0.35  # fallback when the session dir was never located
+        if session_dir is not None:
+            name = Path(str(clip.get("url", ""))).name
+            path = session_dir / "clips" / name
+            if path.exists():
+                with wave.open(str(path)) as w:
+                    dur = w.getnframes() / float(w.getframerate())
+        await asyncio.sleep(dur)
+        total += dur
+    return total
+
+
+async def run_countdown_handshake(send_msg, data_messages: list[tuple[float, dict]], since_idx: int,
+                                   session_dir: Path | None, timeout_s: float = 30.0) -> int:
+    """The browser's half of the countdown handshake: wait for staged clips,
+    pace through their real durations, ack completion. Returns the ready
+    message's index so callers can keep waiting for phase=present after it."""
+    idx, cd_id, clips = await wait_for_countdown_ready(data_messages, since_idx, timeout_s)
+    labels = [c.get("label") for c in clips]
+    played_s = await play_countdown_clips(clips, session_dir)
+    await send_msg({"type": "countdown_complete", "id": cd_id})
+    print(f"  countdown {cd_id} clips={labels} played={played_s:.2f}s -> acked")
+    return idx
+
+
 def infer_item_id(text: str, kind: str, judgment: dict) -> str | None:
     """Best-effort post-hoc mapping from a logged agent_speech_start's (truncated
     to 200 chars by Store.log's caller) text back to the improvement id it belongs
@@ -643,7 +697,6 @@ async def run_session(room: rtc.Room, agent_participant: rtc.RemoteParticipant,
     audio_pub = await wait_for_audio_pub(agent_participant)
     sink = AgentAudioSink()
     await sink.attach(audio_pub.track)
-
     audio_source = rtc.AudioSource(SAMPLE_RATE, 1, queue_size_ms=AUDIO_SOURCE_QUEUE_MS)
     local_track = rtc.LocalAudioTrack.create_audio_track("presenter-mic", audio_source)
     await room.local_participant.publish_track(local_track, rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE))
@@ -663,9 +716,11 @@ async def run_session(room: rtc.Room, agent_participant: rtc.RemoteParticipant,
                              "timeline.jsonl-based checks were skipped")
     print(f"session dir: {session_dir}")
 
-
-    # -- prep -> present (revision 1): feed real speech, then end it -----------
+    # -- prep -> present (revision 1): drive the countdown handshake (CONTRACTS
+    # §5/§6 -- staged clips played by the CLIENT, real durations paced here),
+    # then feed real speech and end it ----------------------------------------
     await send_msg({"type": "ready"})
+    idx = await run_countdown_handshake(send_msg, data_messages, idx, session_dir, timeout_s=30.0)
     idx = await wait_for_phase(data_messages, "present", idx, 10.0)
     print("phase=present (revision 1)")
     await mic.enqueue(present_pcm)
@@ -680,7 +735,9 @@ async def run_session(room: rtc.Room, agent_participant: rtc.RemoteParticipant,
     rerecord_sent_t = time.monotonic()
     await send_msg({"type": "rerecord", "slide": 1})
 
-    # -- present (revision 2): real presentation again, then end it -------------
+    # -- present (revision 2): countdown handshake again (clips are cached and
+    # reused per CONTRACTS §6), real presentation again, then end it -----------
+    idx = await run_countdown_handshake(send_msg, data_messages, idx, session_dir, timeout_s=30.0)
     idx = await wait_for_phase(data_messages, "present", idx, 10.0)
     print("phase=present (revision 2, post-rerecord)")
     await mic.enqueue(present_pcm)

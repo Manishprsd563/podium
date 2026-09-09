@@ -140,12 +140,36 @@ kbd {
   justify-content: center;
   background: rgba(11, 15, 20, 0.92);
 }
+.countdown-loading, .countdown-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  text-align: center;
+}
+.countdown-orb-canvas { width: 96px; height: 96px; }
+.countdown-loading-title { font-size: 1.15rem; font-weight: 600; color: var(--text); }
+.countdown-loading-sub { font-size: 0.95rem; color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
 .countdown-number {
   font-size: 9rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
+.countdown-status {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.countdown-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9em;
+  max-width: 320px;
+  text-align: center;
+}
+.countdown-error-message { color: #ffb3ac; font-size: 1rem; margin: 0; }
 
 /* ---------- Start gate ---------- */
 
@@ -214,6 +238,18 @@ body.wide-view main { max-width: 1160px; }
   padding: 1.2em 1.3em;
   margin-bottom: 1.1em;
 }
+details.panel { padding: 0.9em 1.3em; }
+details.panel summary {
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  outline: none;
+}
+details.panel[open] summary { margin-bottom: 0.8em; }
+details.panel > .row { margin-bottom: 0.9em; }
 
 .row { display: flex; gap: 1em; }
 .row > * { flex: 1; }
@@ -434,7 +470,6 @@ body.wide-view main { max-width: 1160px; }
 
 .coach-status { font-size: 0.85rem; color: var(--text-dim); }
 
-#new-talk-btn { margin-top: 0.4em; }
 
 /* ---------- Coaching stage (v2) ---------- */
 

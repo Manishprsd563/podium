@@ -33,6 +33,7 @@ import logging
 import os
 import re
 import time
+import uuid
 import wave
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -122,12 +123,12 @@ GREETING_TEXT = (
     "better. To begin, type or tell me a topic and I'll build the slides, or upload your "
     "own deck."
 )
-COUNTDOWN_SPEECH = "Three. <700> Two. <700> One. <500> Go!"
 
 _PRESENT_END_RE = re.compile(r"\b(i'?m\s+done|that'?s\s+it|i'?m\s+finished)\b", re.I)
 _NEXT_SLIDE_RE = re.compile(r"\bnext\s+slide\b", re.I)
 _PAUSE_MARKUP_RE = re.compile(r"<\d+>")
 _READY_RE = re.compile(r"\b(ready|let'?s go|begin|start|go ahead|i'?m good)\b", re.I)
+_NOT_READY_RE = re.compile(r"\b(?:not|never)\s+(?:\w+\s+){0,3}ready\b|n'?t\s+(?:\w+\s+){0,3}ready\b", re.I)
 
 # CONTRACTS.md §5 option names -> a short voice/regex match. Only names currently
 # offered (`PodiumOrchestrator._offered`) are ever matched against these.
@@ -145,6 +146,9 @@ _INTENT_PATTERNS: dict[str, re.Pattern[str]] = {
     "next": re.compile(r"\b(next|move on|next one|got it,? next)\b", re.I),
     "skip": re.compile(r"\bskip\b", re.I),
     "finish": re.compile(r"\b(finish|that'?s enough|wrap(?: it)? up|stop coaching|i'?m done coaching)\b", re.I),
+    "more": re.compile(r"\b(more practice|again please|do (?:it|that|them) again|one more (?:round|time)|keep practicing)\b", re.I),
+    "rerecord": re.compile(r"\b(try (?:a )?(?:another|different) slide|re-?record|redo (?:a |that |the )?slide)\b", re.I),
+    "new_talk": re.compile(r"\b(new (?:talk|topic|presentation)|start over|different topic|upload (?:a |another |my |the |own )?(?:new |own )?(?:deck|slides|pdf))\b", re.I),
 }
 
 # Short, plain-language phrasing of each option name, used in nudges and in the
@@ -156,6 +160,7 @@ _OPTION_LABELS: dict[str, str] = {
     "again": "hear it again", "slower": "hear it slower", "why": "ask why",
     "practice": "say it yourself", "next": "move to the next one",
     "skip": "skip this one", "finish": "finish up",
+    "more": "practice more", "rerecord": "try another slide", "new_talk": "start a new topic",
 }
 
 _NUDGE_FALLBACK: dict[str, str] = {
@@ -163,6 +168,7 @@ _NUDGE_FALLBACK: dict[str, str] = {
     "prep": "Still with me? No rush -- say ready when you are, or just start talking about your topic.",
     "coach": "Still with me? No rush -- pick one whenever you're ready.",
     "drill": "Still there? Just say the word whenever you're ready.",
+    "report": "Take your time -- practice more, redo a slide, or start something new whenever you're ready.",
 }
 
 _ITEM_OPTIONS = [
@@ -177,6 +183,12 @@ _ITEM_OPTIONS = [
     {"name": "next", "label": "Next"},
     {"name": "skip", "label": "Skip"},
     {"name": "finish", "label": "Finish"},
+]
+
+_WRAP_OPTIONS = [
+    {"name": "more", "label": "More practice"},
+    {"name": "rerecord", "label": "Try another slide"},
+    {"name": "new_talk", "label": "New topic / upload slides"},
 ]
 
 _PRACTICE_PROMPTS = (
@@ -196,6 +208,15 @@ def _now_iso() -> str:
 
 def _strip_pause_markup(text: str) -> str:
     return _PAUSE_MARKUP_RE.sub(" ", text).strip()
+
+
+def _is_ready_phrase(text: str) -> bool:
+    """True iff `text` contains a ready-to-begin phrase and is not a negation of
+    it (e.g. "not ready", "I'm not quite ready" must never trigger the
+    countdown -- CONTRACTS §5's ready/countdown handshake is opt-in only)."""
+    if _NOT_READY_RE.search(text):
+        return False
+    return bool(_READY_RE.search(text))
 
 
 def _match_intent(text: str, offered: list[str]) -> str | None:
@@ -329,6 +350,10 @@ class ImprovementItem:
     # Which trio slots ("v0"/"v1", "v2", "v3") have played through uninterrupted
     # at least once. feedback_heard only fires once all three are present.
     completed: set[str] = field(default_factory=set)
+    # Practice attempts already recorded for this item, across every pass
+    # (including "more" wrap reuse) -- the next attempt's clip filename number
+    # so a repeat pass never overwrites an earlier take.
+    attempt_count: int = 0
 
 
 class PodiumAgent(Agent):
@@ -377,6 +402,8 @@ class PodiumAgent(Agent):
         orch = self._orch
         if orch.phase != "prep":
             return "We're not in the prep window right now."
+        if orch._countdown_pending:
+            return "The countdown's already starting -- one sec."
         orch._start_present_flow()
         return "Starting the countdown now."
 
@@ -503,6 +530,20 @@ class PodiumOrchestrator:
         self._capture_words: list[dict[str, Any]] = []
         self._capture_active = False
 
+        # -- v2: countdown handshake (CONTRACTS §5/§6) + topic-reset fencing ---
+        self._countdown_cache: dict[str, dict[str, Any]] | None = None
+        self._countdown_task: asyncio.Task | None = None  # prewarm render, started at prep entry
+        self._countdown_id: str | None = None              # id of the in-flight countdown, else None
+        self._countdown_pending: bool = False
+        self._countdown_future: asyncio.Future[bool] | None = None
+        self._countdown_ready = asyncio.Event()  # set once the in-flight countdown's clips are ready
+        # Bumped by new_talk so a judge/render/attempt callback still in flight
+        # for the old topic fences itself even before a new revision exists to
+        # fence on (store.current_revision alone doesn't move until the next
+        # presentation starts).
+        self._epoch: int = 0
+        self._progress_recorded_for: set[int] = set()  # revisions already credited (wrap "more" safety)
+
     # -- wiring -----------------------------------------------------
 
     def wire_session_events(self) -> None:
@@ -525,7 +566,8 @@ class PodiumOrchestrator:
                 self._last_user_speech_start_mono = time.monotonic()
             elif ev.old_state == "speaking" and ev.new_state != "speaking":
                 self.store.log("user_speech_end")
-            if (ev.new_state == "away" and self.phase in ("setup", "prep", "coach", "drill")
+            if (ev.new_state == "away" and not self._countdown_pending
+                    and self.phase in ("setup", "prep", "coach", "drill", "report")
                     and self._is_awaiting_input() and self._nudges_this_wait < MAX_NUDGES_PER_WAIT):
                 self._nudges_this_wait += 1
                 asyncio.create_task(self._nudge(reason="idle"))
@@ -567,6 +609,13 @@ class PodiumOrchestrator:
                 log.warning("bad podium data packet")
                 return
             self.on_client(msg)
+
+        @room.on("disconnected")
+        def _on_disconnected(*_: Any) -> None:
+            # A closed tab/lost connection must not leave a countdown ack wait,
+            # a render/judge call, or a prep timer running forever in the
+            # background -- cancel every pending flow.
+            asyncio.create_task(self._cancel_stale_tasks(exclude_current=False))
 
     async def start(self) -> None:
         self.store.set_config(
@@ -628,7 +677,16 @@ class PodiumOrchestrator:
             elif t == "deck_upload" and self.phase == "setup":
                 await self._handle_deck_upload(msg)
             elif t == "ready" and self.phase == "prep":
-                self._start_present_flow()
+                if self._countdown_pending:
+                    # A duplicate "ready" while the countdown handshake is
+                    # already in flight is ignored, never cancel-and-restart.
+                    self.store.log("countdown_ready_ignored", id=self._countdown_id)
+                else:
+                    self._start_present_flow()
+            elif t == "countdown_complete":
+                self._handle_countdown_ack(str(msg.get("id", "")), True)
+            elif t == "countdown_failed":
+                self._handle_countdown_ack(str(msg.get("id", "")), False)
             elif t == "slide_next":
                 self._advance_slide()
             elif t == "present_end" and self.phase == "present":
@@ -644,6 +702,17 @@ class PodiumOrchestrator:
         except Exception:
             log.exception("error handling client msg: %s", msg)
             self.send({"type": "error", "message": f"failed to handle {t}"})
+
+    def _handle_countdown_ack(self, cid: str, ok: bool) -> None:
+        """CONTRACTS §5/§6: an ack only matters for the currently in-flight
+        countdown id -- a duplicate or a stale id (e.g. left over from before a
+        rerecord/new_talk moved on) is dropped and never starts a recording."""
+        if not self._countdown_pending or cid != self._countdown_id:
+            self.store.log("countdown_stale_ack", id=cid, ok=ok, current=self._countdown_id)
+            return
+        fut = self._countdown_future
+        if fut is not None and not fut.done():
+            fut.set_result(ok)
 
     # -- speech helpers -----------------------------------------------------
 
@@ -801,13 +870,17 @@ class PodiumOrchestrator:
     def route_utterance(self, text: str) -> bool:
         """Deterministic-first: True means the utterance was consumed and the
         caller must raise StopResponse (no default LLM reply)."""
+        if self._countdown_pending:
+            # Nothing spoken during the countdown handshake gets a reply, a
+            # nudge, or routed anywhere -- the browser owns this window.
+            return True
         if self.phase == "drill":
             self.deliver_drill_answer(text)
             return True
-        if self.phase == "prep" and len(text.split()) <= 8 and _READY_RE.search(text):
+        if self.phase == "prep" and len(text.split()) <= 8 and _is_ready_phrase(text):
             self._start_present_flow()
             return True
-        if self._expect in ("proceed", "menu"):
+        if self._expect in ("proceed", "menu", "wrap"):
             name = _match_intent(text, self._offered)
             if name is not None:
                 self._deliver_intent(name, "regex")
@@ -867,9 +940,11 @@ class PodiumOrchestrator:
                 self._intent_future = None
 
     def _is_awaiting_input(self) -> bool:
+        if self._countdown_pending:
+            return False
         if self.phase in ("setup", "prep"):
             return True
-        if self.phase == "coach":
+        if self.phase in ("coach", "report"):
             return self._intent_future is not None
         if self.phase == "drill":
             return self._drill_answer_future is not None
@@ -969,6 +1044,7 @@ class PodiumOrchestrator:
         if self._prep_task and not self._prep_task.done():
             self._prep_task.cancel()
         self._prep_task = asyncio.create_task(self._run_prep_countdown())
+        self._prewarm_countdown()
 
     async def _run_prep_countdown(self) -> None:
         remaining = PREP_DURATION_S
@@ -982,6 +1058,126 @@ class PodiumOrchestrator:
             return
         self._start_present_flow()
 
+    # -- countdown handshake (CONTRACTS §5/§6) -----------------------------------------------------
+
+    def _prewarm_countdown(self) -> None:
+        """Kicks off the four-clip render as soon as prep starts so the ready
+        handshake usually has nothing left to wait on. Tracked on
+        self._countdown_task -- never a stray untracked task -- and guarded so
+        a second prep entry (e.g. recovering from a countdown error) never
+        renders twice; the same clips are reused for every rerecord."""
+        if self._countdown_cache is not None:
+            return
+        if self._countdown_task is not None and not self._countdown_task.done():
+            return
+        self._countdown_task = asyncio.create_task(self._render_countdown_cache())
+
+    async def _render_countdown_cache(self) -> None:
+        try:
+            clips = await render_mod.render_countdown(self.store.clips_dir, model=RIME_MODEL, speaker=RIME_SPEAKER)
+        except asyncio.CancelledError:
+            # Only this render was cancelled (disconnect/new_talk tear-down):
+            # complete quietly so an awaiter never mistakes someone else's
+            # cancellation for its own.
+            return
+        except Exception:
+            log.exception("countdown prewarm render failed")
+            return
+        self._countdown_cache = clips
+
+    async def _ensure_countdown_clips(self) -> dict[str, dict[str, Any]] | None:
+        if self._countdown_cache is not None:
+            return self._countdown_cache
+        task = self._countdown_task
+        if task is not None and not task.done():
+            await task
+            if self._countdown_cache is not None:
+                return self._countdown_cache
+        try:
+            clips = await render_mod.render_countdown(self.store.clips_dir, model=RIME_MODEL, speaker=RIME_SPEAKER)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            log.exception("countdown render failed")
+            return None
+        self._countdown_cache = clips
+        return clips
+
+    def _countdown_clip_url(self, info: dict[str, Any]) -> str:
+        return f"/sessions/{self.store.session_id}/clips/{Path(info['path']).name}"
+
+    async def _interrupt_and_drain(self) -> None:
+        """Stops and drains whatever Thunder is saying before the countdown
+        handshake claims the audio pipeline -- never touches the deck or any
+        other state, only the speech queue."""
+        try:
+            await self.session.interrupt(force=True)
+        except Exception:
+            log.exception("interrupt(force=True) failed ahead of countdown")
+
+    async def _run_countdown(self) -> bool:
+        """CONTRACTS §5/§6 countdown handshake. Stages loading->ready with four
+        same-voice clips (cached after the first render, reused on rerecord),
+        then blocks -- no timeout, no local timer -- until the client's
+        completion ack for THIS id. Returns True to proceed into
+        _enter_present; False means the caller must not start recording
+        (render error, an actual client-reported playback failure, or we were
+        cancelled out from under -- disconnect, a rerecord, or new_talk)."""
+        cid = uuid.uuid4().hex
+        self._countdown_id = cid
+        self._countdown_pending = True
+        self._countdown_ready.clear()
+        fut: asyncio.Future[bool] = asyncio.get_event_loop().create_future()
+        self._countdown_future = fut
+        ok = False
+        try:
+            await self._interrupt_and_drain()
+
+            self.store.log("countdown", id=cid, status="loading")
+            self.send({"type": "countdown", "id": cid, "status": "loading"})
+
+            clips = await self._ensure_countdown_clips()
+            if clips is None:
+                self.store.log("countdown", id=cid, status="error")
+                self.send({"type": "countdown", "id": cid, "status": "error",
+                           "message": "could not prepare the countdown"})
+            else:
+                clip_list = [{"label": label, "url": self._countdown_clip_url(info)} for label, info in clips.items()]
+                self.store.log("countdown", id=cid, status="ready")
+                self.send({"type": "countdown", "id": cid, "status": "ready", "clips": clip_list})
+                self._countdown_ready.set()
+                ok = await fut
+        finally:
+            if self._countdown_id == cid:
+                self._countdown_id = None
+                self._countdown_pending = False
+            self._countdown_future = None
+        if not ok:
+            # A stray final transcript from during the countdown wait (someone
+            # talking over it, a "not ready" that got this far anyway) must
+            # never bleed into the next thing said or the presentation itself.
+            self.session.clear_user_turn()
+            self._enter_prep()
+        return ok
+
+    async def _cancel_stale_tasks(self, *, exclude_current: bool = True) -> None:
+        """Cancels every background flow (countdown render, present/analyze
+        flow, post-analyze judge/coach/drill/report chain, prep timer, a
+        practice-attempt capture) -- used on disconnect and by new_talk. Never
+        cancels the task calling this (new_talk itself usually runs inside the
+        very post-analyze/report chain being torn down)."""
+        current = asyncio.current_task() if exclude_current else None
+        candidates = (self._countdown_task, self._flow_task, self._post_analyze_task,
+                      self._prep_task, self._attempt_task)
+        fut = self._countdown_future
+        if fut is not None and not fut.done():
+            fut.cancel()
+        tasks = [t for t in candidates if t is not None and not t.done() and t is not current]
+        for t in tasks:
+            t.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
     # -- present -----------------------------------------------------
 
     def _start_present_flow(self, *, scope: dict[str, Any] | str = "full", rerecord: bool = False,
@@ -994,14 +1190,14 @@ class PodiumOrchestrator:
 
     async def _run_flow(self, *, scope: dict[str, Any] | str, rerecord: bool, slide: int | None) -> None:
         try:
-            self.send({"type": "countdown", "seconds": 3})
-            cue = self._say(COUNTDOWN_SPEECH, kind="cue", allow_interruptions=False, add_to_chat_ctx=False)
-            await cue.wait_for_playout()
+            if not await self._run_countdown():
+                return
             revision = await self._enter_present(scope=scope, rerecord=rerecord, slide=slide)
             wav_path, text, words = await self._finish_present(revision)
             await self._enter_analyze(revision, wav_path, text, words)
         except asyncio.CancelledError:
             self._cleanup_present_recording()
+            self._countdown_pending = False
             raise
         except Exception:
             log.exception("presentation flow crashed")
@@ -1269,6 +1465,7 @@ class PodiumOrchestrator:
 
     async def _judge_then_coach(self, revision: int, text: str, words: list[dict[str, Any]],
                                  metrics: dict[str, Any]) -> None:
+        epoch = self._epoch
         start = time.monotonic()
         self.store.log("tool_start", tool="judge", revision=revision)
         try:
@@ -1284,8 +1481,13 @@ class PodiumOrchestrator:
         ms = round((time.monotonic() - start) * 1000)
         self.store.log("tool_end", tool="judge", revision=revision, ms=ms)
 
-        if revision != self.store.current_revision:
-            self.store.log("stale_dropped", tool="judge", revision=revision, current_revision=self.store.current_revision)
+        if epoch != self._epoch or revision != self.store.current_revision:
+            # Fenced: either a rerecord opened a newer revision, or new_talk
+            # reset the topic before any new revision exists (the epoch covers
+            # that window, store.current_revision alone does not).
+            self.store.log("stale_dropped", tool="judge", revision=revision,
+                            current_revision=self.store.current_revision,
+                            epoch=epoch, current_epoch=self._epoch)
             return
 
         self.current_judgment = judgment
@@ -1560,6 +1762,7 @@ class PodiumOrchestrator:
 
     async def _render_clips(self, item: ImprovementItem) -> dict[str, dict[str, Any]] | None:
         revision = item.revision
+        epoch = self._epoch
         rev_data = self.store.get_revision(revision)
         rev_wav = self.store.wav_path(revision)
         words = rev_data["transcript"]["words"]
@@ -1573,8 +1776,10 @@ class PodiumOrchestrator:
         ms = round((time.monotonic() - start) * 1000)
         self.store.log("tool_end", tool="render", revision=revision, ms=ms)
 
-        if revision != self.store.current_revision:
-            self.store.log("stale_dropped", tool="render", revision=revision, current_revision=self.store.current_revision)
+        if epoch != self._epoch or revision != self.store.current_revision:
+            self.store.log("stale_dropped", tool="render", revision=revision,
+                            current_revision=self.store.current_revision,
+                            epoch=epoch, current_epoch=self._epoch)
             return None
 
         if v0 is not None:
@@ -1602,8 +1807,12 @@ class PodiumOrchestrator:
         self._say(prompt, kind="feedback")
         self._send_coach("practice", options=_ITEM_OPTIONS, improvement_id=imp["id"], index=idx + 1, total=total)
         self._expect = "menu"
-        self._attempt_n = 1
+        # Resume numbering after every attempt this item has ever opened (wrap
+        # "more" reuses the same items) so a repeat pass never overwrites an
+        # earlier take's clip file.
+        self._attempt_n = item.attempt_count + 1
         await self._start_capture(item, self._attempt_n)
+        item.attempt_count = max(item.attempt_count, self._attempt_n)
 
         while True:
             intent = await self._await_intent(PRACTICE_WAIT_S)
@@ -1621,6 +1830,7 @@ class PodiumOrchestrator:
                     continue
             self._attempt_n += 1
             await self._start_capture(item, self._attempt_n)
+            item.attempt_count = max(item.attempt_count, self._attempt_n)
 
     async def _handle_menu_intent(self, item: ImprovementItem, intent: str) -> None:
         imp = item.data
@@ -1653,13 +1863,20 @@ class PodiumOrchestrator:
         item = self._current_item
         if item is None:
             return
+        # Capture both fences before the first await: new_talk resets
+        # _attempt_n/_current_item and bumps _epoch while _stop_capture yields.
         n = self._attempt_n
+        epoch = self._epoch
         wav_path, words = await self._stop_capture()
+        if epoch != self._epoch or item.revision != self.store.current_revision:
+            self.store.log("stale_dropped", tool="attempt", revision=item.revision,
+                            current_revision=self.store.current_revision,
+                            epoch=epoch, current_epoch=self._epoch)
+            return
         metrics = None
         if words and wav_path is not None:
             metrics = metrics_mod.compute(words=words, audio_path=str(wav_path), deck=self.deck or {},
                                            slide_events=[], budget_s=self.budget_s)
-        verdict = practice_mod.evaluate_attempt(item.data, attempt=n, text=text, words=words, metrics=metrics)
         imp_id = item.data["id"]
         self.store.log("practice_attempt", improvement_id=imp_id, attempt=n,
                         fillers=verdict["fillers"]["count"], longest_pause_s=verdict["pauses"]["longest_s"],
@@ -1826,13 +2043,43 @@ class PodiumOrchestrator:
     # -- report -----------------------------------------------------
 
     async def _enter_report(self) -> None:
+        """The wrap state on the SAME dashboard (no separate report page). The
+        summary/progress speech runs exactly once per revision; after that this
+        loop waits indefinitely for a wrap choice -- silence just keeps the
+        dashboard waiting, it never re-runs the wrap speech and never auto-picks
+        more/new_talk. "more" re-enters the items loop directly (no recursive
+        _enter_coach/_enter_report nesting); rerecord/new_talk hand off to their
+        own flows and end this loop."""
         self._set_phase("report")
-        self._send_coach("wrap")
+        await self._speak_wrap_summary()
+        self._send_coach("wrap", options=_WRAP_OPTIONS)
+        self.store.set_graph(self.graph.to_json())
+        while True:
+            self._expect = "wrap"
+            intent = await self._await_wrap_intent()
+            self._expect = None
+            if intent == "new_talk":
+                await self._handle_new_talk()
+                return
+            if intent == "rerecord":
+                await self._handle_rerecord({"slide": self.current_slide})
+                return
+            # "more": replay the existing improvements -- no new judgment, no
+            # duplicate heard marks, no extra progress credit.
+            self._resume_items_for_more()
+            await self._run_items_loop()
+
+    async def _speak_wrap_summary(self) -> None:
         heard = sum(1 for i in self.improvement_queue if i.heard)
         total = len(self.improvement_queue)
         self._say(f"That's a wrap. We worked through {heard} of {total} improvements together.", kind="feedback")
 
-        if self.progress is not None and self.current_judgment is not None:
+        # Cross-session progress is recorded at most once per presentation
+        # revision: a wrap "more" loop must never credit the same talk twice.
+        revision = self.store.current_revision
+        if (self.progress is not None and self.current_judgment is not None
+                and revision and revision not in self._progress_recorded_for):
+            self._progress_recorded_for.add(revision)
             self.progress.record_session(self.current_judgment.get("scores", {}),
                                           self.current_judgment.get("improvements", []),
                                           list(self._verdicts))
@@ -1845,10 +2092,92 @@ class PodiumOrchestrator:
                 f"and that next time you'll focus on {next_focus}. Use only these facts."
             )
             fallback = f"You're now at the {level} level overall -- next time, let's focus on {next_focus}."
-            await self._speak_llm(instructions, fallback, kind="feedback")
+            try:
+                await self._speak_llm(instructions, fallback, kind="feedback")
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                log.exception("wrap progress line failed")
 
-        self._say("Re-record any slide whenever you want another pass, or start a brand new talk. "
-                  "Good luck out there.", kind="feedback")
+        self._say("Practice these again, redo a slide, or start something new -- your call.",
+                  kind="feedback")
+
+    async def _await_wrap_intent(self) -> str | None:
+        """Waits for a wrap choice. Unlike _await_intent there is no
+        timeout-and-default: one brief check-in nudge fires when the option
+        prompts go quiet, then the wait continues indefinitely -- silence never
+        picks a continuation, and the wrap speech is never re-run."""
+        self._nudges_this_wait = 0
+        while True:
+            parked, self._pending_command = self._pending_command, None
+            if parked in self._offered:
+                return parked
+            self._intent_future = asyncio.get_event_loop().create_future()
+            try:
+                timeout = PRACTICE_WAIT_S if self._nudges_this_wait == 0 else None
+                return await asyncio.wait_for(self._intent_future, timeout=timeout)
+            except asyncio.TimeoutError:
+                self._nudges_this_wait += 1
+                await self._nudge(reason="timeout")
+            finally:
+                self._intent_future = None
+
+    def _resume_items_for_more(self) -> None:
+        """Replays the current judgment's improvements from the intro. Playback
+        progress resets; heard marks, verdicts, attempt numbering, and clip files
+        are preserved -- no new judgment, no duplicate heard/progress credit."""
+        for item in self.improvement_queue:
+            item.stage_idx = 0
+            item.completed.clear()
+
+    async def _handle_new_talk(self) -> None:
+        """CONTRACTS §5 wrap `new_talk`: reset to the setup phase on the same
+        connection. Cancels and awaits every old flow (never the task calling
+        this), bumps the epoch so stale judge/render/attempt callbacks fence
+        themselves even before the next revision exists, and clears the topic's
+        deck/metrics/judgment/words/clips/graph focus/turn context. Browser
+        identity, connection, microphone, provider, and cross-session progress
+        are preserved; old recordings on disk are never touched."""
+        self._epoch += 1
+        await self._cancel_stale_tasks()
+        self.session.interrupt()
+
+        self.deck = None
+        self.budget_s = 60
+        self.current_slide = 1
+        self.active_revision = None
+        self.words_buffer = []
+        self.transcript_parts = []
+        self.slide_events = []
+        self._pending_supersede = None
+        self.current_metrics = None
+        self.current_judgment = None
+        self.improvement_queue = []
+        self.drill_terms = []
+        self.drill_words = []
+        self._verdicts = []
+        self._pending_command = None
+        self._attempt_n = 0
+        self._current_item = None
+        self._expect = None
+        self._offered = []
+        self._progress_recorded_for = set()
+        # The countdown clips are rendered once per live session in the fixed
+        # process voice (RIME_MODEL/RIME_SPEAKER are env constants) -- new_talk
+        # reuses them like any rerecord does.
+
+        self.graph = graph_mod.SessionGraph(self.store.t0_mono)
+        self._utterance_n = 0
+        if self.progress is not None:
+            self.graph.attach_progress(self.progress)
+
+        self.session.clear_user_turn()
+        self.store.set_deck(None)
+        self.send({"type": "reset"})
+        self._set_phase("setup")
+        offer = ("Ready for a new one? Tell me a topic and I'll build the slides, "
+                 "or upload your own deck.")
+        self._say(offer, kind="ack")
         self.store.set_graph(self.graph.to_json())
 
     # -- rerecord -----------------------------------------------------
@@ -1858,6 +2187,20 @@ class PodiumOrchestrator:
             self.send({"type": "error", "message": "rerecord requires an active deck"})
             return
         slide = msg.get("slide")
+        if slide is not None:
+            try:
+                slide = int(slide)
+            except (TypeError, ValueError):
+                slide = None
+            total = len(self.deck.get("slides", []))
+            if slide is None or slide < 1 or (total and slide > total):
+                # Out-of-scope rerecord: reject rather than record a slide that
+                # does not exist (CONTRACTS §5 -- the rerecord message carries an
+                # explicit slide and the dashboard is responsible for sending a
+                # valid one; a bad one must never open a revision).
+                self.store.log("rerecord_rejected", slide=msg.get("slide"), total=total)
+                self.send({"type": "error", "message": f"no slide {msg.get('slide')!r} to rerecord"})
+                return
         if self._post_analyze_task and not self._post_analyze_task.done():
             self._post_analyze_task.cancel()
         old_revision = self.store.current_revision

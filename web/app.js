@@ -66,14 +66,15 @@ const state = {
   feedbackPlayed: {}, // improvement_id -> Set of stages already cued
   drill: null, // {word, stage, confBefore, confAfter, url} - latest §5 `drill` message
   progress: null, // {level, levels, skills, nextFocus} - latest §5 `progress` message
-  countdownValue: null,
-  countdownTimer: null,
+  countdown: null, // {id, uiStatus, clips, clipIndex, abortController, errorKind, errorMessage, completedSent}
+  beginPending: false, // true from Begin-now/Enter until phase leaves prep or the attempt fails
   gateOpen: true,
   agentPresent: false,
   audioCtx: null,
   analysers: {}, // agent|user -> {analyser, data}
   orbGate: null,
   orbBubble: null,
+  orbCountdown: null,
   clientId: CLIENT_ID,
 };
 const el = {};
@@ -89,7 +90,7 @@ function cacheEls() {
     "conn-badge", "mic-badge", "agent-badge", "provider-badge", "level-badge", "error-banner",
     "astra-indicator", "astra-line", "user-line",
     "gate", "gate-orb", "gate-status", "gate-start-btn", "unmute-pill",
-    "view-setup", "view-stage", "view-coach", "view-report",
+    "view-setup", "view-stage", "view-coach",
     "setup-form", "setup-topic", "setup-level", "setup-duration",
     "upload-input", "upload-status", "upload-error",
     "setup-deck-preview", "deck-preview-list",
@@ -99,9 +100,11 @@ function cacheEls() {
     "scorecard", "judgment-summary", "metrics-grid", "metrics-perslide",
     "coach-chat-log", "coach-card", "drill-card", "coach-transcript-strip",
     "coach-options", "coach-status",
-    "progress-panel", "level-track", "skill-rows", "next-focus", "report-transcript-strip",
-    "rerecord-slide", "rerecord-btn", "improvement-cards", "new-talk-btn",
-    "countdown-overlay", "countdown-number",
+    "progress-panel", "level-track", "skill-rows", "next-focus",
+    "rerecord-slide", "rerecord-btn", "improvement-cards",
+    "countdown-overlay", "countdown-loading", "countdown-orb", "countdown-loading-title",
+    "countdown-playing", "countdown-number", "countdown-status",
+    "countdown-error", "countdown-error-message", "countdown-retry-btn",
   ].forEach((id) => { el[toCamel(id)] = q(id); });
 }
 function toCamel(id) {
@@ -191,6 +194,7 @@ function wireRoom(room, identity) {
   room.on(RoomEvent.Disconnected, () => {
     state.connected = false;
     setConnBadge("disconnected", "muted");
+    resetCountdownState();
   });
 }
 function sendMessage(msg) {
@@ -363,10 +367,16 @@ function handleMessage(msg) {
   switch (msg.type) {
     case "phase": {
       const enteringPresent = msg.name === "present";
+      const wasPrep = state.phase === "prep";
       state.phase = msg.name;
       if (msg.budget_s != null) state.budgetS = msg.budget_s;
       if (enteringPresent) startPresentClock(state.budgetS);
       else stopPresentClock();
+      // The countdown overlay is only ever torn down by leaving prep (into
+      // present on success, or elsewhere as a defensive cleanup) -- never by
+      // a timeout -- so visuals can't outrun the audio that gates them.
+      if (wasPrep && msg.name !== "prep") resetCountdownState();
+      if (msg.name !== "prep") state.beginPending = false;
       break;
     }
     case "deck":
@@ -441,7 +451,7 @@ function handleMessage(msg) {
       }
       break;
     case "countdown":
-      startCountdown(msg.seconds);
+      handleCountdownMessage(msg);
       break;
     case "provider":
       state.provider = { name: msg.name, model: msg.model, speaker: msg.speaker };
@@ -450,6 +460,9 @@ function handleMessage(msg) {
     case "error":
       showError(msg.message || "Unknown agent error");
       return;
+    case "reset":
+      handleReset();
+      break;
     default:
       console.warn("unhandled podium message", msg);
       return;
@@ -458,43 +471,248 @@ function handleMessage(msg) {
 }
 
 // ------------------------------------------------------------ countdown overlay
-function clearCountdownTimer() {
-  if (state.countdownTimer) {
-    clearInterval(state.countdownTimer);
-    state.countdownTimer = null;
+// The countdown is four short server-rendered clips (Three/Two/One/Begin)
+// played back-to-back on ONE shared media element. The overlay label only
+// ever changes on that element's own `playing`/`ended` events -- never on a
+// local timer -- so the UI can't finish before the audio the user actually
+// hears. `countdown_complete` fires exactly once, after the last `ended`.
+const COUNTDOWN_AUDIO = new Audio();
+COUNTDOWN_AUDIO.preload = "auto";
+
+function agentAudioEl() {
+  return document.getElementById("coach-audio");
+}
+function muteAgentAudio() {
+  const a = agentAudioEl();
+  if (a) a.muted = true;
+}
+function restoreAgentAudio() {
+  const a = agentAudioEl();
+  if (a) a.muted = false;
+}
+function renderCountdownOverlay() {
+  const cur = state.countdown;
+  if (!cur) {
+    el.countdownOverlay.classList.add("hidden");
+    return;
+  }
+  el.countdownOverlay.classList.remove("hidden");
+  const showLoading = cur.uiStatus === "loading" || cur.uiStatus === "buffering";
+  const showPlaying = cur.uiStatus === "playing";
+  const showStarting = cur.uiStatus === "starting";
+  const showError = cur.uiStatus === "error";
+  el.countdownLoading.classList.toggle("hidden", !showLoading);
+  el.countdownPlaying.classList.toggle("hidden", !showPlaying);
+  el.countdownStatus.classList.toggle("hidden", !showStarting);
+  el.countdownError.classList.toggle("hidden", !showError);
+  if (showLoading) {
+    el.countdownLoadingTitle.textContent = cur.uiStatus === "loading" ? "Preparing your countdown\u2026" : "Loading\u2026";
+    if (state.orbCountdown) state.orbCountdown.setState("connecting");
+  }
+  if (showPlaying) {
+    const clip = cur.clips[cur.clipIndex];
+    el.countdownNumber.textContent = clip ? clip.label : "";
+  }
+  if (showStarting) {
+    el.countdownStatus.textContent = "Starting microphone\u2026";
+  }
+  if (showError) {
+    el.countdownErrorMessage.textContent = cur.errorMessage || "Something went wrong.";
+    el.countdownRetryBtn.textContent = cur.errorKind === "autoplay" ? "Resume audio" : "Try again";
   }
 }
-function startCountdown(seconds) {
-  clearCountdownTimer();
-  state.countdownValue = seconds;
-  el.countdownOverlay.classList.remove("hidden");
-  el.countdownNumber.textContent = String(seconds);
-  let n = seconds;
-  state.countdownTimer = setInterval(() => {
-    n -= 1;
-    if (n > 0) {
-      el.countdownNumber.textContent = String(n);
-    } else if (n === 0) {
-      el.countdownNumber.textContent = "Go!";
-    } else {
-      clearCountdownTimer();
-      el.countdownOverlay.classList.add("hidden");
+// Cleans up the shared audio element, its listeners (via AbortController),
+// and the mute it placed on the agent's track. Called on supersede, reset,
+// disconnect, and leaving prep -- the only ways the overlay ever closes.
+function resetCountdownState() {
+  const cur = state.countdown;
+  if (cur && cur.abortController) cur.abortController.abort();
+  try { COUNTDOWN_AUDIO.pause(); } catch (err) { /* ignore */ }
+  COUNTDOWN_AUDIO.removeAttribute("src");
+  try { COUNTDOWN_AUDIO.load(); } catch (err) { /* ignore */ }
+  state.countdown = null;
+  restoreAgentAudio();
+  renderCountdownOverlay();
+}
+function failCountdown(cur, kind, message) {
+  if (state.countdown !== cur) return;
+  try { COUNTDOWN_AUDIO.pause(); } catch (err) { /* ignore */ }
+  cur.uiStatus = "error";
+  cur.errorKind = kind;
+  cur.errorMessage = message;
+  // Autoplay refusal is not an agent-visible failure: the same clip just
+  // needs a user gesture, so no countdown_failed and no Begin re-arm.
+  if (kind !== "autoplay") {
+    if (kind === "media") sendMessage({ type: "countdown_failed", id: cur.id });
+    state.beginPending = false;
+  }
+  restoreAgentAudio();
+  renderCountdownOverlay();
+}
+function finishCountdown(cur) {
+  if (state.countdown !== cur) return;
+  if (!cur.completedSent) {
+    cur.completedSent = true;
+    sendMessage({ type: "countdown_complete", id: cur.id });
+  }
+  cur.uiStatus = "starting";
+  restoreAgentAudio();
+  renderCountdownOverlay();
+}
+function attachClipListeners(cur, index, signal) {
+  const isCurrent = () => state.countdown === cur && cur.clipIndex === index;
+  COUNTDOWN_AUDIO.addEventListener("playing", () => {
+    if (!isCurrent()) return;
+    cur.uiStatus = "playing";
+    renderCountdownOverlay();
+  }, { signal });
+  const onBuffering = () => {
+    if (!isCurrent()) return;
+    cur.uiStatus = "buffering";
+    renderCountdownOverlay();
+  };
+  COUNTDOWN_AUDIO.addEventListener("waiting", onBuffering, { signal });
+  COUNTDOWN_AUDIO.addEventListener("stalled", onBuffering, { signal });
+  COUNTDOWN_AUDIO.addEventListener("ended", () => {
+    if (!isCurrent()) return;
+    if (index + 1 < cur.clips.length) playCountdownClip(cur, index + 1);
+    else finishCountdown(cur);
+  }, { signal });
+  COUNTDOWN_AUDIO.addEventListener("error", () => {
+    if (!isCurrent()) return;
+    failCountdown(cur, "media", "Countdown audio failed to load.");
+  }, { signal });
+}
+function playCountdownClip(cur, index) {
+  if (state.countdown !== cur) return;
+  cur.clipIndex = index;
+  cur.uiStatus = "buffering"; // waiting for this clip's own `playing` event
+  const clip = cur.clips[index];
+  attachClipListeners(cur, index, cur.abortController.signal);
+  COUNTDOWN_AUDIO.pause();
+  COUNTDOWN_AUDIO.src = clip.url;
+  renderCountdownOverlay();
+  const playPromise = COUNTDOWN_AUDIO.play();
+  if (playPromise && playPromise.catch) {
+    playPromise.catch((err) => {
+      if (state.countdown !== cur || cur.clipIndex !== index) return;
+      if (err && err.name === "NotAllowedError") {
+        failCountdown(cur, "autoplay", "Tap to resume the countdown.");
+      } else {
+        failCountdown(cur, "media", "Countdown audio failed to play.");
+      }
+    });
+  }
+}
+function retryAutoplay(cur) {
+  if (state.countdown !== cur || cur.uiStatus !== "error" || cur.errorKind !== "autoplay") return;
+  cur.uiStatus = "buffering";
+  cur.errorKind = null;
+  cur.errorMessage = null;
+  renderCountdownOverlay();
+  const playPromise = COUNTDOWN_AUDIO.play();
+  if (playPromise && playPromise.catch) {
+    playPromise.catch((err) => {
+      if (state.countdown !== cur) return;
+      failCountdown(cur, err && err.name === "NotAllowedError" ? "autoplay" : "media", "Tap to resume the countdown.");
+    });
+  }
+}
+// Requests a fresh countdown attempt: the Begin button, prep Enter key, and
+// the error overlay's "Try again" all funnel through here so a pending
+// request can never be issued twice.
+function requestBegin() {
+  if (state.beginPending) return;
+  state.beginPending = true;
+  renderStage();
+  sendMessage({ type: "ready" });
+}
+function handleCountdownMessage(msg) {
+  const { id, status } = msg;
+  if (!id) return;
+  const cur = state.countdown;
+  if (status === "loading") {
+    if (cur && cur.id === id) return; // duplicate loading for the same id
+    if (cur) resetCountdownState(); // a newer id supersedes whatever was in flight
+    muteAgentAudio();
+    state.countdown = {
+      id,
+      uiStatus: "loading",
+      clips: null,
+      clipIndex: -1,
+      abortController: new AbortController(),
+      errorKind: null,
+      errorMessage: null,
+      completedSent: false,
+    };
+    renderCountdownOverlay();
+    return;
+  }
+  if (!cur || cur.id !== id) return; // stale/superseded id: ignore
+  if (cur.completedSent) return; // already acked; late same-id messages are stale
+  if (status === "ready") {
+    if (cur.uiStatus !== "loading") return; // duplicate ready: already started, never replay
+    const clips = Array.isArray(msg.clips) ? msg.clips : [];
+    if (!clips.length) {
+      failCountdown(cur, "media", "No countdown audio received.");
+      return;
     }
-  }, 900);
+    cur.clips = clips;
+    playCountdownClip(cur, 0);
+    return;
+  }
+  if (status === "error") {
+    failCountdown(cur, "server", msg.message || "Could not prepare the countdown.");
+    return;
+  }
+}
+function handleReset() {
+  resetCountdownState();
+  stopPresentClock();
+  state.deck = null;
+  state.pendingDeckSlides = null;
+  state.currentSlide = 1;
+  state.remainingS = null;
+  state.transcript = new Map();
+  state.lastAgentLine = null;
+  state.lastUserLine = null;
+  state.metrics = null;
+  state.judgment = null;
+  state.clips = {};
+  state.activeImprovementId = null;
+  state.coach = null;
+  state.coachHistory = {};
+  state.feedback = null;
+  state.feedbackPlayed = {};
+  state.drill = null;
+  state.beginPending = false;
+  // Preserved on purpose: room/connected, micEnabled, provider, progress,
+  // clientId, agentSpeaking/localSpeaking -- new_talk keeps the session live.
+  if (el.errorBanner) {
+    el.errorBanner.textContent = "";
+    el.errorBanner.classList.add("hidden");
+  }
+  if (el.setupTopic) el.setupTopic.value = "";
+  if (el.setupDeckPreview) el.setupDeckPreview.classList.add("hidden");
+  if (el.deckPreviewList) el.deckPreviewList.innerHTML = "";
+  if (el.uploadInput) el.uploadInput.value = "";
+  if (el.uploadStatus) el.uploadStatus.textContent = "";
+  if (el.uploadError) {
+    el.uploadError.textContent = "";
+    el.uploadError.classList.add("hidden");
+  }
 }
 
 // ------------------------------------------------------------------ render
 function viewForPhase(phase) {
   if (phase === "prep" || phase === "present") return "stage";
-  if (phase === "analyze" || phase === "coach" || phase === "drill") return "coach";
-  if (phase === "report") return "report";
+  if (phase === "analyze" || phase === "coach" || phase === "drill" || phase === "report") return "coach";
   return "setup";
 }
 function showView(name) {
   el.viewSetup.classList.toggle("hidden", name !== "setup");
   el.viewStage.classList.toggle("hidden", name !== "stage");
   el.viewCoach.classList.toggle("hidden", name !== "coach");
-  el.viewReport.classList.toggle("hidden", name !== "report");
   document.body.classList.toggle("wide-view", name === "coach");
 }
 function render() {
@@ -503,8 +721,7 @@ function render() {
   renderAstraBubble();
   if (state.phase === "setup") renderSetup();
   else if (state.phase === "prep" || state.phase === "present") renderStage();
-  else if (state.phase === "analyze" || state.phase === "coach" || state.phase === "drill") renderCoachView();
-  else renderReport();
+  else renderCoachView(); // analyze | coach | drill | report -- one continuation dashboard
 }
 function renderTopbar() {
   el.micBadge.classList.toggle("hidden", !state.micEnabled);
@@ -531,10 +748,10 @@ function renderLevelBadge() {
 }
 function renderAstraBubble() {
   const agent = state.lastAgentLine;
-  if (agent) {
-    el.astraLine.textContent = stripPauseMarkup(agent.text);
-    el.astraLine.classList.toggle("partial", !agent.final);
-  }
+  // A cleared transcript (new-talk reset) falls back to the placeholder so a
+  // stale line from the previous talk never survives a reset.
+  el.astraLine.textContent = agent ? stripPauseMarkup(agent.text) : "Your coach is connecting\u2026";
+  el.astraLine.classList.toggle("partial", !!agent && !agent.final);
   const user = state.lastUserLine;
   el.userLine.classList.toggle("hidden", !user);
   if (user) {
@@ -657,6 +874,7 @@ function renderStage() {
   el.stageStatus.classList.toggle("listening", !state.agentSpeaking);
   if (isPrep) {
     el.prepCountdown.textContent = state.remainingS != null ? String(Math.max(0, Math.ceil(state.remainingS))) : "\u2014";
+    el.prepReadyBtn.disabled = state.beginPending;
     return;
   }
   renderPresentTimer();
@@ -740,6 +958,9 @@ function renderCoachView() {
   renderPronunciationTranscript(el.coachTranscriptStrip);
   renderCoachOptions();
   renderCoachStatus();
+  renderRerecordSlideOptions();
+  renderImprovementCards();
+  renderProgressPanel();
 }
 function renderCoachChatLog() {
   el.coachChatLog.innerHTML = "";
@@ -951,7 +1172,12 @@ function renderDrillCard() {
     el.drillCard.appendChild(audio);
   }
 }
-const PRIMARY_COMMANDS = new Set(["proceed", "next", "practice"]);
+const PRIMARY_COMMANDS = new Set(["proceed", "next", "practice", "more"]);
+function doRerecord() {
+  const slide = Number(el.rerecordSlide.value);
+  if (!slide) return;
+  sendMessage({ type: "rerecord", slide });
+}
 function renderCoachOptions() {
   el.coachOptions.innerHTML = "";
   const options = (state.coach && state.coach.options) || [];
@@ -960,7 +1186,10 @@ function renderCoachOptions() {
     btn.type = "button";
     if (!PRIMARY_COMMANDS.has(opt.name)) btn.className = "secondary";
     btn.textContent = opt.label;
-    btn.addEventListener("click", () => sendMessage({ type: "command", name: opt.name }));
+    // wrap's "rerecord" option reuses the Recordings slide selector instead
+    // of a bare command -- the agent needs the actual slide number.
+    if (opt.name === "rerecord") btn.addEventListener("click", () => doRerecord());
+    else btn.addEventListener("click", () => sendMessage({ type: "command", name: opt.name }));
     el.coachOptions.appendChild(btn);
   });
 }
@@ -973,7 +1202,7 @@ function renderCoachStatus() {
   el.coachStatus.textContent = state.agentSpeaking ? `${coachName()} is speaking` : "listening \u2014 say it or tap an option";
 }
 
-// ------------------------------------------------------------- Report view
+// ------------------------------------------------------ Recordings & path
 const SCORE_MAX = 5; // rubric scale per skills/judge/*.md examples in GATE0.md
 // The TEDx skill ladder (§9 curriculum), in the fixed order the path panel
 // always shows all ten in, whether or not the judge has trained them yet.
@@ -981,12 +1210,6 @@ const SKILL_IDS = [
   "hook", "structure", "pacing", "pausing", "fillers",
   "vocal-variety", "storytelling", "slide-connection", "closing", "articulation",
 ];
-function renderReport() {
-  renderRerecordSlideOptions();
-  renderImprovementCards();
-  renderProgressPanel();
-  renderPronunciationTranscript(el.reportTranscriptStrip);
-}
 function renderScorecard() {
   el.scorecard.innerHTML = "";
   const scores = (state.judgment && state.judgment.scores) || null;
@@ -1175,11 +1398,16 @@ function wireEvents() {
     const file = el.uploadInput.files[0];
     if (file) handlePdfUpload(file);
   });
-  el.prepReadyBtn.addEventListener("click", () => sendMessage({ type: "ready" }));
+  el.prepReadyBtn.addEventListener("click", () => requestBegin());
   el.slideNextBtn.addEventListener("click", () => sendMessage({ type: "slide_next" }));
   el.presentDoneBtn.addEventListener("click", () => sendMessage({ type: "present_end" }));
-  el.rerecordBtn.addEventListener("click", () => sendMessage({ type: "rerecord", slide: Number(el.rerecordSlide.value) }));
-  el.newTalkBtn.addEventListener("click", () => location.reload());
+  el.rerecordBtn.addEventListener("click", () => doRerecord());
+  el.countdownRetryBtn.addEventListener("click", () => {
+    const cur = state.countdown;
+    if (!cur || cur.uiStatus !== "error") return;
+    if (cur.errorKind === "autoplay") retryAutoplay(cur);
+    else requestBegin();
+  });
   el.gateStartBtn.addEventListener("click", () => startSession());
   el.unmutePill.addEventListener("click", async () => {
     try {
@@ -1192,6 +1420,11 @@ function wireEvents() {
   window.addEventListener("keydown", (e) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+    if (state.phase === "prep" && e.code === "Enter") {
+      e.preventDefault();
+      requestBegin();
+      return;
+    }
     if (state.phase !== "present") return;
     if (e.code === "Space") {
       e.preventDefault();
@@ -1206,6 +1439,7 @@ function init() {
   cacheEls();
   state.orbGate = createOrb(el.gateOrb);
   state.orbBubble = createOrb(el.astraIndicator);
+  state.orbCountdown = createOrb(el.countdownOrb);
   wireEvents();
   render();
   connect();

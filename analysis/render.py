@@ -24,6 +24,12 @@ MAX_CHARS = 1000
 
 VARIANT_NAMES = {"v1": "asdelivered", "v2": "cleaned", "v3": "paced"}
 
+# Countdown clips (CONTRACTS.md §5/§6): four short same-voice numerals rendered
+# once per live session and played back entirely by the browser -- the server
+# never speaks a duplicate countdown. Order matters: it's the order the client
+# receives and plays the clips in.
+COUNTDOWN_TEXT = (("3", "Three."), ("2", "Two."), ("1", "One."), ("Begin", "Begin!"))
+
 # GATE0.md: requesting timeScaleFactor=1.3 measured a 1.67x actual duration
 # ratio on mistv3 (not 1.3x) -- the shipped "slower" feature calibrates
 # against measured duration rather than trusting the nominal factor.
@@ -208,6 +214,33 @@ async def render_variants(improvement: dict, out_dir: Path, *, slower: bool = Fa
                 "duration_s": round(len(samples) / sr, 3) if sr else 0.0,
                 "text": text,
                 "gaps": gaps(path.read_bytes()),
+            }
+        return results
+
+    return await asyncio.to_thread(_do)
+
+
+async def render_countdown(out_dir: Path, *, model: str = "mistv3", speaker: str = "summit") -> dict[str, dict]:
+    """CONTRACTS.md §5/§6: renders "Three."/"Two."/"One."/"Begin!" as four separate
+    same-voice clips, keyed by label ("3", "2", "1", "Begin") in playback order.
+    The browser owns countdown *timing* (waits for each clip's media-element
+    `playing`/`ended`); this only has to produce the audio once. Callers (e.g.
+    `session_agent.PodiumOrchestrator`) cache the result for the life of a
+    session and reuse it across rerecord -- this function itself is stateless
+    and always renders fresh, same as `render_variants`."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    def _do() -> dict[str, dict]:
+        results: dict[str, dict] = {}
+        for label, text in COUNTDOWN_TEXT:
+            samples, sr = _synth_pcm(text, model, speaker, RATE)
+            path = out_dir / f"countdown_{label.lower()}.wav"
+            _write_wav(path, samples, sr)
+            results[label] = {
+                "path": str(path),
+                "duration_s": round(len(samples) / sr, 3) if sr else 0.0,
+                "text": text,
             }
         return results
 

@@ -109,7 +109,7 @@
 
   </section>
 
-  <!-- ============ COACH VIEW (analyze + coach + drill) ============ -->
+  <!-- ============ COACH VIEW (analyze + coach + drill + report) ============ -->
   <section id="view-coach" class="view hidden">
     <div class="coach-layout">
       <div class="coach-left">
@@ -129,6 +129,22 @@
           <p class="hint">Words your coach's ear (Deepgram) heard with low confidence are underlined &mdash; that is intelligibility, not accent.</p>
           <div id="coach-transcript-strip" class="transcript-strip pronunciation-strip"></div>
         </div>
+
+        <details class="panel" id="recordings-panel">
+          <summary>Recordings</summary>
+          <div class="row">
+            <select id="rerecord-slide"></select>
+            <button id="rerecord-btn" type="button" class="secondary">Re-record this slide</button>
+          </div>
+          <div id="improvement-cards"></div>
+        </details>
+
+        <details class="panel hidden" id="progress-panel">
+          <summary>Your path</summary>
+          <div id="level-track" class="level-track"></div>
+          <div id="skill-rows" class="skill-rows"></div>
+          <p id="next-focus" class="hint"></p>
+        </details>
       </div>
 
       <div class="coach-right">
@@ -144,41 +160,20 @@
     </div>
   </section>
 
-  <!-- ============ REPORT VIEW ============ -->
-  <section id="view-report" class="view hidden">
-    <h1>Report</h1>
-
-    <div class="panel hidden" id="progress-panel">
-      <h2>Your path</h2>
-      <div id="level-track" class="level-track"></div>
-      <div id="skill-rows" class="skill-rows"></div>
-      <p id="next-focus" class="hint"></p>
-    </div>
-
-    <div class="panel" id="report-transcript-panel">
-      <h2>Transcript</h2>
-      <p class="hint">Underlined words were heard with low confidence.</p>
-      <div id="report-transcript-strip" class="transcript-strip pronunciation-strip"></div>
-    </div>
-
-    <div class="panel" id="rerecord-panel">
-      <h2>Re-record a slide</h2>
-      <div class="row">
-        <select id="rerecord-slide"></select>
-        <button id="rerecord-btn" type="button">Re-record this slide</button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>Improvements</h2>
-      <div id="improvement-cards"></div>
-    </div>
-
-    <button id="new-talk-btn" type="button" class="secondary">New talk</button>
-  </section>
-
 <div id="countdown-overlay" class="countdown-overlay hidden">
-  <div id="countdown-number" class="countdown-number">3</div>
+  <div id="countdown-loading" class="countdown-loading hidden">
+    <canvas id="countdown-orb" class="countdown-orb-canvas"></canvas>
+    <div id="countdown-loading-title" class="countdown-loading-title">Preparing your countdown&hellip;</div>
+    <div class="countdown-loading-sub">Wait to speak</div>
+  </div>
+  <div id="countdown-playing" class="countdown-playing hidden">
+    <div id="countdown-number" class="countdown-number">3</div>
+  </div>
+  <div id="countdown-status" class="countdown-status hidden">Starting microphone&hellip;</div>
+  <div id="countdown-error" class="countdown-error hidden">
+    <p id="countdown-error-message" class="countdown-error-message"></p>
+    <button id="countdown-retry-btn" type="button">Try again</button>
+  </div>
 </div>
 
 <footer id="shortcuts">Space = next slide (while presenting) &middot; Enter = done</footer>

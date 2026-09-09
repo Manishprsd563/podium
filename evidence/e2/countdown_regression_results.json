@@ -1,0 +1,51 @@
+{
+  "cases": {
+    "missing_and_delayed_ack": {
+      "ok": true,
+      "detail": "no revision while unacked; late ack opened revision 1",
+      "seconds": 6.5
+    },
+    "duplicate_ready_and_acks": {
+      "ok": true,
+      "detail": "duplicate ready/acks ignored; one phase=present, one revision",
+      "seconds": 5.2
+    },
+    "countdown_failed_and_error": {
+      "ok": true,
+      "detail": "failed/error -> prep, never records; retry reaches present",
+      "seconds": 8.0
+    },
+    "not_ready_negative": {
+      "ok": true,
+      "detail": "'not ready' started no countdown and no flow; 'ready' does",
+      "seconds": 3.8
+    },
+    "wrap_more_reuse": {
+      "ok": false,
+      "error": "AssertionError('timeout (30.0s) waiting for practice_attempt logged (pass 1)')",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\Workspace\\dataforge-rime\\evidence\\e2_countdown_regression.py\", line 848, in main\n    res = await asyncio.wait_for(fn(), timeout=CASE_TIMEOUT_S)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\asus\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\asyncio\\tasks.py\", line 520, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"D:\\Workspace\\dataforge-rime\\evidence\\e2_countdown_regression.py\", line 639, in case_wrap_more_reuse\n    await wait_for(lambda: len([e for e in read_timeline(store) if e.get(\"ev\") == \"practice_attempt\"])\n  File \"D:\\Workspace\\dataforge-rime\\evidence\\e2_countdown_regression.py\", line 324, in wait_for\n    raise AssertionError(f\"timeout ({timeout_s}s) waiting for {desc}\")\nAssertionError: timeout (30.0s) waiting for practice_attempt logged (pass 1)\n",
+      "seconds": 84.1
+    },
+    "wrap_rerecord_and_scope": {
+      "ok": true,
+      "detail": "bad slide 99 rejected with error, no revision; wrap rerecord ran the handshake then presented with scope {'slide': 1}",
+      "seconds": 26.2
+    },
+    "new_talk_and_fence": {
+      "ok": true,
+      "detail": "new_talk -> reset message, setup phase, cleared deck/judgment/queue/focus/buffers, epoch+1, offer spoken, countdown clips and progress kept, old recordings preserved, next setup works",
+      "seconds": 25.2
+    },
+    "epoch_fence_direct": {
+      "ok": true,
+      "detail": "in-flight render dropped with stale_dropped after epoch bump",
+      "seconds": 4.1
+    },
+    "disconnect_style_cancel": {
+      "ok": true,
+      "detail": "cancel-stale-tasks mid-countdown: no revision, prep kept, flow dead",
+      "seconds": 3.7
+    }
+  },
+  "failures": 1
+}

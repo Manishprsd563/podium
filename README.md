@@ -22,8 +22,12 @@ you through the whole session, and every button on screen has a spoken equivalen
    (exported from your slides; PPTX is not supported, see Limitations).
 2. **Prep** — Thunder acknowledges the topic with one specific detail about it, then a
    60 s countdown; say "ready" or press *Begin now* to skip it.
-3. **Three, two, one, go** — counted aloud with Rime `<NNN>` pause markup, mirrored by an
-   on-screen overlay.
+3. **Audio-led countdown** — a loading overlay stays visible until the active Rime voice
+   is ready. The browser plays “Three, two, one, begin” and displays each word with its
+   actual playback, rather than running an independent visual timer. Recording and the
+   presentation clock start only after the browser confirms the last clip has finished.
+   If audio is blocked or stalls, the overlay asks you to wait or retry; it never starts
+   your presentation silently.
 4. **Present** — you talk through the slides with a live clock (overtime turns amber); the
    agent listens without interrupting your thinking pauses (the presentation-mode turn
    policy, see below), speaks a T−30 s cue over you without taking your turn, and advances
@@ -47,9 +51,11 @@ you through the whole session, and every button on screen has a spoken equivalen
 7. **Drill** — up to three words a recogniser was unsure of: you hear your own take, then
    the coach's, say it again, and the confidence is re-measured. This is intelligibility,
    never an accent judgement.
-8. **Report** — metrics, judgment, clip playback including your recording slices and
-   practice takes, re-record, and *Your path*: the Novice → Speaker → Presenter → Keynote →
-   TEDx-ready ladder with per-skill mastery, tracked across sessions per browser.
+8. **Keep practising on the dashboard** — there is no separate final report page.
+   Thunder asks whether you want more practice, another slide from the current deck,
+   or a new topic / uploaded deck. Scores, recordings and progress stay available on
+   the same dashboard. A new talk returns to the topic/PDF form without disconnecting
+   the coach; repeated practice does not count the same presentation twice in progress.
 
 The coach keeps its thread through a `SessionGraph` (`agent/graph.py`): a timestamped
 in-process graph of slides, improvements, clips, attempts, verdicts and your remarks. The
