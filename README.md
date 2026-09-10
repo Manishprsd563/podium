@@ -128,4 +128,4 @@ had a P95 of 1400 ms. See `RIME_EVIDENCE.md` claim 4 for the setup and results.
 
 ## License
 
-[MIT](LICENSE) © 2026 Manish Prasad.
+[MIT](LICENSE) © 2026 VARH-AI.
