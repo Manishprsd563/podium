@@ -18,24 +18,14 @@ back, then a cleaned version, then the cleaned version with a deliberate pause, 
 Rime voice, so the only thing that changes between clips is delivery, not wording. Built for the
 DataForge x Rime hackathon.
 
+Full evidence for every claim below — numbers, thresholds, reproduction commands and honest
+limitations — is in [`RIME_EVIDENCE.md`](RIME_EVIDENCE.md). Measured configuration decisions and
+rejected alternatives are in [`GATE0.md`](GATE0.md). Frozen cross-module data shapes are in
+[`CONTRACTS.md`](CONTRACTS.md).
+
 ## Demo
 
-<!-- Autoplaying animated WebP: GitHub's Markdown sanitiser strips <video> for
-     every host except its own attachment CDN, and it serves a raw .mp4 as a
-     download rather than a stream. An animated image is the only preview that
-     actually plays on a repository front page. -->
-
-[![Podium demo — six moments from the film](docs/demo/podium-preview.webp)](https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4)
-
-**[Watch the full film with sound](https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4)** — 4 minutes 18 seconds,
-1600x900, 12 MB. Also in the repository at
-[`docs/demo/podium-demo.mp4`](docs/demo/podium-demo.mp4), and attached to
-[release v1.0.0](https://github.com/Manishprsd563/podium/releases/tag/v1.0.0).
-
-The film is a directed product pitch built on the real Podium browser UI (the actual Three.js
-orb from `web/orb.js`, captured live), voiced by three Rime `mistv3` speakers, and grounded in
-real measured numbers from this repository (`RIME_EVIDENCE.md`, `sessions/s_20260909_160535/`)
-rather than invented statistics.
+<video src="https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4" poster="docs/demo/podium-poster.png" controls preload="metadata" playsinline width="100%"><a href="https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4">Watch the demo film (4:18, 12 MB)</a></video>
 
 ## Quickstart
 
@@ -105,31 +95,59 @@ live clock, then get a scorecard and spoken, contrastive coaching.
 
 ## How a session works
 
-Outside `present`, the microphone stays muted until you deliberately take the floor: hold
-**Space** to talk (double-tap to latch it open, **Escape** to release). During `present` the
-microphone is live for the whole take instead — that recording is the deliverable.
+Podium is voice-first: the coach talks you through the whole session, and every button on
+screen has a spoken equivalent. Outside `present` the microphone stays muted until you
+deliberately take the floor — hold **Space** to talk, double-tap to latch it open, **Escape**
+to release. During `present` the microphone is live for the whole take instead; that recording
+is the deliverable.
 
-1. **Setup** — Podium greets you and asks for a topic or a PDF upload. A spoken topic is
-   captured deterministically (the LLM never gets a free-form setup turn), then level and
-   length are asked one at a time with the same spoken options shown on screen.
-2. **Deck** — once topic, level, and length are known, a three-slide deck is generated and
-   acknowledged in one line before prep starts.
+1. **Setup** — the coach introduces itself and offers two ways in: say or type a topic ("a
+   five-minute talk on smart cities"), or upload a PDF exported from your slides. A spoken
+   topic is captured deterministically — the LLM never gets a free-form setup turn — then
+   level and length are asked one at a time, with the same options shown on screen as spoken
+   aloud, so voice and buttons take exactly the same path.
+2. **Deck** — once topic, level and length are known, a three-slide deck is generated and
+   acknowledged with one specific detail about your topic, so you can hear that it read the
+   brief rather than filed it.
 3. **Prep** — a 60-second countdown; say "ready" or press **Enter** to skip it.
-4. **Countdown** — "Three, two, one, begin," spoken in the active Rime voice; recording starts
-   only after the browser confirms the last clip has finished playing.
-5. **Present** — the current slide and a live clock are on screen (overtime turns amber). Move
-   between slides with **←** / **→** or by voice ("next slide"); press **Enter** (or say "I'm
-   done") to end the take. The presentation-mode turn policy does not end your turn on an
-   in-monologue thinking pause.
-6. **Analyze** — the recording is re-transcribed for per-word confidence, code computes every
-   metric, and the judge LLM scores five rubric categories and picks up to three improvements.
-7. **Coach** — score bars narrated one at a time, then each improvement played back as your own
-   clip, a cleaned version, and a paced version, with a chance to practice it yourself.
-8. **Drill** — up to three low-confidence words: hear your take, hear the coach's, say it again,
-   get re-measured.
-9. **Report / wrap** — score bars again with a delta against the previous revision. From here
-   you can practice the existing improvements more, try the whole talk again (a new revision,
-   new scorecard, and a visible delta), or start a new topic — all without disconnecting.
+4. **Countdown** — a loading overlay stays up until the active Rime voice has rendered the
+   clips, then the browser plays "Three, two, one, begin" and shows each numeral on its
+   actual playback rather than on an independent visual timer. Recording and the presentation
+   clock start only after the browser confirms the final clip finished. If audio is blocked or
+   stalls, the overlay asks you to retry — it never starts your presentation silently.
+5. **Present** — the slide and a live clock are on screen, and the clock turns amber in
+   overtime. Move between slides with **←** / **→** or by voice ("next slide", "previous
+   slide"); press **Enter** or say "I'm done" to end the take. The presentation-mode turn
+   policy does not end your turn on an in-monologue thinking pause, and a T−30 s cue is spoken
+   over you without taking the floor away.
+6. **Analyze** — the recording is re-transcribed once through Deepgram's REST endpoint for
+   real per-word confidence. Code, not the LLM, computes pace, filler rate, pause taxonomy,
+   loudness variance, time budget and intelligibility. The judge LLM then scores five rubric
+   categories against `skills/judge/*.md`, tags each of up to three improvements with the
+   curriculum skill it trains, and every quote's time span is derived by code from the
+   transcript words.
+7. **Coach, as a conversation** — the dashboard appears while the coach summarises the numbers
+   in its own words and asks whether to work through the improvements. Each one is signposted
+   ("Improvement 2 of 3 — pausing, slide 2") and cued on screen: it plays **your own
+   recording** of the sentence, then the cleaned line, then the cleaned line with a deliberate
+   pause before the key phrase — the last two in the same Rime voice — and asks you to say it
+   yourself. Your take is recorded, `analysis/practice.py` computes fillers before and after,
+   whether the pause landed, and pace, and the coach phrases the verdict. Interrupt with a
+   question and it answers, then resumes at the step it was on rather than from the top.
+8. **Drill** — up to three words the recogniser was unsure of: you hear your own take, then the
+   coach's, say it again, and the confidence is re-measured. This is intelligibility, never an
+   accent judgement.
+9. **Keep practising** — there is no separate report page. Score bars return with a delta
+   against the previous revision, and you can practise the existing improvements again, retake
+   the whole talk (a new revision, new scorecard, visible delta), or start a new topic — all
+   without disconnecting. Repeated practice never double-counts the same revision in progress.
+
+The coach keeps its thread through a `SessionGraph` (`agent/graph.py`): a timestamped
+in-process graph of slides, improvements, clips, attempts, verdicts and your own remarks. The
+LLM's steering context and the on-screen cues come from that one structure, and a `recap` tool
+answers "what have we done so far". Every number it speaks comes from code — the coach LLM only
+phrases facts it is handed. A revision fence guarantees that a stale judgment from a superseded
+recording is never spoken.
 
 ## What is measured, and by what
 
@@ -149,6 +167,44 @@ Code computes every one of these numbers; the coach LLM only phrases them into s
 judge LLM returns a strict-JSON scorecard (`CONTRACTS.md` §3) — five categories, up to three
 improvements, each with a verbatim quote from the transcript (code verifies the substring match
 and drops any quote that isn't one).
+
+## The orb, and what it tells you
+
+A Three.js shader orb plus a live caption are the only constant on screen; the panel beneath
+them changes with the phase. The orb is not decoration — it is the session's state machine made
+visible. Colour and motion for every state live in one table in `web/orb.js`, and
+`web/app.js`'s `computeOrbState()` picks the state; transitions are GSAP-tweened over ~600 ms,
+never snapped.
+
+| State | Colour | What it means |
+|---|---|---|
+| `connecting` / `reconnecting` | grey, orbiting ring | not joined yet, or LiveKit is retrying |
+| `idle` | teal → periwinkle | connected, floor open, nobody audible |
+| `speaking` | teal → periwinkle, faster | the coach's own output level is above threshold |
+| `listening` | violet → teal | your microphone level is above threshold |
+| `micLive` | green | the push-to-talk floor is yours |
+| `waiting` | amber, breathing | the coach is waiting on an answer from you |
+| `thinking` | grey, orbiting ring | a line is being synthesized; the coach is deliberately silent |
+| `disconnected` | red | was connected and dropped |
+
+The orb's noise shimmer and halo brightness are driven every frame by the smoothed RMS
+amplitude of whichever side holds the floor, so the blob visibly reacts to your voice rather
+than animating on a loop. If `WebGLRenderer` construction fails, a 2D-canvas fallback renders
+the same state table without the shader detail, and the orb recovers from WebGL context loss
+instead of freezing.
+
+## Speech-first sequencing
+
+Every UI-affecting agent message — `coach`, `feedback`, `judgment`, `focus`, `progress`, and
+the `phase` transitions into coaching — is sent only after the audio for its matching spoken
+line already exists. The coach line is pre-synthesized over Rime REST, and only once those
+frames are in hand does the message go out over the data channel.
+
+The reason is a specific failure mode: a dashboard that updates before the voice explains it
+reads as a lag or, worse, as the numbers and the narration disagreeing. Sequencing the other
+way round means the screen and the sentence always land together, and a synthesis failure
+degrades into a silent-but-consistent UI rather than a caption describing something that never
+got said.
 
 ## Voice and provider configuration
 
@@ -187,6 +243,17 @@ Re-run the full suite with `python evidence/run_all.py`. It spends real Rime/Dee
 credit and exits non-zero when a preregistered target (like claim 4's stop latency) is missed.
 
 ## Architecture
+
+![Podium architecture: browser to LiveKit Cloud to Deepgram to the session graph to Rime, with a dotted REST lane for the contrast clips and a dotted analysis lane](docs/img/architecture.png)
+
+One duplex call carries everything. Your microphone streams through LiveKit into Deepgram for
+words and timestamps; a turn-gated session graph decides when the coach may speak; Rime speaks
+it live over a WebSocket at 24 kHz, while the same model renders the contrast clips over REST.
+The analysis lane is deliberately separate: it is pure Python with no LiveKit dependency, which
+is what makes every number reproducible outside a live room.
+
+<details>
+<summary>The same graph as exact module wiring</summary>
 
 ```mermaid
 flowchart LR
@@ -230,6 +297,10 @@ flowchart LR
   TTS_REST -.pre-rendered clips.-> Orch
 ```
 
+</details>
+
+**Repository layout**
+
 | Directory | Contents |
 |---|---|
 | `agent/` | The LiveKit agent worker — `session_agent.py` (phases, turn policy, revision fence), `graph.py` (`SessionGraph`), `store.py` (session persistence), `llm_config.py` |
@@ -238,7 +309,7 @@ flowchart LR
 | `skills/` | Authored judge rubric and curriculum markdown the coach and judge cite by id |
 | `evidence/` | The preregistered acceptance-test scripts behind `RIME_EVIDENCE.md` and their `results.json` output |
 | `scripts/` | One-off probes and the local preflight/submission-packaging tools |
-| `docs/` | Reference docs and the demo video/poster |
+| `docs/` | Provider reference notes, the architecture diagram, and the demo film |
 | `sessions/` | Per-session recordings, transcripts, and `session.json`/`timeline.jsonl`, written at runtime |
 
 ## Configuration reference
@@ -300,8 +371,29 @@ flowchart LR
 | Rime returns 401 | `RIME_API_KEY` is missing or wrong in `.env`; get a fresh key from the Rime dashboard. |
 | `/token` returns "LiveKit credentials not configured" | One of `LIVEKIT_URL`/`LIVEKIT_API_KEY`/`LIVEKIT_API_SECRET` is empty in `.env` — `web/serve.py` checks all three before minting a token. |
 
+## Prior art, and what is different here
+
+The Rime voice-agent catalog already includes "Continuum — Interview Practice", a Q&A agent
+with memory. Podium is a different shape of problem — **timed monologue rehearsal graded
+against slides**, not conversational Q&A — and three consequences follow from that:
+
+- Acoustic metrics (pace, pause taxonomy, filler rate, loudness variance) are **computed from
+  the audio and STT word timestamps by code** (`analysis/metrics.py`), not inferred by an LLM.
+- The coaching mechanism is **contrastive Rime playback** — the same voice speaking the
+  as-delivered line, the cleaned line and the paced line back to back — not a text explanation
+  of what to change.
+- A **presentation-mode turn policy** is required, because a monologue has long in-context
+  thinking pauses that default endpointing treats as end-of-turn. A Q&A agent never faces this.
+
+No broader novelty is claimed beyond this specific combination.
+
 ## License and credits
 
-Built for the DataForge x Rime hackathon. The coaching curriculum and rubric files under
-`skills/curriculum/` and `skills/judge/` are project-authored. This repository does not yet
-declare a license.
+[MIT](LICENSE) — do what you like with it, keep the copyright notice, no warranty.
+
+Built for the DataForge x Rime hackathon. The coaching curriculum and judge rubric under
+`skills/curriculum/` and `skills/judge/` are project-authored.
+
+The license covers the code in this repository. It does not grant rights to the third-party
+services Podium calls (Rime, Deepgram, LiveKit — each has its own terms), and the browser
+client loads Three.js, GSAP, Lenis and livekit-client from a CDN under their own licenses.
