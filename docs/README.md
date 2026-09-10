@@ -519,7 +519,7 @@ No broader novelty is claimed beyond this specific combination.
 
 ## License and credits
 
-[MIT](../LICENSE) © 2026 Manish Prasad.
+[MIT](../LICENSE) © 2026 VARH-AI.
 
 Built for the DataForge x Rime hackathon. The coaching curriculum and judge rubric under
 `skills/curriculum/` and `skills/judge/` are written for this project. Rime, Deepgram and
