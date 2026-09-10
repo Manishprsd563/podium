@@ -23,10 +23,9 @@
 
 Podium is a voice-native presentation coach built for the DataForge x Rime hackathon. You
 rehearse a timed talk out loud against your slides while it listens live, scoring pace, fillers,
-pauses, loudness and intelligibility straight from the audio.
+pauses, loudness and intelligibility straight from the audio. It then coaches you by contrast: hear your recorded delivery alongside a revised version spoken by Rime. 
 
-It then coaches you by contrast: hear your recorded delivery alongside a revised version
-spoken by Rime. With 10 coaching skills, slide-aware feedback and a session-graph architecture
+With 10 coaching skills, slide-aware feedback and a session-graph architecture
 that tracks each attempt, Podium helps you turn a first rehearsal into a clearer, more
 confident, stage-ready presentation.
 
