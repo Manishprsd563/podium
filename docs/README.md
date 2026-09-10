@@ -18,16 +18,21 @@ coaches you back by contrast.
 Podium is built for one job: **timed monologue rehearsal graded against slides.** You talk for
 a fixed budget while Podium listens through Deepgram in real time. Every metric it reports —
 pace, filler rate, pause taxonomy, loudness variance, intelligibility — is computed in code from
-the audio and word timestamps; the LLM only phrases them. Coaching works by contrast: you hear
-your own recording of a line, then the same point rewritten and spoken by Rime with cleaned-up
-wording, then that cleaned wording again with a deliberate pause before the key phrase. The two
-Rime clips share voice and words, so delivery is the only thing that changes between them.
-Built for the DataForge x Rime hackathon.
+the audio and word timestamps. A judge LLM then scores the talk against the rubric files in
+`skills/judge/`: it reads the transcript for opening, structure, clarity and connection to the
+slide on screen, and it reads the measured numbers — never re-estimating them — for delivery and
+intelligibility. Coaching works by contrast: you hear your own recording of a line, then the same
+point rewritten and spoken by Rime with cleaned-up wording, then that cleaned wording again with a
+deliberate pause before the key phrase. The two Rime clips share voice and words, so delivery is
+the only thing that changes between them. Built for the DataForge x Rime hackathon.
 
 - **Timed slide rehearsal.** Talk against your own slides on a live clock, with prep time and a
   deck generated from your topic or an uploaded PDF.
-- **Delivery metrics from the audio.** Pace, filler rate, pause taxonomy, loudness variance and
-  intelligibility are computed in code from your speech, not estimated by an LLM.
+- **Measured delivery, judged content.** Pace, filler rate, pause taxonomy, loudness variance and
+  intelligibility are computed in code from your speech, never re-estimated by an LLM. A judge
+  LLM then scores the talk against six rubric skills — opening and structure, clarity, connection
+  to the slide on screen, and how the measured numbers sit against the pace and pause bands — and
+  ties each improvement to one of ten curriculum skills.
 - **Hear the before and after.** Every improvement plays your own recording next to a cleaned,
   Rime-voiced rewrite, so you hear the difference instead of reading about it.
 - **Focused drills, not a wall of notes.** Up to three improvements and up to three unclear
