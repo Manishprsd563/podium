@@ -20,11 +20,7 @@
   <a href="docs/README.md">Docs</a>
 </p>
 
-Podium is a voice-native presentation coach built for the DataForge x Rime hackathon. You
-rehearse a timed talk out loud against your slides while it listens live, measuring pace, fillers,
-pauses, loudness and intelligibility straight from the audio. A rubric-driven judge then scores
-your opening, structure, clarity and how well you spoke to each slide, and coaches you by contrast:
-hear your recorded delivery alongside a revised version spoken by Rime.
+Podium is a voice-native presentation coach built for the DataForge x Rime hackathon. You rehearse a timed talk out loud against your slides while it listens live, scoring pace, fillers, pauses, loudness and intelligibility straight from the audio. It then coaches you by contrast: hear your recorded delivery alongside a revised version spoken by Rime.
 
 With 10+ coaching skills, slide-aware feedback and a session-graph architecture
 that tracks each attempt, Podium helps you turn a first rehearsal into a clearer, more
@@ -36,11 +32,11 @@ https://github.com/user-attachments/assets/b9dc5196-367d-4328-a915-690f68c6672e
 
 - **Timed slide rehearsal.** Talk against your own slides on a live clock, with prep time and a
   deck generated from your topic or an uploaded PDF.
-- **Measured delivery, judged content.** Pace, filler rate, pause taxonomy, loudness variance and
-  intelligibility are computed in code from your speech, never re-estimated by an LLM. A judge
-  LLM then scores the talk against six rubric skills — opening and structure, clarity, connection
+- **Measured delivery.** Pace, filler rate, pause taxonomy, loudness variance and
+  intelligibility are computed in code from your speech, never estimated by an LLM.
+- **Judged content.** A judge LLM scores the talk against six rubric skills — opening and structure, clarity, connection
   to the slide on screen, and how the measured numbers sit against the pace and pause bands — and
-  ties each improvement to one of ten curriculum skills.
+  ties each improvement to fine-tuned curriculum skills.
 - **Hear the before and after.** Every improvement plays your original line next to a cleaned,
   Rime-voiced rewrite, so you hear the difference instead of reading about it.
 - **Focused drills, not a wall of notes.** Up to three improvements and up to three unclear
