@@ -378,8 +378,7 @@ it live over a WebSocket at 24 kHz, while the same model renders the contrast cl
 The analysis lane is deliberately separate: it is pure Python with no LiveKit dependency, which
 is what makes every number reproducible outside a live room.
 
-The module wiring, exactly as the code is laid out (the README's rendered image is generated
-from this graph by `python scripts/architecture_diagram.py`):
+The module wiring, exactly as the code is laid out:
 
 ```mermaid
 flowchart LR
