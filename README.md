@@ -25,7 +25,9 @@ rejected alternatives are in [`GATE0.md`](GATE0.md). Frozen cross-module data sh
 
 ## Demo
 
-<video src="https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4" poster="docs/demo/podium-poster.png" controls preload="metadata" playsinline width="100%"><a href="https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4">Watch the demo film (4:18, 12 MB)</a></video>
+[**Watch the film with sound**](https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4) · 4:18
+
+<video src="https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4" poster="docs/demo/podium-poster.png" controls preload="metadata" playsinline width="100%"></video>
 
 ## Quickstart
 
