@@ -372,7 +372,7 @@ claim 4's stop latency) is missed.
 
 ## Architecture
 
-![Podium architecture: browser to LiveKit Cloud to Deepgram to the session graph to Rime, with a dotted REST lane for the contrast clips and a dotted analysis lane](img/architecture.png)
+![Podium architecture: the browser (index.html, app.js, orb.js, dashboard.js) talks WebRTC to a LiveKit Cloud room; the agent process's PodiumOrchestrator drives Deepgram nova-3, the LiveKit Inference coach and judge models, and Rime over WebSocket and REST; the pure-Python analysis lane (metrics, judge, render) produces V1/V2/V3 clips through Rime REST that loop back to the orchestrator](img/architecture.svg)
 
 One duplex call carries everything. Your microphone streams through LiveKit into Deepgram for
 words and timestamps; a turn-gated session graph decides when the coach may speak; Rime speaks
@@ -381,7 +381,7 @@ The analysis lane is deliberately separate: it is pure Python with no LiveKit de
 is what makes every number reproducible outside a live room.
 
 <details>
-<summary>The same graph as exact module wiring</summary>
+<summary>The same graph as mermaid (regenerate the image with <code>python scripts/architecture_diagram.py</code>)</summary>
 
 ```mermaid
 flowchart LR

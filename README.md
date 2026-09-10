@@ -104,7 +104,7 @@ scorecard, and spoken contrastive coaching.
 
 ## Architecture
 
-![Podium architecture: browser to LiveKit Cloud to Deepgram to the session graph to Rime, with a dotted REST lane for the contrast clips and a dotted analysis lane](docs/img/architecture.png)
+![Podium architecture: the browser (index.html, app.js, orb.js, dashboard.js) talks WebRTC to a LiveKit Cloud room; the agent process's PodiumOrchestrator drives Deepgram nova-3, the LiveKit Inference coach and judge models, and Rime over WebSocket and REST; the pure-Python analysis lane (metrics, judge, render) produces V1/V2/V3 clips through Rime REST that loop back to the orchestrator](docs/img/architecture.svg)
 
 One duplex call carries everything: your microphone streams through LiveKit into Deepgram for
 words and timestamps, a turn-gated session graph decides when the coach may speak, and Rime

@@ -1,0 +1,154 @@
+<svg width="1680" height="960" viewBox="0 0 1680 960" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch-title arch-desc">
+  <title id="arch-title">Podium architecture: module wiring</title>
+  <desc id="arch-desc">Browser (index.html, app.js, orb.js, dashboard.js) talks WebRTC audio and a data channel to a LiveKit Cloud room; the agent process's PodiumOrchestrator joins the same room and drives Deepgram nova-3 STT, LiveKit Inference coach and judge models, Rime over WebSocket for live speech and over REST to pre-synthesize lines; the pure-Python analysis lane (metrics.py, judge.py, render.py) produces V1/V2/V3 contrast clips through Rime REST, which loop back to the orchestrator as clip paths and pre-rendered clips.</desc>
+  <defs><linearGradient id="bg-depth" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#12192c"/><stop offset="55%" stop-color="#111827"/><stop offset="100%" stop-color="#0d1320"/></linearGradient><radialGradient id="glow-lavender" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#c4b5fd" stop-opacity="0.16"/><stop offset="100%" stop-color="#c4b5fd" stop-opacity="0"/></radialGradient><radialGradient id="glow-mint" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7dd3c0" stop-opacity="0.12"/><stop offset="100%" stop-color="#7dd3c0" stop-opacity="0"/></radialGradient><radialGradient id="glow-coral" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f5a997" stop-opacity="0.10"/><stop offset="100%" stop-color="#f5a997" stop-opacity="0"/></radialGradient><filter id="soft-blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter><filter id="node-shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.35"/></filter><marker id="arrow-c4b5fd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0.5 L10 5 L0 9.5 z" fill="#c4b5fd"/></marker><marker id="arrow-c4b5fd-rev" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10 0.5 L0 5 L10 9.5 z" fill="#c4b5fd"/></marker><marker id="arrow-7dd3c0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0.5 L10 5 L0 9.5 z" fill="#7dd3c0"/></marker><marker id="arrow-7dd3c0-rev" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10 0.5 L0 5 L10 9.5 z" fill="#7dd3c0"/></marker><marker id="arrow-f5a997" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0.5 L10 5 L0 9.5 z" fill="#f5a997"/></marker><marker id="arrow-f5a997-rev" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10 0.5 L0 5 L10 9.5 z" fill="#f5a997"/></marker><marker id="arrow-f3d17c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0.5 L10 5 L0 9.5 z" fill="#f3d17c"/></marker><marker id="arrow-f3d17c-rev" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10 0.5 L0 5 L10 9.5 z" fill="#f3d17c"/></marker><marker id="arrow-f5f5f7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0.5 L10 5 L0 9.5 z" fill="#f5f5f7"/></marker><marker id="arrow-f5f5f7-rev" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10 0.5 L0 5 L10 9.5 z" fill="#f5f5f7"/></marker></defs>
+  <rect width="1680" height="960" fill="url(#bg-depth)"/>
+  <g filter="url(#soft-blur)"><ellipse cx="260" cy="440" rx="320" ry="300" fill="url(#glow-lavender)"/><ellipse cx="900" cy="330" rx="420" ry="260" fill="url(#glow-mint)"/><ellipse cx="1420" cy="720" rx="360" ry="220" fill="url(#glow-coral)"/></g>
+  <g stroke="#f5f5f7" stroke-width="1.5" opacity="0.22" fill="none"><path d="M40 64V40h24M1640 64V40h-24M40 896v24h24M1640 896v24h-24"/></g>
+  <rect x="40" y="120" width="280" height="660" rx="16" fill="#c4b5fd" fill-opacity="0.035" stroke="#c4b5fd" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>
+  <text x="60" y="148" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" font-weight="600" letter-spacing="3.5" fill="#c4b5fd">BROWSER</text>
+  <text x="60" y="166" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11.5" fill="#f5f5f7" fill-opacity="0.55">web/  ·  no build step</text>
+  <rect x="390" y="255" width="210" height="220" rx="16" fill="#7dd3c0" fill-opacity="0.035" stroke="#7dd3c0" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>
+  <text x="410" y="283" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" font-weight="600" letter-spacing="3.5" fill="#7dd3c0">LIVEKIT CLOUD</text>
+  <text x="410" y="301" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11.5" fill="#f5f5f7" fill-opacity="0.55">India South</text>
+  <rect x="620" y="100" width="640" height="560" rx="16" fill="#f5f5f7" fill-opacity="0.035" stroke="#f5f5f7" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>
+  <text x="640" y="128" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" font-weight="600" letter-spacing="3.5" fill="#f5f5f7">AGENT PROCESS</text>
+  <text x="640" y="146" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11.5" fill="#f5f5f7" fill-opacity="0.55">agent/session_agent.py</text>
+  <rect x="730" y="690" width="660" height="170" rx="16" fill="#f3d17c" fill-opacity="0.035" stroke="#f3d17c" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>
+  <text x="750" y="718" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" font-weight="600" letter-spacing="3.5" fill="#f3d17c">ANALYSIS</text>
+  <text x="750" y="736" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11.5" fill="#f5f5f7" fill-opacity="0.55">analysis/*  ·  pure Python, no LiveKit</text>
+  <rect x="65" y="185" width="230" height="84" rx="11" fill="#c4b5fd" fill-opacity="0.09" stroke="#c4b5fd" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="65" y="197" width="3" height="60" rx="1.5" fill="#c4b5fd"/>
+  <g transform="translate(83 213.0) scale(1.17)" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M6 6.5h.01M9 6.5h.01"/></g>
+  <text x="125" y="223.5" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">index.html</text>
+  <text x="125" y="240.5" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">import map, statusbar, slot</text>
+  <rect x="65" y="325" width="230" height="96" rx="11" fill="#c4b5fd" fill-opacity="0.09" stroke="#c4b5fd" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="65" y="337" width="3" height="72" rx="1.5" fill="#c4b5fd"/>
+  <g transform="translate(83 359.0) scale(1.17)" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 21 8l-9 5-9-5 9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></g>
+  <text x="125" y="361.0" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">app.js</text>
+  <text x="125" y="378.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">state + view router,</text>
+  <text x="125" y="395.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">LiveKit client</text>
+  <rect x="65" y="495" width="190" height="84" rx="11" fill="#c4b5fd" fill-opacity="0.09" stroke="#c4b5fd" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="65" y="507" width="3" height="60" rx="1.5" fill="#c4b5fd"/>
+  <g transform="translate(83 523.0) scale(1.17)" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></g>
+  <text x="125" y="533.5" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">orb.js</text>
+  <text x="125" y="550.5" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">Three.js orb</text>
+  <rect x="65" y="655" width="230" height="96" rx="11" fill="#c4b5fd" fill-opacity="0.09" stroke="#c4b5fd" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="65" y="667" width="3" height="72" rx="1.5" fill="#c4b5fd"/>
+  <g transform="translate(83 689.0) scale(1.17)" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13M10 20V6M16 20V10M22 20H2"/></g>
+  <text x="125" y="691.0" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">dashboard.js</text>
+  <text x="125" y="708.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">scores / improvement /</text>
+  <text x="125" y="725.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">drill / wrap</text>
+  <path d="M435.0 332 v76 a60.0 12 0 0 0 120 0 v-76" fill="#7dd3c0" fill-opacity="0.09" stroke="#7dd3c0" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <ellipse cx="495" cy="332" rx="60.0" ry="12" fill="#151d31" stroke="#7dd3c0" stroke-width="1.5"/>
+  <text x="495" y="374.0" text-anchor="middle" font-family="'Poppins','Century Gothic','Futura',Avenir,'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="16" font-weight="700" fill="#f5f5f7">Room</text>
+  <text x="495" y="392.0" text-anchor="middle" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="11.5" fill="#f5f5f7" fill-opacity="0.65">WebRTC SFU</text>
+  <rect x="650" y="200" width="220" height="230" rx="14" fill="#c4b5fd" fill-opacity="0.11" stroke="#c4b5fd" stroke-width="2" filter="url(#node-shadow)"/>
+  <circle cx="760.0" cy="262" r="30" fill="#c4b5fd" fill-opacity="0.12" stroke="#c4b5fd" stroke-opacity="0.5"/>
+  <g transform="translate(742.0 244) scale(1.5)" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="m10.8 7.2-4.6 9.6M13.2 7.2l4.6 9.6M7.5 19h9"/></g>
+  <text x="760.0" y="326" text-anchor="middle" font-family="'Poppins','Century Gothic','Futura',Avenir,'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="17" font-weight="700" fill="#f5f5f7">PodiumOrchestrator</text>
+  <text x="760.0" y="350" text-anchor="middle" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12.5" fill="#f5f5f7" fill-opacity="0.75">phases, turn policy,</text>
+  <text x="760.0" y="368" text-anchor="middle" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12.5" fill="#f5f5f7" fill-opacity="0.75">revision fence</text>
+  <rect x="635" y="470" width="205" height="90" rx="11" fill="#f5a997" fill-opacity="0.09" stroke="#f5a997" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="635" y="482" width="3" height="66" rx="1.5" fill="#f5a997"/>
+  <g transform="translate(653 501.0) scale(1.17)" fill="none" stroke="#f5a997" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18.5 7a7 7 0 0 1 0 10"/></g>
+  <text x="695" y="503.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">Rime mistv3/thunder</text>
+  <text x="695" y="520.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">WebSocket /ws3,</text>
+  <text x="695" y="537.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">live speech</text>
+  <rect x="990" y="130" width="240" height="75" rx="11" fill="#7dd3c0" fill-opacity="0.09" stroke="#7dd3c0" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="990" y="142" width="3" height="51" rx="1.5" fill="#7dd3c0"/>
+  <g transform="translate(1008 153.5) scale(1.17)" fill="none" stroke="#7dd3c0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4M21 12h.5"/></g>
+  <text x="1050" y="164.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">Deepgram nova-3</text>
+  <text x="1050" y="181.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">STT: words + timestamps</text>
+  <rect x="990" y="240" width="240" height="75" rx="11" fill="#7dd3c0" fill-opacity="0.09" stroke="#7dd3c0" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="990" y="252" width="3" height="51" rx="1.5" fill="#7dd3c0"/>
+  <g transform="translate(1008 263.5) scale(1.17)" fill="none" stroke="#7dd3c0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></g>
+  <text x="1050" y="274.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">LiveKit Inference</text>
+  <text x="1050" y="291.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">coach: gemma-4-31b-it</text>
+  <rect x="990" y="355" width="240" height="90" rx="11" fill="#f5a997" fill-opacity="0.09" stroke="#f5a997" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="990" y="367" width="3" height="66" rx="1.5" fill="#f5a997"/>
+  <g transform="translate(1008 386.0) scale(1.17)" fill="none" stroke="#f5a997" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6h4l4 3.5v-13L7 9H3z"/><circle cx="17" cy="15" r="4.5"/><path d="M17 12.5V15l1.8 1.2"/></g>
+  <text x="1050" y="388.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">Rime mistv3/thunder</text>
+  <text x="1050" y="405.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">REST, pre-synthesizes each</text>
+  <text x="1050" y="422.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">line ahead of its UI message</text>
+  <rect x="990" y="540" width="240" height="75" rx="11" fill="#7dd3c0" fill-opacity="0.09" stroke="#7dd3c0" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="990" y="552" width="3" height="51" rx="1.5" fill="#7dd3c0"/>
+  <g transform="translate(1008 563.5) scale(1.17)" fill="none" stroke="#7dd3c0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></g>
+  <text x="1050" y="574.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">LiveKit Inference</text>
+  <text x="1050" y="591.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">judge: gpt-5.4-mini</text>
+  <rect x="760" y="740" width="160" height="100" rx="11" fill="#f3d17c" fill-opacity="0.09" stroke="#f3d17c" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="760" y="752" width="3" height="76" rx="1.5" fill="#f3d17c"/>
+  <g transform="translate(778 776.0) scale(1.17)" fill="none" stroke="#f3d17c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17a8 8 0 1 1 16 0"/><path d="m12 17 4-6"/><circle cx="12" cy="17" r="1.5"/></g>
+  <text x="820" y="778.0" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">metrics.py</text>
+  <text x="820" y="795.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">wpm, pauses,</text>
+  <text x="820" y="812.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">fillers, loudness</text>
+  <rect x="960" y="740" width="200" height="100" rx="11" fill="#f3d17c" fill-opacity="0.09" stroke="#f3d17c" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="960" y="752" width="3" height="76" rx="1.5" fill="#f3d17c"/>
+  <g transform="translate(978 776.0) scale(1.17)" fill="none" stroke="#f3d17c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 21h12M4 7h16"/><path d="M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7z"/></g>
+  <text x="1020" y="786.5" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">judge.py</text>
+  <text x="1020" y="803.5" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">+ skills/judge/*.md</text>
+  <rect x="1200" y="740" width="150" height="100" rx="11" fill="#f3d17c" fill-opacity="0.09" stroke="#f3d17c" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="1200" y="752" width="3" height="76" rx="1.5" fill="#f3d17c"/>
+  <g transform="translate(1218 776.0) scale(1.17)" fill="none" stroke="#f3d17c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14M3 10h5M3 14h5M16 10h5M16 14h5"/></g>
+  <text x="1260" y="786.5" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="13.5" font-weight="600" fill="#f5f5f7">render.py</text>
+  <text x="1260" y="803.5" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">V1 / V2 / V3 clips</text>
+  <rect x="1420" y="740" width="210" height="100" rx="11" fill="#f5a997" fill-opacity="0.09" stroke="#f5a997" stroke-width="1.5" filter="url(#node-shadow)"/>
+  <rect x="1420" y="752" width="3" height="76" rx="1.5" fill="#f5a997"/>
+  <g transform="translate(1438 776.0) scale(1.17)" fill="none" stroke="#f5a997" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9l-6-6z"/><path d="M13 3v6h6"/><path d="M8 13v3h2l2.5 2v-7L10 13H8z"/><path d="M15 14a2 2 0 0 1 0 3"/></g>
+  <text x="1480" y="778.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="600" fill="#f5f5f7">Rime mistv3/thunder</text>
+  <text x="1480" y="795.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">REST /v1/rime-tts,</text>
+  <text x="1480" y="812.0" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.72">offline clips</text>
+  <path d="M180 269 L180 325" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-c4b5fd)"/>
+  <path d="M160 421 L160 495" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-c4b5fd)"/>
+  <path d="M275 421 L275 655" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-c4b5fd)"/>
+  <path d="M295 373 L435 373" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)" marker-start="url(#arrow-7dd3c0-rev)"/>
+  <rect x="316.8" y="339" width="96.4" height="18" rx="9" fill="#111827" stroke="#7dd3c0" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="365" y="352" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#7dd3c0">WebRTC audio</text>
+  <rect x="310.1" y="389" width="109.8" height="18" rx="9" fill="#111827" stroke="#7dd3c0" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="365" y="402" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#7dd3c0">+ data channel</text>
+  <path d="M555 373 L650 373" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)" marker-start="url(#arrow-7dd3c0-rev)"/>
+  <rect x="573.9" y="339" width="56.2" height="18" rx="9" fill="#111827" stroke="#7dd3c0" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="602" y="352" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#7dd3c0">WebRTC</text>
+  <path d="M870 230 L930 230 L930 167 L990 167" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)" marker-start="url(#arrow-7dd3c0-rev)"/>
+  <path d="M870 277 L990 277" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)" marker-start="url(#arrow-7dd3c0-rev)"/>
+  <path d="M870 400 L990 400" fill="none" stroke="#f5a997" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f5a997)" marker-start="url(#arrow-f5a997-rev)"/>
+  <rect x="901.9" y="415" width="56.2" height="18" rx="9" fill="#111827" stroke="#f5a997" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="930" y="428" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f5a997">frames</text>
+  <path d="M737 430 L737 470" fill="none" stroke="#f5a997" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f5a997)"/>
+  <path d="M635 515 L495 515 L495 420" fill="none" stroke="#f5a997" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f5a997)"/>
+  <rect x="500.0" y="531" width="150.0" height="18" rx="9" fill="#111827" stroke="#f5a997" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="575" y="544" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f5a997">live speech · 24 kHz</text>
+  <path d="M855 430 L855 740" fill="none" stroke="#f3d17c" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f3d17c)"/>
+  <rect x="823.5" y="601" width="62.9" height="18" rx="9" fill="#111827" stroke="#f3d17c" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="855" y="614" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f3d17c">analyze</text>
+  <path d="M920 790 L960 790" fill="none" stroke="#f3d17c" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f3d17c)"/>
+  <path d="M1050 740 L1050 615" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)"/>
+  <path d="M1100 615 L1100 740" fill="none" stroke="#7dd3c0" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-7dd3c0)"/>
+  <path d="M1160 790 L1200 790" fill="none" stroke="#f3d17c" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f3d17c)"/>
+  <rect x="1141.8" y="806" width="76.3" height="18" rx="9" fill="#111827" stroke="#f3d17c" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="1180" y="819" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f3d17c">v3_markup</text>
+  <path d="M1350 790 L1420 790" fill="none" stroke="#f5a997" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f5a997)"/>
+  <path d="M1290 740 L1290 68 L850 68 L850 200" fill="none" stroke="#f3d17c" stroke-width="1.8" stroke-opacity="0.9" marker-end="url(#arrow-f3d17c)"/>
+  <rect x="1028.5" y="59" width="83.0" height="18" rx="9" fill="#111827" stroke="#f3d17c" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="1070" y="72" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f3d17c">clip paths</text>
+  <path d="M1525 740 L1525 45 L820 45 L820 200" fill="none" stroke="#f5a997" stroke-width="1.8" stroke-opacity="0.9" stroke-dasharray="7 6" marker-end="url(#arrow-f5a997)"/>
+  <rect x="1131.7" y="36" width="136.6" height="18" rx="9" fill="#111827" stroke="#f5a997" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="1200" y="49" text-anchor="middle" font-family="'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#f5a997">pre-rendered clips</text>
+  <rect x="48" y="906" width="11" height="11" rx="2.5" fill="#c4b5fd" opacity="0.85"/>
+  <rect x="66" y="906" width="11" height="11" rx="2.5" fill="#7dd3c0" opacity="0.85"/>
+  <rect x="84" y="906" width="11" height="11" rx="2.5" fill="#f5a997" opacity="0.85"/>
+  <rect x="102" y="906" width="11" height="11" rx="2.5" fill="#f5f5f7" opacity="0.85"/>
+  <rect x="150" y="905" width="14" height="14" rx="4" fill="#c4b5fd" fill-opacity="0.18" stroke="#c4b5fd" stroke-width="1.4"/>
+  <text x="172" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">Podium code</text>
+  <rect x="267" y="905" width="14" height="14" rx="4" fill="#7dd3c0" fill-opacity="0.18" stroke="#7dd3c0" stroke-width="1.4"/>
+  <text x="289" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">LiveKit  ·  Deepgram</text>
+  <rect x="447" y="905" width="14" height="14" rx="4" fill="#f5a997" fill-opacity="0.18" stroke="#f5a997" stroke-width="1.4"/>
+  <text x="469" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">Rime</text>
+  <rect x="515" y="905" width="14" height="14" rx="4" fill="#f3d17c" fill-opacity="0.18" stroke="#f3d17c" stroke-width="1.4"/>
+  <text x="537" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">analysis, offline</text>
+  <path d="M704 912h36" stroke="#f5f5f7" stroke-width="1.8" stroke-opacity="0.8" marker-end="url(#arrow-f5f5f7)"/>
+  <text x="750" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">live call path</text>
+  <path d="M854 912h36" stroke="#f5f5f7" stroke-width="1.8" stroke-opacity="0.8" stroke-dasharray="7 6" marker-end="url(#arrow-f5f5f7)"/>
+  <text x="900" y="916" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#f5f5f7" fill-opacity="0.78">offline, ahead of the call</text>
+  <text x="1632" y="916" text-anchor="end" font-family="'Segoe UI',ui-sans-serif,system-ui,sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="#c4b5fd" opacity="0.85">PODIUM  ·  MODULE WIRING</text>
+</svg>
