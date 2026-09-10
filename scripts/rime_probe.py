@@ -5,6 +5,7 @@ first-byte latency and silence gaps (to verify `<750>` pause markup renders),
 and checks word timestamps over /ws3. Clips go to evidence/probe/.
 
 Run:  .venv/Scripts/python.exe scripts/rime_probe.py
+Writes evidence/probe/*.wav. Needs: RIME_API_KEY (see .env.example).
 """
 from __future__ import annotations
 

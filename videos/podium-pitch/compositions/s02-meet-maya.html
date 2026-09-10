@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- head is metadata for the source file only; the runtime ignores it -->
+  </head>
+  <body>
+    <template>
+      <style>
+      /* =========================================================================
+         Podium pitch video — design tokens
+         Extracted from web/style.css (:root) and web/dashboard.css (.dash-root),
+         plus the orb.js STATES colour table. This file declares values only —
+         no selectors beyond :root, no layout, no animation. components.css and
+         every scene reference these custom properties instead of literal colour.
+         ========================================================================= */
+
+      #root {
+        /* ---- surfaces ---------------------------------------------------- */
+        --bg: #0b0d12;               /* canvas / page background (web/style.css --bg) */
+        --bg-rgb: 11, 13, 18;
+        --surface: #11151d;          /* card / pill / slide background (web/style.css --bg-2) */
+        --surface-rgb: 17, 21, 29;
+        --surface-2: #161c27;        /* nested surface (drill ring hole, tile hover) */
+        --surface-2-rgb: 22, 28, 39;
+
+        /* ---- ink (text) ---------------------------------------------------- */
+        --ink: #f3f5f9;               /* primary text */
+        --ink-rgb: 243, 245, 249;
+        --ink-2: rgba(var(--ink-rgb), 0.66);   /* soft text (web/style.css --ink-soft) */
+        --ink-3: rgba(var(--ink-rgb), 0.52);   /* faint text (web/style.css --ink-faint) */
+
+        /* ---- hairlines ------------------------------------------------------ */
+        --hair: rgba(var(--ink-rgb), 0.10);     /* web/style.css --hairline */
+        --hair-2: rgba(var(--ink-rgb), 0.16);   /* stronger hairline for borders that need to read at a distance */
+
+        /* ---- accents (web/style.css --accent / --accent-2 / --user / etc.) - */
+        --teal: #5ee1d0;              /* --accent */
+        --teal-rgb: 94, 225, 208;
+        --peri: #7b8cff;              /* --accent-2 */
+        --peri-rgb: 123, 140, 255;
+        --violet: #8f7bff;            /* --user (Maya / listening) */
+        --violet-rgb: 143, 123, 255;
+        --amber: #f5c451;             /* --wait / --warn */
+        --amber-rgb: 245, 196, 81;
+        --red: #ff5c5c;               /* --danger */
+        --red-rgb: 255, 92, 92;
+        --green: #5ee1a0;             /* --good */
+        --green-rgb: 94, 225, 160;
+        --mic: #3ddc84;               /* orb.js STATES.micLive colorA */
+        --mic-rgb: 61, 220, 132;
+        --think: #8a94a6;             /* --think / orb.js STATES.thinking colorA */
+        --think-rgb: 138, 148, 166;
+
+        /* dashboard two-voice ink (web/dashboard.css .dash-root --pd-you / --pd-coach) */
+        --pd-you: var(--red);
+        --pd-coach: var(--green);
+
+        /* ---- orb duotone per state (orb.js STATES table, colorA -> colorB) - */
+        --orb-idle-a: #5ee1d0;    /* idle + speaking share this pair */
+        --orb-idle-a-rgb: 94, 225, 208;
+        --orb-idle-b: #7b8cff;
+        --orb-idle-b-rgb: 123, 140, 255;
+        --orb-listen-a: #8f7bff;  /* listening */
+        --orb-listen-a-rgb: 143, 123, 255;
+        --orb-listen-b: #5ee1d0;
+        --orb-listen-b-rgb: 94, 225, 208;
+        --orb-mic-a: #3ddc84;     /* micLive */
+        --orb-mic-a-rgb: 61, 220, 132;
+        --orb-mic-b: #1f9d5a;
+        --orb-mic-b-rgb: 31, 157, 90;
+        --orb-wait-a: #f5c451;    /* waiting */
+        --orb-wait-a-rgb: 245, 196, 81;
+        --orb-wait-b: #ffdf8a;
+        --orb-wait-b-rgb: 255, 223, 138;
+        --orb-think-a: #8a94a6;   /* thinking */
+        --orb-think-a-rgb: 138, 148, 166;
+        --orb-think-b: #b6c0cf;
+        --orb-think-b-rgb: 182, 192, 207;
+        --orb-connect-a: #8a94a6; /* connecting / reconnecting */
+        --orb-connect-a-rgb: 138, 148, 166;
+        --orb-connect-b: #5b6472;
+        --orb-connect-b-rgb: 91, 100, 114;
+        --orb-off-a: #ff5c5c;     /* disconnected */
+        --orb-off-a-rgb: 255, 92, 92;
+        --orb-off-b: #7a1f1f;
+        --orb-off-b-rgb: 122, 31, 31;
+
+        /* ---- type ------------------------------------------------------------ */
+        --font: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+        --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+        --ls-tight: -0.01em;
+        --ls-normal: 0em;
+        --ls-wide: 0.06em;
+        --ls-wider: 0.12em;
+
+        /* ---- shape / elevation ------------------------------------------------ */
+        --radius: 18px;
+        --radius-sm: 10px;
+        --radius-pill: 999px;
+        --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--ink-rgb), 0.04);
+        --shadow-glow-teal: 0 0 24px rgba(var(--teal-rgb), 0.35);
+        --shadow-glow-amber: 0 0 18px rgba(var(--amber-rgb), 0.35);
+        --shadow-glow-red: 0 0 18px rgba(var(--red-rgb), 0.35);
+        --shadow-glow-green: 0 0 18px rgba(var(--green-rgb), 0.35);
+
+        /* ---- reference timing (informational — components.css never applies
+           these as `transition`/`animation`; scenes read them for GSAP eases) --- */
+        --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+        --dur: 260ms;
+        --dur-slow: 640ms;
+
+        /* ---- component metrics ------------------------------------------------ */
+        --statusbar-h: 56px;
+      }
+
+      /* =========================================================================
+         Podium pitch video — component kit
+         Faithful, class-based reproductions of web/style.css + web/dashboard.css
+         + the orb.js palette, resized for a fixed 1920x1080 canvas. Every colour
+         is a var() from tokens.css — nothing here is animated: no @keyframes, no
+         `animation:`, no `transition:`. Scenes drive motion with GSAP, tweening
+         transforms/opacity and the custom properties called out per component in
+         ui/README.md (--pct, --v, --pos, --pulse, --glow, --lvl, --orb-size, ...).
+         ========================================================================= */
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      /* =========================================================================
+         Status bar — web/style.css #statusbar + web/app.js renderStatusbar()
+         Segment order: conn · agent · provider(badge) · attention · phase ·
+         stage · mic · room, exactly as narrated in SCRIPT.md.
+         ========================================================================= */
+
+      .pd-statusbar {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        height: var(--statusbar-h);
+        padding: 0 40px;
+        font-family: var(--font-mono);
+        font-size: 20px;
+        letter-spacing: var(--ls-normal);
+        color: var(--ink-3);
+        background: linear-gradient(to top, var(--bg) 55%, transparent);
+        white-space: nowrap;
+      }
+
+      .pd-statusbar-seg {
+        color: var(--ink-3);
+      }
+
+      .pd-statusbar-seg.is-badge {
+        color: var(--teal);
+        letter-spacing: var(--ls-wide);
+        border-bottom: 2px solid var(--teal);
+        padding-bottom: 2px;
+      }
+
+      .pd-statusbar-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--ink-3);
+        flex: 0 0 auto;
+      }
+
+      .pd-level {
+        position: relative;
+        width: 96px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--hair);
+        overflow: hidden;
+      }
+
+      .pd-level-fill {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--teal);
+        transform-origin: left center;
+        transform: scaleX(var(--lvl, 0));
+      }
+
+      /* =========================================================================
+         Orb — orb.js palette (STATES table), rebuilt as 3 layered CSS gradients:
+         halo (outer blurred bloom) -> core (main gradient sphere, --pulse scale)
+         -> rim (fresnel highlight, screen blend). State classes swap --orb-a/-b.
+         ========================================================================= */
+
+      .pd-orb {
+        position: relative;
+        width: var(--orb-size, 220px);
+        height: var(--orb-size, 220px);
+        --pulse: 0;
+        --glow: 1;
+        --orb-a: var(--orb-idle-a);
+        --orb-b: var(--orb-idle-b);
+        --orb-a-rgb: var(--orb-idle-a-rgb);
+        --orb-b-rgb: var(--orb-idle-b-rgb);
+      }
+
+      .pd-orb.is-idle, .pd-orb.is-speaking {
+        --orb-a: var(--orb-idle-a);
+        --orb-b: var(--orb-idle-b);
+        --orb-a-rgb: var(--orb-idle-a-rgb);
+        --orb-b-rgb: var(--orb-idle-b-rgb);
+      }
+
+      .pd-orb.is-listening {
+        --orb-a: var(--orb-listen-a);
+        --orb-b: var(--orb-listen-b);
+        --orb-a-rgb: var(--orb-listen-a-rgb);
+        --orb-b-rgb: var(--orb-listen-b-rgb);
+      }
+
+      .pd-orb.is-mic-live {
+        --orb-a: var(--orb-mic-a);
+        --orb-b: var(--orb-mic-b);
+        --orb-a-rgb: var(--orb-mic-a-rgb);
+        --orb-b-rgb: var(--orb-mic-b-rgb);
+      }
+
+      .pd-orb.is-waiting {
+        --orb-a: var(--orb-wait-a);
+        --orb-b: var(--orb-wait-b);
+        --orb-a-rgb: var(--orb-wait-a-rgb);
+        --orb-b-rgb: var(--orb-wait-b-rgb);
+      }
+
+      .pd-orb.is-thinking {
+        --orb-a: var(--orb-think-a);
+        --orb-b: var(--orb-think-b);
+        --orb-a-rgb: var(--orb-think-a-rgb);
+        --orb-b-rgb: var(--orb-think-b-rgb);
+      }
+
+      .pd-orb.is-connecting {
+        --orb-a: var(--orb-connect-a);
+        --orb-b: var(--orb-connect-b);
+        --orb-a-rgb: var(--orb-connect-a-rgb);
+        --orb-b-rgb: var(--orb-connect-b-rgb);
+      }
+
+      .pd-orb.is-disconnected {
+        --orb-a: var(--orb-off-a);
+        --orb-b: var(--orb-off-b);
+        --orb-a-rgb: var(--orb-off-a-rgb);
+        --orb-b-rgb: var(--orb-off-b-rgb);
+      }
+
+      .pd-orb-halo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 220%;
+        height: 220%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        filter: blur(calc(var(--orb-size, 220px) * 0.12));
+        background: radial-gradient(
+          circle,
+          rgba(var(--orb-b-rgb), calc(0.22 * var(--glow, 1))) 0%,
+          rgba(var(--orb-b-rgb), 0) 70%
+        );
+        pointer-events: none;
+      }
+
+      .pd-orb-core {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        transform: scale(calc(1 + var(--pulse, 0) * 0.08));
+        background: radial-gradient(
+          circle at 38% 32%,
+          rgba(var(--orb-a-rgb), 0.95) 0%,
+          rgba(var(--orb-b-rgb), 0.55) 55%,
+          rgba(var(--orb-b-rgb), 0) 78%
+        );
+        box-shadow: 0 0 calc(var(--orb-size, 220px) * 0.18) rgba(var(--orb-a-rgb), calc(0.45 * var(--glow, 1)));
+      }
+
+      .pd-orb-rim {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        mix-blend-mode: screen;
+        opacity: 0.9;
+        background: radial-gradient(
+          circle at 64% 68%,
+          rgba(var(--orb-a-rgb), 0) 55%,
+          rgba(var(--orb-a-rgb), 0.5) 82%,
+          rgba(var(--orb-a-rgb), 0) 100%
+        );
+      }
+
+      /* =========================================================================
+         Caption — web/style.css #caption (.partial = interim grey)
+         ========================================================================= */
+
+      .pd-caption-label {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin: 0 0 6px;
+      }
+
+      .pd-caption {
+        margin: 0;
+        font-family: var(--font);
+        font-size: 44px;
+        font-weight: 500;
+        line-height: 1.15;
+        color: var(--ink);
+      }
+
+      .pd-caption.is-interim {
+        color: var(--ink-2);
+      }
+
+      .pd-caption.is-final {
+        color: var(--ink);
+      }
+
+      .pd-caption.is-narrator { color: var(--ink); }
+      .pd-caption.is-maya { color: var(--violet); }
+      .pd-caption.is-coach { color: var(--teal); }
+
+      /* =========================================================================
+         Choice chips — web/style.css #choices / .choice
+         ========================================================================= */
+
+      .pd-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .pd-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 22px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        background: rgba(var(--surface-rgb), 0.4);
+        color: var(--ink-2);
+        font-family: var(--font);
+        font-size: 20px;
+      }
+
+      .pd-chip.is-on {
+        border-color: var(--teal);
+        color: var(--ink);
+        background: rgba(var(--teal-rgb), 0.14);
+        box-shadow: var(--shadow-glow-teal);
+      }
+
+      /* =========================================================================
+         Slide card — web/style.css #view-present (#present-title/-bullets/-counter)
+         ========================================================================= */
+
+      .pd-slide {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        color: var(--ink);
+      }
+
+      .pd-slide-counter {
+        position: absolute;
+        top: 28px;
+        right: 32px;
+        font-family: var(--font-mono);
+        font-size: 18px;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-3);
+      }
+
+      .pd-slide-title {
+        margin: 0;
+        font-family: var(--font);
+        font-size: 40px;
+        font-weight: 600;
+        line-height: 1.1;
+        color: var(--ink);
+      }
+
+      .pd-slide-bullets {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .pd-slide-bullets li {
+        position: relative;
+        padding-left: 26px;
+        font-size: 22px;
+        line-height: 1.4;
+        color: var(--ink-2);
+      }
+
+      .pd-slide-bullets li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.6em;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--teal);
+      }
+
+      .pd-slide-hint {
+        font-size: 18px;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Clock — web/style.css #present-clock
+         ========================================================================= */
+
+      .pd-clock {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        font-size: 22px;
+        letter-spacing: var(--ls-normal);
+        color: var(--ink-3);
+      }
+
+      .pd-clock.is-warn {
+        color: var(--amber);
+      }
+
+      /* =========================================================================
+         Waveform strip — container for a live-drawn canvas (S04/S06/S07)
+         ========================================================================= */
+
+      .pd-wave {
+        position: relative;
+        width: 100%;
+        height: 96px;
+        border-bottom: 1px solid var(--hair);
+      }
+
+      .pd-wave-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* =========================================================================
+         Live meter — wpm / fillers / pauses (S04)
+         ========================================================================= */
+
+      .pd-meter {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 160px;
+      }
+
+      .pd-meter-label {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .pd-meter-value {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .pd-meter-num {
+        font-size: 44px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-meter-unit {
+        font-size: 20px;
+        color: var(--ink-3);
+      }
+
+      .pd-meter-band {
+        align-self: flex-start;
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        font-size: 16px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-2);
+      }
+
+      .pd-meter-band.is-fast {
+        color: var(--amber);
+        border-color: rgba(var(--amber-rgb), 0.5);
+      }
+
+      .pd-meter-band.is-good {
+        color: var(--green);
+        border-color: rgba(var(--green-rgb), 0.5);
+      }
+
+      .pd-meter-band.is-slow {
+        color: var(--peri);
+        border-color: rgba(var(--peri-rgb), 0.5);
+      }
+
+      /* =========================================================================
+         Scorecard — web/dashboard.css .pd-bars/.pd-bar (renamed container)
+         ========================================================================= */
+
+      .pd-scorecard {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 100%;
+      }
+
+      .pd-bar {
+        display: grid;
+        grid-template-columns: minmax(140px, 260px) 1fr auto;
+        align-items: center;
+        gap: 28px;
+        width: 100%;
+      }
+
+      .pd-bar-label {
+        font-size: 24px;
+        letter-spacing: 0.01em;
+        color: var(--ink-2);
+      }
+
+      .pd-bar-track {
+        position: relative;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--hair);
+      }
+
+      .pd-bar-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: calc(var(--v, 0) / 5 * 100%);
+        border-radius: 3px;
+        background: var(--teal);
+        opacity: 0.9;
+      }
+
+      .pd-bar-value {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .pd-bar-num {
+        font-size: 48px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-bar-max {
+        font-size: 20px;
+        color: var(--ink-3);
+      }
+
+      .pd-bar-delta {
+        margin-left: 6px;
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--teal);
+      }
+
+      .pd-bar-delta.is-flat {
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Metrics strip — web/dashboard.css .pd-metrics-strip/.pd-metric
+         ========================================================================= */
+
+      .pd-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        font-size: 19px;
+        letter-spacing: 0.01em;
+        color: var(--ink-3);
+      }
+
+      .pd-metric {
+        color: var(--ink-2);
+      }
+
+      .pd-metric-sep {
+        margin: 0 10px;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Improvement card — web/dashboard.css .pd-said/.pd-stage-line/.pd-pause-glyph
+         ========================================================================= */
+
+      .pd-imp {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        width: 100%;
+      }
+
+      .pd-imp-eyebrow {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .pd-line {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .pd-line-label {
+        font-size: 16px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+
+      .pd-line-body {
+        font-size: 22px;
+        line-height: 1.5;
+        max-width: 34ch;
+      }
+
+      .pd-line.is-you .pd-line-label,
+      .pd-line.is-you .pd-line-body {
+        color: var(--pd-you);
+      }
+
+      .pd-line.is-say .pd-line-label,
+      .pd-line.is-say .pd-line-body {
+        color: var(--pd-coach);
+      }
+
+      .pd-line.is-paced .pd-line-label {
+        color: var(--ink-3);
+      }
+
+      .pd-line.is-paced .pd-line-body {
+        color: var(--ink);
+      }
+
+      .pd-pause-glyph {
+        margin: 0 3px;
+        color: var(--teal);
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+
+      /* =========================================================================
+         Drill — word + confidence ring (S08), conic-gradient(--pct)
+         ========================================================================= */
+
+      .pd-drill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .pd-drill-word {
+        margin: 0;
+        font-size: 120px;
+        font-weight: 300;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-drill-ring {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: conic-gradient(var(--drill-color, var(--teal)) calc(var(--pct, 0) * 1%), var(--hair) 0);
+      }
+
+      .pd-drill-ring.is-ok { --drill-color: var(--teal); }
+      .pd-drill-ring.is-warn { --drill-color: var(--amber); }
+      .pd-drill-ring.is-fail { --drill-color: var(--red); }
+
+      .pd-drill-ring::before {
+        content: "";
+        position: absolute;
+        inset: 16px;
+        border-radius: 50%;
+        background: var(--bg);
+      }
+
+      .pd-drill-pct {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      /* =========================================================================
+         Skill tiles — grid tile for S09 (10 skills)
+         ========================================================================= */
+
+      .pd-tiles {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        width: 100%;
+      }
+
+      .pd-tile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 10px;
+        text-align: center;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius-sm);
+        color: var(--ink-2);
+        font-size: 20px;
+        letter-spacing: 0.01em;
+      }
+
+      .pd-tile.is-lit {
+        border-color: var(--teal);
+        color: var(--ink);
+        background: rgba(var(--teal-rgb), 0.1);
+        box-shadow: var(--shadow-glow-teal);
+      }
+
+      /* =========================================================================
+         Ladder — Novice -> Speaker -> Presenter -> TEDx (S09)
+         ========================================================================= */
+
+      .pd-ladder {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        padding-top: 40px;
+      }
+
+      .pd-ladder-line {
+        position: absolute;
+        left: 7px;
+        right: 7px;
+        top: 47px;
+        height: 1px;
+        background: var(--hair);
+        z-index: 0;
+      }
+
+      .pd-ladder-notch {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pd-ladder-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--hair-2);
+        border: 1px solid var(--hair-2);
+      }
+
+      .pd-ladder-notch.is-active .pd-ladder-dot,
+      .pd-ladder-notch.is-done .pd-ladder-dot {
+        background: var(--teal);
+        border-color: var(--teal);
+      }
+
+      .pd-ladder-label {
+        font-size: 18px;
+        color: var(--ink-3);
+      }
+
+      .pd-ladder-notch.is-active .pd-ladder-label {
+        color: var(--ink);
+      }
+
+      .pd-ladder-marker {
+        position: absolute;
+        top: 0;
+        left: calc(var(--pos, 0) / 3 * 100%);
+        transform: translateX(-50%);
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        background: var(--teal);
+        color: var(--bg);
+        font-size: 16px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* =========================================================================
+         Sparkline — container for an injected SVG/canvas trend line (S10)
+         ========================================================================= */
+
+      .pd-sparkline {
+        position: relative;
+        width: 100%;
+        height: 96px;
+        border-bottom: 1px solid var(--hair);
+      }
+
+      .pd-sparkline > svg,
+      .pd-sparkline > canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* =========================================================================
+         Statement — large impact typography (every scene's closing line)
+         ========================================================================= */
+
+      .pd-statement {
+        margin: 0;
+        max-width: 20ch;
+        font-family: var(--font);
+        font-size: 88px;
+        font-weight: 600;
+        line-height: 1.05;
+        letter-spacing: var(--ls-tight);
+        color: var(--ink);
+      }
+
+      .pd-statement-sub {
+        margin: 18px 0 0;
+        font-size: 22px;
+        color: var(--ink-2);
+      }
+
+      /* =========================================================================
+         Evidence chip — small mono citation pill (corner of scorecard/drill/etc.)
+         ========================================================================= */
+
+      .pd-evidence-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        background: rgba(var(--surface-rgb), 0.6);
+        font-family: var(--font-mono);
+        font-size: 17px;
+        letter-spacing: 0.01em;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Generic card surface
+         ========================================================================= */
+
+      .pd-card {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius);
+        padding: 40px;
+        box-shadow: var(--shadow-card);
+        color: var(--ink);
+      }
+
+      /* =========================================================================
+         Shared eyebrow utility (used inside pd-imp / pd-card / pd-evidence-chip)
+         ========================================================================= */
+
+      .pd-eyebrow {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+      </style>
+      <style>
+        #root {
+          position: relative;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: var(--bg);
+          font-family: var(--font);
+        }
+
+        #s02-bg {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(circle at 20% 46%, rgba(var(--teal-rgb), 0.13), transparent 33%),
+            radial-gradient(circle at 83% 42%, rgba(var(--peri-rgb), 0.12), transparent 35%),
+            var(--bg);
+          z-index: 0;
+        }
+
+        #s02-window {
+          position: absolute;
+          left: 56px;
+          top: 42px;
+          width: 1808px;
+          height: 996px;
+          overflow: hidden;
+          border: 1px solid rgba(var(--ink-rgb), 0.16);
+          border-radius: 24px;
+          background: var(--surface);
+          box-shadow: 0 46px 110px -28px rgba(0, 0, 0, 0.72);
+          z-index: 2;
+          opacity: 0;
+          transform-origin: 50% 50%;
+        }
+
+        #s02-titlebar {
+          position: relative;
+          height: 58px;
+          display: flex;
+          align-items: center;
+          padding: 0 20px;
+          border-bottom: 1px solid var(--hair);
+          background: #121720;
+          z-index: 8;
+        }
+
+        #s02-window-dots { display: flex; gap: 9px; }
+        .s02-window-dot { width: 11px; height: 11px; border-radius: 50%; opacity: 0.75; }
+        .s02-window-dot:nth-child(1) { background: #ff6d6d; }
+        .s02-window-dot:nth-child(2) { background: #f5c451; }
+        .s02-window-dot:nth-child(3) { background: #5ee1a0; }
+
+        #s02-address {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 300px;
+          justify-content: center;
+          padding: 9px 18px;
+          border: 1px solid var(--hair);
+          border-radius: var(--radius-pill);
+          background: rgba(var(--bg-rgb), 0.72);
+          color: var(--ink-3);
+          font: 500 15px/1 var(--font-mono);
+          letter-spacing: 0.03em;
+          transform: translate(-50%, -50%);
+        }
+
+        #s02-address-lock { color: var(--teal); font-size: 13px; }
+        #s02-window-live {
+          margin-left: auto;
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: var(--teal);
+          font: 500 14px/1 var(--font-mono);
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+        }
+        #s02-window-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 14px rgba(var(--teal-rgb), .7); }
+
+        #s02-viewport {
+          position: relative;
+          width: 100%;
+          height: 882px;
+          overflow: hidden;
+          background: var(--bg);
+        }
+
+        #s02-zoom-outer,
+        #s02-zoom-inner {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          transform-origin: 50% 50%;
+        }
+
+        #s02-stage {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          padding: 30px 76px;
+        }
+
+        #s02-orb-wrap {
+          flex: 0 0 520px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+        }
+
+        #s02-orb-canvas {
+          display: block;
+          width: 380px;
+          height: 380px;
+        }
+
+        #s02-right {
+          flex: 1;
+          position: relative;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          padding-left: 54px;
+        }
+
+        #s02-convo {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+        }
+
+        #s02-cap-label { margin: 0; }
+        #s02-cap-stack { position: relative; min-height: 212px; }
+        #s02-cap-m01,
+        #s02-cap-c01 { position: absolute; left: 0; top: 0; right: 42px; margin: 0; font-size: 40px; }
+        #s02-cap-c01 { opacity: 0; }
+        .s02-w { display: inline-block; opacity: 0; margin: 0 0.14em 0 0; }
+        #s02-chips-wrap.pd-chips { max-width: 720px; row-gap: 12px; }
+        #s02-chips-wrap .pd-chip { opacity: 0; background: rgba(var(--surface-rgb), .7); }
+
+        #s02-statement-wrap {
+          position: absolute;
+          inset: 0 36px 0 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 28px;
+          opacity: 0;
+        }
+
+        #s02-statement.pd-statement { max-width: 9.6ch; font-size: 74px; }
+        .s02-stmt-w { display: inline-block; opacity: 0; margin: 0 0.16em 0 0; }
+        #s02-narrator-steps { display: flex; flex-direction: column; gap: 13px; max-width: 720px; }
+        .s02-narrator-step {
+          display: grid;
+          grid-template-columns: 32px 1fr;
+          gap: 14px;
+          align-items: baseline;
+          font-size: 25px;
+          line-height: 1.3;
+          color: var(--ink-2);
+          opacity: 0;
+        }
+        .s02-narrator-num { color: var(--teal); font-family: var(--font-mono); font-size: 17px; }
+
+        #s02-statusbar {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 9;
+          height: 56px;
+          padding: 0 24px;
+          gap: 16px;
+          font-size: 15px;
+          border-top: 1px solid var(--hair);
+          background: #0d1118;
+        }
+        #s02-statusbar .pd-level { margin-left: auto; width: 84px; }
+
+        #s02-cursor {
+          position: absolute;
+          left: 1370px;
+          top: 98px;
+          width: 30px;
+          height: 38px;
+          z-index: 20;
+          color: var(--ink);
+          filter: drop-shadow(0 5px 6px rgba(0,0,0,.55));
+          opacity: 0;
+          pointer-events: none;
+          transform-origin: 5px 4px;
+        }
+        #s02-cursor svg { display: block; width: 100%; height: 100%; }
+        #s02-cursor-ripple {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 58px;
+          height: 58px;
+          border: 2px solid rgba(var(--teal-rgb), .72);
+          border-radius: 50%;
+          opacity: 0;
+          pointer-events: none;
+          transform-origin: 50% 50%;
+        }
+      </style>
+
+      <div id="root" data-composition-id="s02-meet-maya" data-width="1920" data-height="1080" data-duration="28.8">
+        <div id="s02-bg"></div>
+
+        <div id="s02-window">
+          <div id="s02-titlebar">
+            <div id="s02-window-dots"><span class="s02-window-dot"></span><span class="s02-window-dot"></span><span class="s02-window-dot"></span></div>
+            <div id="s02-address"><span id="s02-address-lock">◆</span><span>podium.local</span></div>
+            <div id="s02-window-live"><span id="s02-window-live-dot"></span><span>live session</span></div>
+          </div>
+
+          <div id="s02-viewport">
+            <div id="s02-zoom-outer"><div id="s02-zoom-inner">
+              <div id="s02-stage">
+                <div id="s02-orb-wrap"><canvas id="s02-orb-canvas" width="760" height="760"></canvas></div>
+
+                <div id="s02-right">
+                  <div id="s02-convo">
+                    <p class="pd-caption-label" id="s02-cap-label">Maya · live caption</p>
+                    <div id="s02-cap-stack">
+                      <p class="pd-caption is-interim" id="s02-cap-m01">
+                        <span class="s02-w" data-t="0.0">Um,</span><span class="s02-w" data-t="0.294">hi.</span><span class="s02-w" data-t="0.588">So...</span><span class="s02-w" data-t="1.029">I</span><span class="s02-w" data-t="1.177">have</span><span class="s02-w" data-t="1.544">to</span><span class="s02-w" data-t="1.765">give</span><span class="s02-w" data-t="2.132">a</span><span class="s02-w" data-t="2.28">talk</span><span class="s02-w" data-t="2.647">next</span><span class="s02-w" data-t="3.015">week?</span><span class="s02-w" data-t="3.456">About</span><span class="s02-w" data-t="3.897">smart</span><span class="s02-w" data-t="4.338">cities.</span><span class="s02-w" data-t="4.927">It's</span><span class="s02-w" data-t="5.294">like</span><span class="s02-w" data-t="5.662">five</span><span class="s02-w" data-t="6.03">minutes,</span><span class="s02-w" data-t="6.692">and</span><span class="s02-w" data-t="6.986">I've,</span><span class="s02-w" data-t="7.427">uh,</span><span class="s02-w" data-t="7.721">never</span><span class="s02-w" data-t="8.162">really</span><span class="s02-w" data-t="8.677">done</span><span class="s02-w" data-t="9.045">this</span><span class="s02-w" data-t="9.412">before.</span>
+                      </p>
+                      <p class="pd-caption is-interim" id="s02-cap-c01">
+                        <span class="s02-w" data-t="0.0">Smart</span><span class="s02-w" data-t="0.327">cities.</span><span class="s02-w" data-t="0.763">Good</span><span class="s02-w" data-t="1.035">topic.</span><span class="s02-w" data-t="1.716">Let's</span><span class="s02-w" data-t="2.043">keep</span><span class="s02-w" data-t="2.316">it</span><span class="s02-w" data-t="2.479">at</span><span class="s02-w" id="s02-c01-novice" data-t="2.642">Novice</span><span class="s02-w" data-t="3.024">level,</span><span class="s02-w" id="s02-c01-five" data-t="3.405">five</span><span class="s02-w" data-t="3.677">minutes.</span><span class="s02-w" data-t="4.168">I'll</span><span class="s02-w" data-t="4.44">write</span><span class="s02-w" data-t="4.767">you</span><span class="s02-w" data-t="4.985">three</span><span class="s02-w" data-t="5.312">slides.</span><span class="s02-w" data-t="5.747">You'll</span><span class="s02-w" data-t="6.129">get</span><span class="s02-w" data-t="6.347">sixty</span><span class="s02-w" data-t="6.673">seconds</span><span class="s02-w" data-t="7.109">to</span><span class="s02-w" data-t="7.273">prep</span><span class="s02-w" data-t="7.545">before</span><span class="s02-w" data-t="7.926">you</span><span class="s02-w" data-t="8.144">present.</span>
+                      </p>
+                    </div>
+                    <div id="s02-chips-wrap" class="pd-chips">
+                      <button class="pd-chip" id="s02-chip-novice">Novice</button><button class="pd-chip" id="s02-chip-speaker">Speaker</button><button class="pd-chip" id="s02-chip-presenter">Presenter</button><button class="pd-chip" id="s02-chip-tedx">TEDx</button><button class="pd-chip" id="s02-chip-3min">3 min</button><button class="pd-chip" id="s02-chip-5min">5 min</button><button class="pd-chip" id="s02-chip-8min">8 min</button>
+                    </div>
+                  </div>
+
+                  <div id="s02-statement-wrap">
+                    <p class="pd-statement" id="s02-statement"><span class="s02-stmt-w">No</span> <span class="s02-stmt-w">form.</span> <span class="s02-stmt-w">No</span> <span class="s02-stmt-w">setup.</span> <span class="s02-stmt-w">Just</span> <span class="s02-stmt-w">talk.</span></p>
+                    <div id="s02-narrator-steps">
+                      <div class="s02-narrator-step" id="s02-narrator-1"><span class="s02-narrator-num">01</span><span>Say what you want to talk about.</span></div>
+                      <div class="s02-narrator-step" id="s02-narrator-2"><span class="s02-narrator-num">02</span><span>Podium picks up your level + length from your own words.</span></div>
+                      <div class="s02-narrator-step" id="s02-narrator-3"><span class="s02-narrator-num">03</span><span>Then it writes the slides.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="pd-statusbar" id="s02-statusbar">
+            <span class="pd-statusbar-seg">connected</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg">agent present</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg is-badge">rime · mistv3 · thunder</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg" id="s02-sb-attention">listening</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg">setup</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg" id="s02-sb-mic">mic live · hold space</span><span class="pd-statusbar-dot"></span><span class="pd-statusbar-seg">podium-fqamkqva</span><div class="pd-level" id="s02-level" style="--lvl:0.3"><div class="pd-level-fill"></div></div>
+          </div>
+        </div>
+
+        <div id="s02-cursor"><svg viewBox="0 0 30 38" aria-hidden="true"><path d="M3 2.5v28.4l7.3-6.5 5.2 10.3 5.2-2.7-5.2-10h10.2z" fill="currentColor" stroke="#0b0d12" stroke-width="2.2" stroke-linejoin="round" /></svg><div id="s02-cursor-ripple"></div></div>
+
+        <audio id="s02-m01" src="public/vo/m01.wav" data-start="0.5" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+        <audio id="s02-c01" src="public/vo/c01.wav" data-start="10.727" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+        <audio id="s02-n03" src="public/vo/n03.wav" data-start="20.007" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+
+        <audio id="s02-sfx-pop1" src="public/sfx/pop.mp3" data-start="10.5" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop2" src="public/sfx/pop.mp3" data-start="10.61" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop3" src="public/sfx/pop.mp3" data-start="10.72" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop4" src="public/sfx/pop.mp3" data-start="10.83" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop5" src="public/sfx/pop.mp3" data-start="10.94" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop6" src="public/sfx/pop.mp3" data-start="11.05" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-pop7" src="public/sfx/pop.mp3" data-start="11.16" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-click1" src="public/sfx/click.mp3" data-start="13.369" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-click2" src="public/sfx/click.mp3" data-start="14.132" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s02-sfx-notification" src="public/sfx/notification.mp3" data-start="10.727" data-track-index="12" data-volume="0.4" data-audio-group="sfx"></audio>
+      </div>
+
+      <script>
+
+        const tl = gsap.timeline({ paused: true });
+        const DURATION = 28.8;
+        const M01_START = 0.5;
+        const C01_START = 10.727;
+        const N03_START = 20.007;
+
+        const mWords = Array.from(document.querySelectorAll("#s02-cap-m01 .s02-w"));
+        const cWords = Array.from(document.querySelectorAll("#s02-cap-c01 .s02-w"));
+        const mStarts = mWords.map((word) => M01_START + Number(word.dataset.t));
+        const cStarts = cWords.map((word) => C01_START + Number(word.dataset.t));
+
+        // Word-synchronous deterministic level: a short attack + decay at every
+        // existing caption timestamp. This drives both the real shader orb and
+        // the real statusbar meter without reading live audio during rendering.
+        function wordLevel(time, starts) {
+          let level = 0;
+          for (let i = 0; i < starts.length; i++) {
+            const d = time - starts[i];
+            if (d < 0 || d > 0.34) continue;
+            const envelope = d < 0.055 ? d / 0.055 : 1 - (d - 0.055) / 0.285;
+            const accent = 0.68 + 0.25 * Math.sin(i * 2.17 + 0.4);
+            level = Math.max(level, envelope * accent);
+          }
+          return Math.max(0, Math.min(1, level));
+        }
+
+        function orbState(time) {
+          if (time < M01_START) return "listening";
+          if (time < 10.55) return "micLive";
+          if (time < C01_START) return "thinking";
+          if (time < 19.307) return "speaking";
+          return "idle";
+        }
+
+        function orbLevel(time, state) {
+          if (state === "micLive") return wordLevel(time, mStarts);
+          if (state === "speaking") return wordLevel(time, cStarts);
+          return 0;
+        }
+
+        const orbCanvas = document.getElementById("s02-orb-canvas");
+        const orb = window.PodiumOrb.mount(orbCanvas, {
+          width: 760,
+          height: 760,
+          pulses: [10.727],
+        });
+        const levelEl = document.getElementById("s02-level");
+        const orbClock = { t: 0 };
+        tl.to(orbClock, {
+          t: DURATION,
+          duration: DURATION,
+          ease: "none",
+          onUpdate: () => {
+            const t = orbClock.t;
+            const state = orbState(t);
+            const level = orbLevel(t, state);
+            orb.render(t, state, level);
+            levelEl.style.setProperty("--lvl", level.toFixed(3));
+          },
+        }, 0);
+        orb.render(0, "listening", 0);
+
+        // Match-cut handoff from S01's final orb pose into a polished browser
+        // surface. The orb starts from S01's overlap position/size then slides
+        // into its exact Podium hero slot as the browser shell resolves around it.
+        tl.fromTo("#s02-window", { x: 92, scale: 0.985, opacity: 0 }, { x: 0, scale: 1, opacity: 1, duration: 0.58, ease: "power3.out" }, 0);
+        tl.fromTo("#s02-orb-wrap", { x: 116, scale: 0.94, opacity: 0 }, { x: 0, scale: 1, opacity: 1, duration: 0.56, ease: "power3.inOut" }, 0.02);
+        tl.fromTo("#s02-titlebar", { opacity: 0 }, { opacity: 1, duration: 0.28, ease: "power2.out" }, 0.22);
+        tl.fromTo("#s02-statusbar", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.34, ease: "power3.out" }, 0.28);
+
+        const capLabel = document.getElementById("s02-cap-label");
+        tl.set(capLabel, { opacity: 0 }, 0);
+        tl.to(capLabel, { opacity: 1, duration: 0.3 }, 0.3);
+        tl.set(capLabel, { textContent: "Coach · live caption" }, 10.627);
+
+        function typewriter(words, base) {
+          words.forEach((word) => {
+            const t = base + Number(word.dataset.t);
+            tl.set(word, { opacity: 1, y: 6 }, t);
+            tl.to(word, { y: 0, duration: 0.12, ease: "power2.out" }, t);
+          });
+        }
+
+        typewriter(mWords, M01_START);
+        tl.set("#s02-cap-m01", { className: "pd-caption is-final is-maya" }, M01_START + 9.712);
+        tl.to("#s02-cap-m01", { autoAlpha: 0, duration: 0.25 }, 10.627);
+        tl.fromTo("#s02-cap-c01", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, 10.627);
+        typewriter(cWords, C01_START);
+        tl.set("#s02-cap-c01", { className: "pd-caption is-final is-coach" }, C01_START + 8.444);
+
+        const chipIds = [
+          "s02-chip-novice", "s02-chip-speaker", "s02-chip-presenter",
+          "s02-chip-tedx", "s02-chip-3min", "s02-chip-5min", "s02-chip-8min",
+        ];
+        chipIds.forEach((id, i) => {
+          const t = 10.5 + i * 0.11;
+          tl.fromTo("#" + id, { opacity: 0, scale: 0.7, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "back.out(2.2)" }, t);
+        });
+        tl.set("#s02-chip-novice", { className: "pd-chip is-on" }, 13.369);
+        tl.set("#s02-chip-5min", { className: "pd-chip is-on" }, 14.132);
+
+        const sbAttn = document.getElementById("s02-sb-attention");
+        const sbMic = document.getElementById("s02-sb-mic");
+        tl.set(sbMic, { textContent: "mic live · hold space" }, 0.3);
+        tl.set(sbAttn, { textContent: "listening" }, 0.3);
+        tl.set(sbAttn, { textContent: "speaking" }, C01_START);
+        tl.set(sbMic, { textContent: "mic muted · hold space to talk" }, C01_START);
+        tl.set(sbAttn, { textContent: "idle" }, 19.307);
+
+        // Sparse launch-style target zoom: one restrained punch toward the live
+        // choice row, then a clean pullback before the narrator statement.
+        tl.to("#s02-zoom-outer", { scale: 1.22, duration: 0.72, ease: "power3.inOut" }, 12.55);
+        tl.to("#s02-zoom-inner", { x: -105, y: -136, duration: 0.72, ease: "power3.inOut" }, 12.55);
+        tl.to("#s02-zoom-outer", { scale: 1, duration: 0.72, ease: "power3.inOut" }, 15.35);
+        tl.to("#s02-zoom-inner", { x: 0, y: 0, duration: 0.72, ease: "power3.inOut" }, 15.35);
+
+        // Visible browser cursor: a brief focus click, then it guides the eye to
+        // the two voice-selected chips without pretending to trigger them.
+        tl.to("#s02-cursor", { opacity: 1, duration: 0.18 }, 0.68);
+        tl.to("#s02-cursor", { x: -290, y: 20, duration: 0.58, ease: "power3.out" }, 0.78);
+        tl.to("#s02-cursor", { scale: 0.84, duration: 0.08, ease: "power2.in", yoyo: true, repeat: 1 }, 1.4);
+        tl.fromTo("#s02-cursor-ripple", { x: -24, y: -24, scale: 0, opacity: 0.75 }, { x: -24, y: -24, scale: 2.8, opacity: 0, duration: 0.62, ease: "power2.out", immediateRender: false }, 1.4);
+        tl.to("#s02-cursor", { x: -640, y: 540, duration: 0.82, ease: "power3.inOut" }, 12.32);
+        tl.to("#s02-cursor", { x: -488, y: 596, duration: 0.58, ease: "power3.inOut" }, 13.61);
+        tl.to("#s02-cursor", { opacity: 0, duration: 0.24, ease: "power2.out" }, 15.72);
+
+        // Narrator payoff: preserve the requested slogan, then keep every spoken
+        // product concept visibly on screen as the Rime narration says it.
+        tl.to("#s02-convo", { autoAlpha: 0, duration: 0.3, ease: "power2.out" }, 19.6);
+        tl.to("#s02-statement-wrap", { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, N03_START);
+        document.querySelectorAll("#s02-statement .s02-stmt-w").forEach((word, i) => {
+          const t = N03_START + i * 0.08;
+          tl.set(word, { opacity: 1, y: 16 }, t);
+          tl.to(word, { y: 0, duration: 0.22, ease: "power3.out" }, t);
+        });
+        tl.fromTo("#s02-narrator-1", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.32, ease: "power3.out" }, 21.65);
+        tl.fromTo("#s02-narrator-2", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.32, ease: "power3.out" }, 23.58);
+        tl.fromTo("#s02-narrator-3", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.32, ease: "power3.out" }, 26.42);
+
+        // Finite ambient breaths keep the live browser plate subtly alive.
+        tl.to("#s02-bg", { scale: 1.018, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: 7 }, 0.6);
+        tl.to("#s02-window-live-dot", { scale: 1.35, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 16 }, 0.55);
+
+        window.__timelines["s02-meet-maya"] = tl;
+      </script>
+    </template>
+  </body>
+</html>

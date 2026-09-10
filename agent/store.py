@@ -29,11 +29,13 @@ class Store:
     """One instance per live session. Not process-shared; a single agent job owns it."""
 
     def __init__(self, session_id: str | None = None, root: Path = SESSIONS_ROOT) -> None:
+        """Create the session directory and write an empty `session.json` (no
+        revisions yet) immediately, so a crash before the first real write still
+        leaves a session directory a client/evidence script can find."""
         self.session_id = session_id or f"s_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         self.dir = root / self.session_id
         self.clips_dir = self.dir / "clips"
         self.clips_dir.mkdir(parents=True, exist_ok=True)
-
         self._t0 = time.monotonic()
         self._lock = Lock()
         self._session_path = self.dir / "session.json"
@@ -59,20 +61,26 @@ class Store:
             tmp.replace(self._session_path)
 
     def set_config(self, **cfg: Any) -> None:
+        """Merge into `session.json["config"]` (CONTRACTS.md §1) and persist."""
         self.session["config"].update(cfg)
         self.save()
 
     def set_deck(self, deck: dict[str, Any]) -> None:
+        """Replace `session.json["deck"]` (§1) and persist; `None` clears it (new_talk)."""
         self.session["deck"] = deck
         self.save()
 
     def set_graph(self, graph: dict[str, Any]) -> None:
+        """Replace `session.json["graph"]` with `SessionGraph.to_json()` (§8) and persist."""
         self.session["graph"] = graph
         self.save()
 
     # -- timeline.jsonl -----------------------------------------------------
 
     def log(self, ev: str, **fields: Any) -> None:
+        """Append one `{"t", "ev", ...fields}` object to `timeline.jsonl` (§4).
+        Append-only: callers never rewrite or reorder prior lines, so the file
+        stays a faithful record even if the process crashes mid-session."""
         entry = {"t": round(time.monotonic() - self._t0, 3), "ev": ev, **fields}
         line = json.dumps(entry)
         with self._lock:
@@ -88,6 +96,8 @@ class Store:
 
     @property
     def current_revision(self) -> int:
+        """The fence value: the highest revision number ever created (see the
+        block comment above for why `superseded` doesn't affect this)."""
         return self._revision_counter
 
     @property
@@ -98,6 +108,10 @@ class Store:
         return self._t0
 
     def new_revision(self, scope: dict[str, Any] | str = "full") -> dict[str, Any]:
+        """Open the next revision (§1 `revisions[]` entry), bump the fence, and log
+        a `"revision"` timeline event. `scope` is `"full"` or `{"slide": n}` for a
+        single-slide rerecord; callers must not reuse a revision number once this
+        returns, since `current_revision` has already moved past it."""
         self._revision_counter += 1
         n = self._revision_counter
         rev = {
@@ -118,6 +132,9 @@ class Store:
         return rev
 
     def supersede(self, revision: int) -> None:
+        """Flag `revision` as superseded (a rerecord replaced it). Does not move
+        `current_revision` -- a caller that wants the fence to also advance must
+        separately call `new_revision`. Raises `KeyError` if `revision` is unknown."""
         for rev in self.session["revisions"]:
             if rev["revision"] == revision:
                 rev["superseded"] = True
@@ -127,6 +144,9 @@ class Store:
         self.save()
 
     def update_revision(self, revision: int, **fields: Any) -> dict[str, Any]:
+        """Merge `fields` into the named revision's dict (e.g. `metrics`,
+        `judgment`, `transcript`) and persist. Raises `KeyError` if `revision`
+        is unknown."""
         for rev in self.session["revisions"]:
             if rev["revision"] == revision:
                 rev.update(fields)
@@ -135,6 +155,7 @@ class Store:
         raise KeyError(f"no such revision: {revision}")
 
     def get_revision(self, revision: int) -> dict[str, Any]:
+        """Look up a revision dict by number. Raises `KeyError` if unknown."""
         for rev in self.session["revisions"]:
             if rev["revision"] == revision:
                 return rev
@@ -143,9 +164,12 @@ class Store:
     # -- paths -----------------------------------------------------
 
     def wav_path(self, revision: int) -> Path:
+        """Where that revision's full-talk recording lives (§1 `presentation_r<N>.wav`)."""
         return self.dir / f"presentation_r{revision}.wav"
 
     def clip_path(self, improvement_id: str, variant: str) -> Path:
+        """Where a practice/contrast clip for `improvement_id` lives; `variant`
+        is one of `_VARIANT_LABEL`'s keys (§1 `clips/` naming)."""
         return self.clips_dir / f"{improvement_id}_{variant}_{_VARIANT_LABEL[variant]}.wav"
 
 

@@ -1,0 +1,29 @@
+# Podium runtime dependencies (Python 3.12).
+#
+#   python -m venv .venv
+#   .venv\Scripts\python.exe -m pip install -r requirements.txt      # Windows
+#   .venv/bin/python -m pip install -r requirements.txt              # macOS / Linux
+#
+# Versions are the ones the shipped session and the evidence numbers in
+# RIME_EVIDENCE.md were produced with. Anything newer in the livekit-agents 1.8
+# line should work, but the pins are what has actually been run end to end.
+
+# Agent runtime: worker, job context, AgentSession, data channel, audio frames.
+livekit-agents==1.8.0
+
+# Speech plugins. Rime is the only TTS (live coach voice over WebSocket);
+# Deepgram nova-3 is the only STT (word timestamps + filler words);
+# Silero supplies the VAD that the presentation turn policy overrides.
+livekit-plugins-rime==1.8.0
+livekit-plugins-deepgram==1.8.0
+livekit-plugins-silero==1.8.0
+
+# Coach and judge LLM calls go through LiveKit Inference, which the agents SDK
+# reaches through its OpenAI-compatible plugin -- no separate provider key.
+livekit-plugins-openai==1.8.0
+
+# Metrics, WAV handling and the offline Rime REST renders (analysis/*).
+numpy==2.5.3
+
+# .env loading for the agent worker, the dev server and every script.
+python-dotenv==1.2.3

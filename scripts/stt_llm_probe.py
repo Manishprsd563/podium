@@ -1,9 +1,15 @@
 """Gate 0: Deepgram keeps fillers with word timestamps; LLM endpoint returns strict JSON.
 
 Feeds the Rime-rendered filler clip (from rime_probe.py) to Deepgram prerecorded
-with filler_words=true, then asks the LLM for a JSON object.
+with filler_words=true, then asks the LLM for a JSON object. The LLM half
+(llm()) targets the opencode-go gateway via agent.llm_config.API_KEY/BASE_URL/
+MODEL, which GATE0.md records as REJECTED in favor of LiveKit Inference and
+which agent/llm_config.py no longer exports; it now prints a clear message
+instead of crashing. deepgram() is unaffected and still exercises the shipped
+Deepgram config.
 
 Run after rime_probe.py:  .venv/Scripts/python.exe scripts/stt_llm_probe.py
+Writes: nothing (stdout only). Needs: DEEPGRAM_API_KEY (see .env.example).
 """
 from __future__ import annotations
 
@@ -45,7 +51,14 @@ def deepgram() -> None:
 
 def llm() -> None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from agent.llm_config import API_KEY, BASE_URL, MODEL, extra_headers
+    try:
+        from agent.llm_config import API_KEY, BASE_URL, MODEL, extra_headers
+    except ImportError:
+        print("agent.llm_config no longer exports API_KEY/BASE_URL/MODEL/extra_headers -- "
+              "this probe targeted the opencode-go gateway, which GATE0.md records as "
+              "rejected in favor of LiveKit Inference. See scripts/inference_probe.py "
+              "and scripts/judge_json_probe.py for the current LLM checks.")
+        return
 
     if not API_KEY or API_KEY.startswith("your_"):
         print("OPENAI_API_KEY missing"); return

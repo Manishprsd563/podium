@@ -23,7 +23,9 @@ import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()
-RIME_KEY = os.environ["RIME_API_KEY"]
+RIME_KEY = os.environ.get("RIME_API_KEY", "")
+if not RIME_KEY:
+    raise SystemExit("RIME_API_KEY missing -- copy .env.example to .env and fill it in")
 DG_KEY = os.environ.get("DEEPGRAM_API_KEY", "")
 OUT = Path("evidence/e1")
 OUT.mkdir(parents=True, exist_ok=True)

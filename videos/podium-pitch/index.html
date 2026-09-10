@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="ui/vendor/gsap.min.js"></script>
+    <script src="ui/vendor/three.min.js"></script>
+    <script src="ui/podium-orb.js"></script>
+    <link rel="stylesheet" href="ui/tokens.css" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg, #0b0d12); }
+      body { font-family: var(--font, system-ui, sans-serif); }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg, #0b0d12); }
+      .host { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform, opacity, clip-path; }
+      #wipe-block { position: absolute; top: 0; left: -1920px; width: 1920px; height: 1080px; background: var(--bg, #0b0d12); z-index: 50; }
+      #wipe-line { position: absolute; top: 0; right: -2px; width: 4px; height: 1080px; background: var(--teal, #4fd1c5); opacity: 0; box-shadow: 0 0 24px var(--teal, #4fd1c5); }
+      #flash { position: absolute; inset: 0; background: var(--ink, #fff); opacity: 0; z-index: 60; }
+      #grain { position: absolute; inset: 0; z-index: 70; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+        background-image: radial-gradient(rgba(255,255,255,0.35) 0.6px, transparent 0.7px); background-size: 3px 3px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="root" data-width="1920" data-height="1080" data-start="0" data-duration="258.1">
+      <div id="el-s01" class="clip host" data-composition-id="s01-cold-open"
+           data-composition-src="compositions/s01-cold-open.html" data-start="0.0" data-duration="12.8"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s02" class="clip host" data-composition-id="s02-meet-maya"
+           data-composition-src="compositions/s02-meet-maya.html" data-start="12.3" data-duration="28.8"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s03" class="clip host" data-composition-id="s03-deck"
+           data-composition-src="compositions/s03-deck.html" data-start="40.65" data-duration="10.2"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s04" class="clip host" data-composition-id="s04-session-one"
+           data-composition-src="compositions/s04-session-one.html" data-start="50.35" data-duration="38.5"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s05" class="clip host" data-composition-id="s05-measured"
+           data-composition-src="compositions/s05-measured.html" data-start="88.45" data-duration="21.0"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s06" class="clip host" data-composition-id="s06-contrast"
+           data-composition-src="compositions/s06-contrast.html" data-start="108.95" data-duration="41.2"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s07" class="clip host" data-composition-id="s07-inside-the-call"
+           data-composition-src="compositions/s07-inside-the-call.html" data-start="149.75" data-duration="20.0"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s08" class="clip host" data-composition-id="s08-drill-failure"
+           data-composition-src="compositions/s08-drill-failure.html" data-start="169.3" data-duration="37.0"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s09" class="clip host" data-composition-id="s09-ten-skills"
+           data-composition-src="compositions/s09-ten-skills.html" data-start="205.8" data-duration="10.7"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s10" class="clip host" data-composition-id="s10-delta"
+           data-composition-src="compositions/s10-delta.html" data-start="216.05" data-duration="21.3"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s11" class="clip host" data-composition-id="s11-provider"
+           data-composition-src="compositions/s11-provider.html" data-start="236.95" data-duration="14.8"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s12" class="clip host" data-composition-id="s12-close"
+           data-composition-src="compositions/s12-close.html" data-start="251.5" data-duration="6.6"
+           data-track-index="1" data-width="1920" data-height="1080"></div>
+
+
+      <div id="wipe-block" data-track-index="49"><div id="wipe-line"></div></div>
+      <div id="flash" data-track-index="51"></div>
+      <div id="grain" data-track-index="52"></div>
+
+      <hf-audio-group id="voice" data-label="Voices" data-volume="1"></hf-audio-group>
+      <hf-audio-group id="sfx" data-label="SFX" data-volume="0.9"></hf-audio-group>
+
+      <audio id="bed" src="public/music/bed_film.wav" data-start="0" data-duration="258.1" data-track-index="10"
+        data-audio-group="music" data-volume="1"
+        data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0},{&quot;t&quot;:1.2,&quot;v&quot;:1.0},{&quot;t&quot;:1.21,&quot;v&quot;:1.0},{&quot;t&quot;:1.22,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:11.901,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:12.501,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:12.62,&quot;v&quot;:1.0},{&quot;t&quot;:12.8,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:31.707,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:32.307,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:32.317,&quot;v&quot;:1.0},{&quot;t&quot;:32.327,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:40.441,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:41.041,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:41.050999999999995,&quot;v&quot;:1.0},{&quot;t&quot;:41.06099999999999,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:49.474,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:50.074,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:50.77,&quot;v&quot;:1.0},{&quot;t&quot;:50.95,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:73.343,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:73.943,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:73.953,&quot;v&quot;:1.0},{&quot;t&quot;:73.993,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:87.723,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:88.323,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:89.57,&quot;v&quot;:1.0},{&quot;t&quot;:89.75,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:99.324,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:99.924,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:99.93400000000001,&quot;v&quot;:1.0},{&quot;t&quot;:99.94400000000002,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:135.022,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:135.622,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:135.632,&quot;v&quot;:1.0},{&quot;t&quot;:135.642,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:149.48,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:150.08,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:150.09,&quot;v&quot;:1.0},{&quot;t&quot;:150.25,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:168.47,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:169.07,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:169.42,&quot;v&quot;:1.0},{&quot;t&quot;:169.6,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:186.651,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:187.251,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:187.261,&quot;v&quot;:1.0},{&quot;t&quot;:187.271,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:205.474,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:206.074,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:206.084,&quot;v&quot;:1.0},{&quot;t&quot;:206.2,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:215.901,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:216.501,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:216.511,&quot;v&quot;:1.0},{&quot;t&quot;:216.55,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:227.063,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:227.663,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:227.673,&quot;v&quot;:1.0},{&quot;t&quot;:227.713,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:236.613,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:237.213,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:237.27,&quot;v&quot;:1.0},{&quot;t&quot;:237.45,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:251.122,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:251.722,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:251.82,&quot;v&quot;:1.0},{&quot;t&quot;:252.0,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:256.698,&quot;v&quot;:0.35481338923357547},{&quot;t&quot;:257.298,&quot;v&quot;:1.0,&quot;curve&quot;:0.3},{&quot;t&quot;:257.308,&quot;v&quot;:1.0},{&quot;t&quot;:258.1,&quot;v&quot;:0}]}]}"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var B = [{"kind": "zoom", "out": "#el-s01", "in": "#el-s02", "t": 12.3, "d": 0.5}, {"kind": "slice", "out": "#el-s02", "in": "#el-s03", "t": 40.65, "d": 0.45}, {"kind": "zoom", "out": "#el-s03", "in": "#el-s04", "t": 50.35, "d": 0.5}, {"kind": "wipe", "out": "#el-s04", "in": "#el-s05", "t": 88.45, "d": 0.4}, {"kind": "zoom", "out": "#el-s05", "in": "#el-s06", "t": 108.95, "d": 0.5}, {"kind": "wipe", "out": "#el-s06", "in": "#el-s07", "t": 149.75, "d": 0.4}, {"kind": "slice", "out": "#el-s07", "in": "#el-s08", "t": 169.3, "d": 0.45}, {"kind": "zoom", "out": "#el-s08", "in": "#el-s09", "t": 205.8, "d": 0.5}, {"kind": "slice", "out": "#el-s09", "in": "#el-s10", "t": 216.05, "d": 0.45}, {"kind": "wipe", "out": "#el-s10", "in": "#el-s11", "t": 236.95, "d": 0.4}, {"kind": "flash", "out": "#el-s11", "in": "#el-s12", "t": 251.5, "d": 0.25}];
+
+      B.forEach(function (b) {
+        var t = b.t, d = b.d;
+        if (b.kind === "zoom") {
+          tl.fromTo(b.out, { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.06, duration: d, ease: "power2.in" }, t);
+          tl.fromTo(b.in, { opacity: 0, scale: 0.965 }, { opacity: 1, scale: 1, duration: d, ease: "power2.out" }, t);
+        } else if (b.kind === "slice") {
+          tl.set(b.in, { opacity: 1, clipPath: "inset(0 0 0 100%)" }, t - 0.001);
+          tl.to(b.in, { clipPath: "inset(0 0 0 0%)", duration: d, ease: "power3.inOut" }, t);
+          tl.to(b.out, { x: -140, opacity: 0.6, duration: d, ease: "power3.inOut" }, t);
+          tl.set(b.out, { opacity: 0 }, t + d);
+        } else if (b.kind === "wipe") {
+          tl.set("#wipe-block", { x: 0 }, t - 0.001);
+          tl.set("#wipe-line", { opacity: 0 }, t - 0.001);
+          tl.to("#wipe-block", { x: 1920, duration: d / 2, ease: "power3.inOut" }, t);
+          tl.to("#wipe-line", { opacity: 1, duration: 0.08, ease: "power2.out" }, t);
+          tl.set(b.out, { opacity: 0 }, t + d / 2);
+          tl.set(b.in, { opacity: 1 }, t + d / 2);
+          tl.to("#wipe-line", { opacity: 0, duration: 0.08, ease: "power1.in" }, t + d / 2);
+          tl.to("#wipe-block", { x: 3840, duration: d / 2, ease: "power3.inOut" }, t + d / 2);
+        } else if (b.kind === "flash") {
+          tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.85, duration: d * 0.35, ease: "power2.in" }, t);
+          tl.set(b.out, { opacity: 0 }, t + d * 0.35);
+          tl.set(b.in, { opacity: 1 }, t + d * 0.35);
+          tl.to("#flash", { opacity: 0, duration: d * 0.65, ease: "power2.out" }, t + d * 0.35);
+        }
+      });
+
+      window.__timelines["root"] = tl;
+    </script>
+  </body>
+</html>

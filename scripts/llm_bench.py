@@ -1,8 +1,17 @@
 """Pick the LLM for Podium: measure first-token and full-response latency per model.
 
 Two workloads: a short coach turn (latency-critical, streamed) and a judge call
-(strict JSON, quality-critical). Run:
-    .venv/Scripts/python.exe scripts/llm_bench.py
+(strict JSON, quality-critical). Targets the opencode-go OpenAI-compatible
+gateway (`agent.llm_config.API_KEY`/`BASE_URL`/`extra_headers`), the path
+GATE0.md records as REJECTED in favor of LiveKit Inference -- see
+scripts/inference_probe.py and scripts/judge_json_probe.py for the LLM
+benchmarks of the shipped path. agent/llm_config.py no longer exports those
+names, so this script now exits with a clear message instead of an
+ImportError; kept for reference in case the gateway comparison is redone.
+
+Run: .venv/Scripts/python.exe scripts/llm_bench.py
+Writes: nothing (stdout only). Needs: OPENAI_API_KEY plus a restored
+opencode-go BASE_URL/extra_headers in agent/llm_config.py (currently absent).
 """
 from __future__ import annotations
 
@@ -14,7 +23,11 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from agent.llm_config import API_KEY, BASE_URL, extra_headers  # noqa: E402
+try:
+    from agent.llm_config import API_KEY, BASE_URL, extra_headers  # noqa: E402
+except ImportError:
+    API_KEY = BASE_URL = None  # noqa: E402
+    extra_headers = None  # noqa: E402
 
 CANDIDATES = [
     "glm-5.3-flash", "glm-5.3", "kimi-k2.7-code", "minimax-m2.5",
@@ -35,6 +48,9 @@ JUDGE = [
 
 
 def post(model: str, messages: list, *, stream: bool, json_mode: bool, max_tokens: int):
+    """Streaming path tracks first-reasoning-token and first-content-token separately:
+    reasoning-heavy models can emit a long reasoning_content burst before any visible
+    content, so ttft must be measured from content, not from the first token of any kind."""
     body = {"model": model, "messages": messages, "temperature": 0, "max_tokens": max_tokens}
     if stream:
         body["stream"] = True
@@ -104,6 +120,13 @@ def _valid(text: str) -> bool:
 
 
 if __name__ == "__main__":
+    if BASE_URL is None:
+        raise SystemExit(
+            "agent.llm_config no longer exports API_KEY/BASE_URL/extra_headers -- "
+            "this probe targeted the opencode-go gateway, which GATE0.md records as "
+            "rejected in favor of LiveKit Inference. See scripts/inference_probe.py "
+            "and scripts/judge_json_probe.py for the current LLM benchmarks."
+        )
     models = sys.argv[1:] or CANDIDATES
     for m in models:
         bench(m)

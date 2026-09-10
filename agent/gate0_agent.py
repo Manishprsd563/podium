@@ -18,7 +18,7 @@ from livekit import agents
 from livekit.agents import Agent, AgentSession, TurnHandlingOptions, function_tool
 from livekit.plugins import deepgram, rime, silero
 
-from agent.llm_config import COACH_MODEL, coach_llm
+from agent.llm_config import coach_llm
 
 load_dotenv()
 log = logging.getLogger("gate0")
@@ -28,6 +28,8 @@ RIME_SPEAKER = os.environ.get("RIME_SPEAKER", "summit")
 
 
 class Gate0(Agent):
+    """Smoke-test persona: one function tool that flips manual turn detection."""
+
     def __init__(self) -> None:
         super().__init__(
             instructions=(
@@ -51,6 +53,9 @@ server = agents.AgentServer()
 
 @server.rtc_session()
 async def entrypoint(ctx: agents.JobContext) -> None:
+    """Wire STT/LLM/TTS/VAD, log user transcripts and agent state transitions,
+    and commit the user's turn manually once "done" is heard in presentation
+    mode (since VAD-based turn detection is switched off for that mode)."""
     session = AgentSession(
         stt=deepgram.STT(model="nova-3", language="en", filler_words=True),
         llm=coach_llm(),

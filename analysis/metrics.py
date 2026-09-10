@@ -53,6 +53,8 @@ def _normalize_phrase(p: str) -> str:
 
 
 def _levenshtein(a: str, b: str) -> int:
+    """Standard edit distance between `a` and `b`; used by `_low_confidence_terms`
+    to fuzzy-match a deck term against same-length windows of heard words."""
     if a == b:
         return 0
     if not a:
@@ -91,6 +93,14 @@ def _scan_phrases(words: list[dict], phrase_set: list[str]) -> dict:
 
 
 def _pauses(words: list[dict]) -> tuple[dict, list[dict]]:
+    """CONTRACTS.md §2 `pauses` block. A gap is measured between each word's
+    `end` and the next word's `start` in `words` (must already be time-sorted
+    by the caller) and counts once it reaches PAUSE_MIN_S (0.35 s).
+    `dead_air` isolates gaps >= DEAD_AIR_S (2.0 s -- lost their place);
+    `rhetorical` isolates gaps inside RHETORICAL_RANGE (0.35-1.2 s -- a
+    deliberate pre-point beat). Returns (the §2 `pauses` dict, the
+    `dead_air` list alone, which `_wpm_overall` reuses to exclude dead air
+    from the speaking-time denominator)."""
     gaps = []
     for a, b in zip(words, words[1:]):
         dur = b["start"] - a["end"]
@@ -109,6 +119,11 @@ def _pauses(words: list[dict]) -> tuple[dict, list[dict]]:
 
 
 def _wpm_overall(words: list[dict], dead_air: list[dict]) -> float:
+    """Overall words per minute: word count divided by speaking time, where
+    speaking time is the span from the first word's start to the last
+    word's end minus any `dead_air` gaps (>= DEAD_AIR_S) -- ordinary pauses
+    under 2 s still count as speaking time, only genuine dead air is
+    excluded from the denominator."""
     if not words:
         return 0.0
     span = words[-1]["end"] - words[0]["start"]
@@ -117,6 +132,10 @@ def _wpm_overall(words: list[dict], dead_air: list[dict]) -> float:
 
 
 def _slide_spans(slide_events: list[dict], duration_s: float) -> list[dict]:
+    """Turn ordered slide-change timeline events into contiguous
+    [start, end) windows in seconds, one per slide; the last slide's
+    window runs to `duration_s`. Time base for `_wpm_by_slide` and
+    `_time_budget`."""
     ordered = sorted(slide_events, key=lambda e: e["at_s"])
     spans = []
     for i, ev in enumerate(ordered):
@@ -127,6 +146,10 @@ def _slide_spans(slide_events: list[dict], duration_s: float) -> list[dict]:
 
 
 def _wpm_by_slide(words: list[dict], spans: list[dict]) -> list[dict]:
+    """Per-slide words per minute: count of words whose `start` falls in
+    the slide's [start, end) window, divided by the window's length in
+    minutes. `seconds` is the window length itself, useful to spot slides
+    that got almost no time."""
     out = []
     for span in spans:
         in_slide = [w for w in words if span["start"] <= w["start"] < span["end"]]
@@ -137,6 +160,10 @@ def _wpm_by_slide(words: list[dict], spans: list[dict]) -> list[dict]:
 
 
 def _time_budget(spans: list[dict], duration_s: float, budget_s: float) -> dict:
+    """CONTRACTS.md §2 `time_budget` block: the talk's total duration
+    against `budget_s`, plus each slide's `used_s` against an even
+    `fair_share_s` (`budget_s / len(spans)`) -- the reference structure.md
+    and slide-connection.md use to flag time imbalance."""
     fair_share = budget_s / len(spans) if spans else float(budget_s)
     per_slide = [
         {"slide": s["slide"], "used_s": round(s["end"] - s["start"], 1), "fair_share_s": round(fair_share, 1)}
@@ -151,6 +178,13 @@ def _time_budget(spans: list[dict], duration_s: float, budget_s: float) -> dict:
 
 
 def _loudness(x: np.ndarray, sr: int) -> dict:
+    """CONTRACTS.md §2 `loudness` block. Splits `x` into 1-second frames
+    (any trailing partial second is dropped), takes each frame's dBFS
+    (20*log10(rms)), and keeps only frames at or above LOUDNESS_FLOOR_DBFS
+    (-50 dBFS) so silence between words doesn't drag `mean_dbfs` down or
+    mask genuine volume variation. `variance_db` is the standard deviation
+    of the kept frames' dBFS -- the vocal-variety.md rubric's monotony
+    signal."""
     if len(x) == 0 or sr <= 0:
         return {"mean_dbfs": -100.0, "variance_db": 0.0}
     frame = sr  # one-second frames
@@ -168,6 +202,8 @@ def _loudness(x: np.ndarray, sr: int) -> dict:
 
 
 def _deck_terms(deck: dict) -> list[str]:
+    """Flatten every slide's `terms` into one deduplicated list, first-seen
+    order preserved, for pronunciation and low-confidence-term checks."""
     terms: list[str] = []
     for slide in deck.get("slides", []):
         for t in slide.get("terms", []):
@@ -177,6 +213,15 @@ def _deck_terms(deck: dict) -> list[str]:
 
 
 def _low_confidence_terms(terms: list[str], words: list[dict]) -> list[dict]:
+    """CONTRACTS.md §2 `low_confidence_terms`. For each deck `term`, finds
+    the best-matching same-length window of `words` (Levenshtein distance
+    over the space-stripped token strings, so STT word-splitting doesn't
+    count as a mismatch) and flags it when either: the match is exact but
+    the window's mean confidence is below 0.6 (heard correctly but
+    unsure), or the match is a "near miss" within one third of the term's
+    length in edits (likely misheard as a different word entirely).
+    `heard` is what the window actually contains, for the judge to quote
+    back to the presenter."""
     norm_words = [_normalize_word(w["w"]) for w in words]
     out = []
     for term in terms:

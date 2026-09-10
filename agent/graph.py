@@ -96,9 +96,12 @@ class SessionGraph:
         self.edges.append({"src": src, "rel": rel, "dst": dst, "t": t if t is not None else self._now(), "props": dict(props)})
 
     def set_focus(self, node_key: str | None) -> None:
+        """Point the coach's "what are we working on" context at `node_key`
+        (an `add()`-returned key), or clear it with `None`."""
         self._focus = node_key
 
     def focus(self) -> str | None:
+        """The currently focused node key, or `None`."""
         return self._focus
 
     def mark(self, node_key: str, **props: Any) -> None:
@@ -275,6 +278,9 @@ class SessionGraph:
     # -- persistence -----------------------------------------------------
 
     def to_json(self) -> dict[str, Any]:
+        """Snapshot for `session.json["graph"]` (§8). Defensive-copies `props`
+        dicts so later graph mutation cannot leak into an already-persisted
+        snapshot."""
         return {
             "t0_mono": self._t0,
             "nodes": {k: {**v, "props": dict(v["props"])} for k, v in self.nodes.items()},
@@ -284,6 +290,8 @@ class SessionGraph:
 
     @classmethod
     def from_json(cls, d: dict[str, Any]) -> "SessionGraph":
+        """Inverse of `to_json`; reconstructs a graph anchored to the same
+        `t0_mono` origin so restored `t` values still line up with the timeline."""
         graph = cls(d.get("t0_mono", 0.0))
         graph.nodes = {k: {**v, "props": dict(v.get("props", {}))} for k, v in d.get("nodes", {}).items()}
         graph.edges = [dict(e, props=dict(e.get("props", {}))) for e in d.get("edges", [])]
@@ -404,6 +412,8 @@ class Progress:
         self._save()
 
     def level(self) -> str:
+        """§8 curriculum level label, derived from the mean mastery across all
+        skills (not weighted by session count)."""
         values = [info["mastery"] for info in self.skills.values()]
         mean = sum(values) / len(values) if values else 0.0
         if mean < 0.3:
@@ -417,6 +427,8 @@ class Progress:
         return "TEDx-ready"
 
     def next_focus(self) -> str | None:
+        """The skill to recommend next: lowest mastery, ties broken toward the
+        skill practiced in fewer sessions."""
         if not self.skills:
             return None
         ordered = sorted(SKILLS, key=lambda s: (self.skills[s]["mastery"], self.skills[s]["sessions"]))

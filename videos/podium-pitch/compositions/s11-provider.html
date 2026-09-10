@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- head is metadata for the source file only; the runtime ignores it -->
+  </head>
+  <body>
+    <template>
+      <style>
+
+                /* ==== inlined ui/tokens.css ====
+                   <link rel="stylesheet"> inside a sub-composition <template> is not
+                   honoured by the HyperFrames runtime (only <template> contents are
+                   cloned into the live render) — inlined per hyperframes-core's
+                   sub-compositions.md "Pitfall 1" guidance, confirmed by a snapshot
+                   that showed unstyled black-on-black text with the <link> form. ==== */
+        /* =========================================================================
+           Podium pitch video — design tokens
+           Extracted from web/style.css (:root) and web/dashboard.css (.dash-root),
+           plus the orb.js STATES colour table. This file declares values only —
+           no selectors beyond :root, no layout, no animation. components.css and
+           every scene reference these custom properties instead of literal colour.
+           ========================================================================= */
+
+        #root {
+          /* ---- surfaces ---------------------------------------------------- */
+          --bg: #0b0d12;               /* canvas / page background (web/style.css --bg) */
+          --bg-rgb: 11, 13, 18;
+          --surface: #11151d;          /* card / pill / slide background (web/style.css --bg-2) */
+          --surface-rgb: 17, 21, 29;
+          --surface-2: #161c27;        /* nested surface (drill ring hole, tile hover) */
+          --surface-2-rgb: 22, 28, 39;
+
+          /* ---- ink (text) ---------------------------------------------------- */
+          --ink: #f3f5f9;               /* primary text */
+          --ink-rgb: 243, 245, 249;
+          --ink-2: rgba(var(--ink-rgb), 0.66);   /* soft text (web/style.css --ink-soft) */
+          --ink-3: rgba(var(--ink-rgb), 0.52);   /* faint text (web/style.css --ink-faint) */
+
+          /* ---- hairlines ------------------------------------------------------ */
+          --hair: rgba(var(--ink-rgb), 0.10);     /* web/style.css --hairline */
+          --hair-2: rgba(var(--ink-rgb), 0.16);   /* stronger hairline for borders that need to read at a distance */
+
+          /* ---- accents (web/style.css --accent / --accent-2 / --user / etc.) - */
+          --teal: #5ee1d0;              /* --accent */
+          --teal-rgb: 94, 225, 208;
+          --peri: #7b8cff;              /* --accent-2 */
+          --peri-rgb: 123, 140, 255;
+          --violet: #8f7bff;            /* --user (Maya / listening) */
+          --violet-rgb: 143, 123, 255;
+          --amber: #f5c451;             /* --wait / --warn */
+          --amber-rgb: 245, 196, 81;
+          --red: #ff5c5c;               /* --danger */
+          --red-rgb: 255, 92, 92;
+          --green: #5ee1a0;             /* --good */
+          --green-rgb: 94, 225, 160;
+          --mic: #3ddc84;               /* orb.js STATES.micLive colorA */
+          --mic-rgb: 61, 220, 132;
+          --think: #8a94a6;             /* --think / orb.js STATES.thinking colorA */
+          --think-rgb: 138, 148, 166;
+
+          /* dashboard two-voice ink (web/dashboard.css .dash-root --pd-you / --pd-coach) */
+          --pd-you: var(--red);
+          --pd-coach: var(--green);
+
+          /* ---- orb duotone per state (orb.js STATES table, colorA -> colorB) - */
+          --orb-idle-a: #5ee1d0;    /* idle + speaking share this pair */
+          --orb-idle-a-rgb: 94, 225, 208;
+          --orb-idle-b: #7b8cff;
+          --orb-idle-b-rgb: 123, 140, 255;
+          --orb-listen-a: #8f7bff;  /* listening */
+          --orb-listen-a-rgb: 143, 123, 255;
+          --orb-listen-b: #5ee1d0;
+          --orb-listen-b-rgb: 94, 225, 208;
+          --orb-mic-a: #3ddc84;     /* micLive */
+          --orb-mic-a-rgb: 61, 220, 132;
+          --orb-mic-b: #1f9d5a;
+          --orb-mic-b-rgb: 31, 157, 90;
+          --orb-wait-a: #f5c451;    /* waiting */
+          --orb-wait-a-rgb: 245, 196, 81;
+          --orb-wait-b: #ffdf8a;
+          --orb-wait-b-rgb: 255, 223, 138;
+          --orb-think-a: #8a94a6;   /* thinking */
+          --orb-think-a-rgb: 138, 148, 166;
+          --orb-think-b: #b6c0cf;
+          --orb-think-b-rgb: 182, 192, 207;
+          --orb-connect-a: #8a94a6; /* connecting / reconnecting */
+          --orb-connect-a-rgb: 138, 148, 166;
+          --orb-connect-b: #5b6472;
+          --orb-connect-b-rgb: 91, 100, 114;
+          --orb-off-a: #ff5c5c;     /* disconnected */
+          --orb-off-a-rgb: 255, 92, 92;
+          --orb-off-b: #7a1f1f;
+          --orb-off-b-rgb: 122, 31, 31;
+
+          /* ---- type ------------------------------------------------------------ */
+          --font: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+          --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+          --ls-tight: -0.01em;
+          --ls-normal: 0em;
+          --ls-wide: 0.06em;
+          --ls-wider: 0.12em;
+
+          /* ---- shape / elevation ------------------------------------------------ */
+          --radius: 18px;
+          --radius-sm: 10px;
+          --radius-pill: 999px;
+          --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--ink-rgb), 0.04);
+          --shadow-glow-teal: 0 0 24px rgba(var(--teal-rgb), 0.35);
+          --shadow-glow-amber: 0 0 18px rgba(var(--amber-rgb), 0.35);
+          --shadow-glow-red: 0 0 18px rgba(var(--red-rgb), 0.35);
+          --shadow-glow-green: 0 0 18px rgba(var(--green-rgb), 0.35);
+
+          /* ---- reference timing (informational — components.css never applies
+             these as `transition`/`animation`; scenes read them for GSAP eases) --- */
+          --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+          --dur: 260ms;
+          --dur-slow: 640ms;
+
+          /* ---- component metrics ------------------------------------------------ */
+          --statusbar-h: 56px;
+        }
+
+                /* ==== inlined ui/components.css ==== */
+        /* =========================================================================
+           Podium pitch video — component kit
+           Faithful, class-based reproductions of web/style.css + web/dashboard.css
+           + the orb.js palette, resized for a fixed 1920x1080 canvas. Every colour
+           is a var() from tokens.css — nothing here is animated: no @keyframes, no
+           `animation:`, no `transition:`. Scenes drive motion with GSAP, tweening
+           transforms/opacity and the custom properties called out per component in
+           ui/README.md (--pct, --v, --pos, --pulse, --glow, --lvl, --orb-size, ...).
+           ========================================================================= */
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        /* =========================================================================
+           Status bar — web/style.css #statusbar + web/app.js renderStatusbar()
+           Segment order: conn · agent · provider(badge) · attention · phase ·
+           stage · mic · room, exactly as narrated in SCRIPT.md.
+           ========================================================================= */
+
+        .pd-statusbar {
+          display: flex;
+          align-items: center;
+          gap: 22px;
+          height: var(--statusbar-h);
+          padding: 0 40px;
+          font-family: var(--font-mono);
+          font-size: 20px;
+          letter-spacing: var(--ls-normal);
+          color: var(--ink-3);
+          background: linear-gradient(to top, var(--bg) 55%, transparent);
+          white-space: nowrap;
+        }
+
+        .pd-statusbar-seg {
+          color: var(--ink-3);
+        }
+
+        .pd-statusbar-seg.is-badge {
+          color: var(--teal);
+          letter-spacing: var(--ls-wide);
+          border-bottom: 2px solid var(--teal);
+          padding-bottom: 2px;
+        }
+
+        .pd-statusbar-dot {
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background: var(--ink-3);
+          flex: 0 0 auto;
+        }
+
+        .pd-level {
+          position: relative;
+          width: 96px;
+          height: 6px;
+          border-radius: var(--radius-pill);
+          background: var(--hair);
+          overflow: hidden;
+        }
+
+        .pd-level-fill {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: var(--teal);
+          transform-origin: left center;
+          transform: scaleX(var(--lvl, 0));
+        }
+
+        /* =========================================================================
+           Orb — orb.js palette (STATES table), rebuilt as 3 layered CSS gradients:
+           halo (outer blurred bloom) -> core (main gradient sphere, --pulse scale)
+           -> rim (fresnel highlight, screen blend). State classes swap --orb-a/-b.
+           ========================================================================= */
+
+        .pd-orb {
+          position: relative;
+          width: var(--orb-size, 220px);
+          height: var(--orb-size, 220px);
+          --pulse: 0;
+          --glow: 1;
+          --orb-a: var(--orb-idle-a);
+          --orb-b: var(--orb-idle-b);
+          --orb-a-rgb: var(--orb-idle-a-rgb);
+          --orb-b-rgb: var(--orb-idle-b-rgb);
+        }
+
+        .pd-orb.is-idle, .pd-orb.is-speaking {
+          --orb-a: var(--orb-idle-a);
+          --orb-b: var(--orb-idle-b);
+          --orb-a-rgb: var(--orb-idle-a-rgb);
+          --orb-b-rgb: var(--orb-idle-b-rgb);
+        }
+
+        .pd-orb.is-listening {
+          --orb-a: var(--orb-listen-a);
+          --orb-b: var(--orb-listen-b);
+          --orb-a-rgb: var(--orb-listen-a-rgb);
+          --orb-b-rgb: var(--orb-listen-b-rgb);
+        }
+
+        .pd-orb.is-mic-live {
+          --orb-a: var(--orb-mic-a);
+          --orb-b: var(--orb-mic-b);
+          --orb-a-rgb: var(--orb-mic-a-rgb);
+          --orb-b-rgb: var(--orb-mic-b-rgb);
+        }
+
+        .pd-orb.is-waiting {
+          --orb-a: var(--orb-wait-a);
+          --orb-b: var(--orb-wait-b);
+          --orb-a-rgb: var(--orb-wait-a-rgb);
+          --orb-b-rgb: var(--orb-wait-b-rgb);
+        }
+
+        .pd-orb.is-thinking {
+          --orb-a: var(--orb-think-a);
+          --orb-b: var(--orb-think-b);
+          --orb-a-rgb: var(--orb-think-a-rgb);
+          --orb-b-rgb: var(--orb-think-b-rgb);
+        }
+
+        .pd-orb.is-connecting {
+          --orb-a: var(--orb-connect-a);
+          --orb-b: var(--orb-connect-b);
+          --orb-a-rgb: var(--orb-connect-a-rgb);
+          --orb-b-rgb: var(--orb-connect-b-rgb);
+        }
+
+        .pd-orb.is-disconnected {
+          --orb-a: var(--orb-off-a);
+          --orb-b: var(--orb-off-b);
+          --orb-a-rgb: var(--orb-off-a-rgb);
+          --orb-b-rgb: var(--orb-off-b-rgb);
+        }
+
+        .pd-orb-halo {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 220%;
+          height: 220%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          filter: blur(calc(var(--orb-size, 220px) * 0.12));
+          background: radial-gradient(
+            circle,
+            rgba(var(--orb-b-rgb), calc(0.22 * var(--glow, 1))) 0%,
+            rgba(var(--orb-b-rgb), 0) 70%
+          );
+          pointer-events: none;
+        }
+
+        .pd-orb-core {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          transform: scale(calc(1 + var(--pulse, 0) * 0.08));
+          background: radial-gradient(
+            circle at 38% 32%,
+            rgba(var(--orb-a-rgb), 0.95) 0%,
+            rgba(var(--orb-b-rgb), 0.55) 55%,
+            rgba(var(--orb-b-rgb), 0) 78%
+          );
+          box-shadow: 0 0 calc(var(--orb-size, 220px) * 0.18) rgba(var(--orb-a-rgb), calc(0.45 * var(--glow, 1)));
+        }
+
+        .pd-orb-rim {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          mix-blend-mode: screen;
+          opacity: 0.9;
+          background: radial-gradient(
+            circle at 64% 68%,
+            rgba(var(--orb-a-rgb), 0) 55%,
+            rgba(var(--orb-a-rgb), 0.5) 82%,
+            rgba(var(--orb-a-rgb), 0) 100%
+          );
+        }
+
+        /* =========================================================================
+           Caption — web/style.css #caption (.partial = interim grey)
+           ========================================================================= */
+
+        .pd-caption-label {
+          font-family: var(--font-mono);
+          font-size: 17px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          color: var(--ink-3);
+          margin: 0 0 6px;
+        }
+
+        .pd-caption {
+          margin: 0;
+          font-family: var(--font);
+          font-size: 44px;
+          font-weight: 500;
+          line-height: 1.15;
+          color: var(--ink);
+        }
+
+        .pd-caption.is-interim {
+          color: var(--ink-2);
+        }
+
+        .pd-caption.is-final {
+          color: var(--ink);
+        }
+
+        .pd-caption.is-narrator { color: var(--ink); }
+        .pd-caption.is-maya { color: var(--violet); }
+        .pd-caption.is-coach { color: var(--teal); }
+
+        /* =========================================================================
+           Choice chips — web/style.css #choices / .choice
+           ========================================================================= */
+
+        .pd-chips {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .pd-chip {
+          display: inline-flex;
+          align-items: center;
+          padding: 10px 22px;
+          border-radius: var(--radius-pill);
+          border: 1px solid var(--hair-2);
+          background: rgba(var(--surface-rgb), 0.4);
+          color: var(--ink-2);
+          font-family: var(--font);
+          font-size: 20px;
+        }
+
+        .pd-chip.is-on {
+          border-color: var(--teal);
+          color: var(--ink);
+          background: rgba(var(--teal-rgb), 0.14);
+          box-shadow: var(--shadow-glow-teal);
+        }
+
+        /* =========================================================================
+           Slide card — web/style.css #view-present (#present-title/-bullets/-counter)
+           ========================================================================= */
+
+        .pd-slide {
+          position: relative;
+          width: 100%;
+          max-width: 640px;
+          padding: 48px;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          background: var(--surface);
+          border: 1px solid var(--hair);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-card);
+          color: var(--ink);
+        }
+
+        .pd-slide-counter {
+          position: absolute;
+          top: 28px;
+          right: 32px;
+          font-family: var(--font-mono);
+          font-size: 18px;
+          font-variant-numeric: tabular-nums;
+          color: var(--ink-3);
+        }
+
+        .pd-slide-title {
+          margin: 0;
+          font-family: var(--font);
+          font-size: 40px;
+          font-weight: 600;
+          line-height: 1.1;
+          color: var(--ink);
+        }
+
+        .pd-slide-bullets {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .pd-slide-bullets li {
+          position: relative;
+          padding-left: 26px;
+          font-size: 22px;
+          line-height: 1.4;
+          color: var(--ink-2);
+        }
+
+        .pd-slide-bullets li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0.6em;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--teal);
+        }
+
+        .pd-slide-hint {
+          font-size: 18px;
+          color: var(--ink-3);
+        }
+
+        /* =========================================================================
+           Clock — web/style.css #present-clock
+           ========================================================================= */
+
+        .pd-clock {
+          font-family: var(--font-mono);
+          font-variant-numeric: tabular-nums;
+          font-size: 22px;
+          letter-spacing: var(--ls-normal);
+          color: var(--ink-3);
+        }
+
+        .pd-clock.is-warn {
+          color: var(--amber);
+        }
+
+        /* =========================================================================
+           Waveform strip — container for a live-drawn canvas (S04/S06/S07)
+           ========================================================================= */
+
+        .pd-wave {
+          position: relative;
+          width: 100%;
+          height: 96px;
+          border-bottom: 1px solid var(--hair);
+        }
+
+        .pd-wave-canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+
+        /* =========================================================================
+           Live meter — wpm / fillers / pauses (S04)
+           ========================================================================= */
+
+        .pd-meter {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 160px;
+        }
+
+        .pd-meter-label {
+          font-size: 17px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          color: var(--ink-3);
+        }
+
+        .pd-meter-value {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .pd-meter-num {
+          font-size: 44px;
+          font-weight: 500;
+          line-height: 1;
+          color: var(--ink);
+        }
+
+        .pd-meter-unit {
+          font-size: 20px;
+          color: var(--ink-3);
+        }
+
+        .pd-meter-band {
+          align-self: flex-start;
+          display: inline-flex;
+          padding: 4px 10px;
+          border-radius: var(--radius-pill);
+          border: 1px solid var(--hair-2);
+          font-size: 16px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          color: var(--ink-2);
+        }
+
+        .pd-meter-band.is-fast {
+          color: var(--amber);
+          border-color: rgba(var(--amber-rgb), 0.5);
+        }
+
+        .pd-meter-band.is-good {
+          color: var(--green);
+          border-color: rgba(var(--green-rgb), 0.5);
+        }
+
+        .pd-meter-band.is-slow {
+          color: var(--peri);
+          border-color: rgba(var(--peri-rgb), 0.5);
+        }
+
+        /* =========================================================================
+           Scorecard — web/dashboard.css .pd-bars/.pd-bar (renamed container)
+           ========================================================================= */
+
+        .pd-scorecard {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+          width: 100%;
+        }
+
+        .pd-bar {
+          display: grid;
+          grid-template-columns: minmax(140px, 260px) 1fr auto;
+          align-items: center;
+          gap: 28px;
+          width: 100%;
+        }
+
+        .pd-bar-label {
+          font-size: 24px;
+          letter-spacing: 0.01em;
+          color: var(--ink-2);
+        }
+
+        .pd-bar-track {
+          position: relative;
+          height: 6px;
+          border-radius: 3px;
+          background: var(--hair);
+        }
+
+        .pd-bar-fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: calc(var(--v, 0) / 5 * 100%);
+          border-radius: 3px;
+          background: var(--teal);
+          opacity: 0.9;
+        }
+
+        .pd-bar-value {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          font-variant-numeric: tabular-nums;
+          white-space: nowrap;
+        }
+
+        .pd-bar-num {
+          font-size: 48px;
+          font-weight: 500;
+          line-height: 1;
+          color: var(--ink);
+        }
+
+        .pd-bar-max {
+          font-size: 20px;
+          color: var(--ink-3);
+        }
+
+        .pd-bar-delta {
+          margin-left: 6px;
+          font-size: 19px;
+          font-weight: 600;
+          color: var(--teal);
+        }
+
+        .pd-bar-delta.is-flat {
+          color: var(--ink-3);
+        }
+
+        /* =========================================================================
+           Metrics strip — web/dashboard.css .pd-metrics-strip/.pd-metric
+           ========================================================================= */
+
+        .pd-metrics {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          font-size: 19px;
+          letter-spacing: 0.01em;
+          color: var(--ink-3);
+        }
+
+        .pd-metric {
+          color: var(--ink-2);
+        }
+
+        .pd-metric-sep {
+          margin: 0 10px;
+          color: var(--ink-3);
+        }
+
+        /* =========================================================================
+           Improvement card — web/dashboard.css .pd-said/.pd-stage-line/.pd-pause-glyph
+           ========================================================================= */
+
+        .pd-imp {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          width: 100%;
+        }
+
+        .pd-imp-eyebrow {
+          font-size: 17px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          color: var(--ink-3);
+        }
+
+        .pd-line {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .pd-line-label {
+          font-size: 16px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          opacity: 0.8;
+        }
+
+        .pd-line-body {
+          font-size: 22px;
+          line-height: 1.5;
+          max-width: 34ch;
+        }
+
+        .pd-line.is-you .pd-line-label,
+        .pd-line.is-you .pd-line-body {
+          color: var(--pd-you);
+        }
+
+        .pd-line.is-say .pd-line-label,
+        .pd-line.is-say .pd-line-body {
+          color: var(--pd-coach);
+        }
+
+        .pd-line.is-paced .pd-line-label {
+          color: var(--ink-3);
+        }
+
+        .pd-line.is-paced .pd-line-body {
+          color: var(--ink);
+        }
+
+        .pd-pause-glyph {
+          margin: 0 3px;
+          color: var(--teal);
+          font-size: 0.8em;
+          opacity: 0.9;
+        }
+
+        /* =========================================================================
+           Drill — word + confidence ring (S08), conic-gradient(--pct)
+           ========================================================================= */
+
+        .pd-drill {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 22px;
+        }
+
+        .pd-drill-word {
+          margin: 0;
+          font-size: 120px;
+          font-weight: 300;
+          line-height: 1;
+          color: var(--ink);
+        }
+
+        .pd-drill-ring {
+          position: relative;
+          width: 220px;
+          height: 220px;
+          border-radius: 50%;
+          background: conic-gradient(var(--drill-color, var(--teal)) calc(var(--pct, 0) * 1%), var(--hair) 0);
+        }
+
+        .pd-drill-ring.is-ok { --drill-color: var(--teal); }
+        .pd-drill-ring.is-warn { --drill-color: var(--amber); }
+        .pd-drill-ring.is-fail { --drill-color: var(--red); }
+
+        .pd-drill-ring::before {
+          content: "";
+          position: absolute;
+          inset: 16px;
+          border-radius: 50%;
+          background: var(--bg);
+        }
+
+        .pd-drill-pct {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+          font-weight: 500;
+          font-variant-numeric: tabular-nums;
+          color: var(--ink);
+        }
+
+        /* =========================================================================
+           Skill tiles — grid tile for S09 (10 skills)
+           ========================================================================= */
+
+        .pd-tiles {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 16px;
+          width: 100%;
+        }
+
+        .pd-tile {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 18px 10px;
+          text-align: center;
+          background: var(--surface);
+          border: 1px solid var(--hair);
+          border-radius: var(--radius-sm);
+          color: var(--ink-2);
+          font-size: 20px;
+          letter-spacing: 0.01em;
+        }
+
+        .pd-tile.is-lit {
+          border-color: var(--teal);
+          color: var(--ink);
+          background: rgba(var(--teal-rgb), 0.1);
+          box-shadow: var(--shadow-glow-teal);
+        }
+
+        /* =========================================================================
+           Ladder — Novice -> Speaker -> Presenter -> TEDx (S09)
+           ========================================================================= */
+
+        .pd-ladder {
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          width: 100%;
+          padding-top: 40px;
+        }
+
+        .pd-ladder-line {
+          position: absolute;
+          left: 7px;
+          right: 7px;
+          top: 47px;
+          height: 1px;
+          background: var(--hair);
+          z-index: 0;
+        }
+
+        .pd-ladder-notch {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .pd-ladder-dot {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--hair-2);
+          border: 1px solid var(--hair-2);
+        }
+
+        .pd-ladder-notch.is-active .pd-ladder-dot,
+        .pd-ladder-notch.is-done .pd-ladder-dot {
+          background: var(--teal);
+          border-color: var(--teal);
+        }
+
+        .pd-ladder-label {
+          font-size: 18px;
+          color: var(--ink-3);
+        }
+
+        .pd-ladder-notch.is-active .pd-ladder-label {
+          color: var(--ink);
+        }
+
+        .pd-ladder-marker {
+          position: absolute;
+          top: 0;
+          left: calc(var(--pos, 0) / 3 * 100%);
+          transform: translateX(-50%);
+          padding: 4px 12px;
+          border-radius: var(--radius-pill);
+          background: var(--teal);
+          color: var(--bg);
+          font-size: 16px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+
+        /* =========================================================================
+           Sparkline — container for an injected SVG/canvas trend line (S10)
+           ========================================================================= */
+
+        .pd-sparkline {
+          position: relative;
+          width: 100%;
+          height: 96px;
+          border-bottom: 1px solid var(--hair);
+        }
+
+        .pd-sparkline > svg,
+        .pd-sparkline > canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+
+        /* =========================================================================
+           Statement — large impact typography (every scene's closing line)
+           ========================================================================= */
+
+        .pd-statement {
+          margin: 0;
+          max-width: 20ch;
+          font-family: var(--font);
+          font-size: 88px;
+          font-weight: 600;
+          line-height: 1.05;
+          letter-spacing: var(--ls-tight);
+          color: var(--ink);
+        }
+
+        .pd-statement-sub {
+          margin: 18px 0 0;
+          font-size: 22px;
+          color: var(--ink-2);
+        }
+
+        /* =========================================================================
+           Evidence chip — small mono citation pill (corner of scorecard/drill/etc.)
+           ========================================================================= */
+
+        .pd-evidence-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: var(--radius-pill);
+          border: 1px solid var(--hair-2);
+          background: rgba(var(--surface-rgb), 0.6);
+          font-family: var(--font-mono);
+          font-size: 17px;
+          letter-spacing: 0.01em;
+          color: var(--ink-3);
+        }
+
+        /* =========================================================================
+           Generic card surface
+           ========================================================================= */
+
+        .pd-card {
+          background: var(--surface);
+          border: 1px solid var(--hair);
+          border-radius: var(--radius);
+          padding: 40px;
+          box-shadow: var(--shadow-card);
+          color: var(--ink);
+        }
+
+        /* =========================================================================
+           Shared eyebrow utility (used inside pd-imp / pd-card / pd-evidence-chip)
+           ========================================================================= */
+
+        .pd-eyebrow {
+          font-size: 17px;
+          letter-spacing: var(--ls-wide);
+          text-transform: uppercase;
+          color: var(--ink-3);
+        }
+
+        #root {
+          position: relative;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          font-family: var(--font);
+        }
+
+        #s11-bg { position: absolute; inset: 0; background: var(--bg); }
+        #s11-glow-main { position: absolute; left: 470px; top: 90px; width: 980px; height: 880px; border-radius: 50%; background: radial-gradient(circle, rgba(var(--teal-rgb), .18), rgba(var(--peri-rgb), .08) 46%, transparent 72%); filter: blur(54px); opacity: .72; }
+        #s11-glow-corner { position: absolute; right: 40px; top: 50px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(var(--peri-rgb), .16), transparent 70%); filter: blur(40px); opacity: .55; }
+        #s11-camera { position: absolute; inset: 0; }
+        #s11-statusbar-row { position: absolute; left: 0; right: 0; bottom: 0; }
+        #s11-statusbar-row .pd-statusbar { padding: 0 24px; gap: 14px; }
+        #s11-badge { position: relative; display: inline-block; }
+        #s11-underline { position: absolute; left: 0; right: 0; bottom: -9px; height: 3px; background: var(--teal); transform-origin: left center; box-shadow: 0 8px 24px rgba(var(--teal-rgb), .28); }
+        #s11-card-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transform-origin: 50% 50%; }
+        #s11-card { width: 1320px; padding: 54px 60px 48px; border-color: var(--hair-2); background: rgba(var(--surface-rgb), .96); }
+        #s11-card .pd-eyebrow { margin: 0 0 30px; font-size: 18px; color: var(--teal); }
+        .s11-rows { display: flex; flex-direction: column; gap: 26px; }
+        .s11-row { display: grid; grid-template-columns: 205px minmax(0, 1fr); align-items: baseline; gap: 34px; min-width: 0; }
+        .s11-row-label { font-family: var(--font-mono); font-size: 21px; letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--ink-3); }
+        .s11-row-value { min-width: 0; font-family: var(--font-mono); font-size: 29px; line-height: 1.25; color: var(--ink); letter-spacing: 0; white-space: nowrap; }
+        .s11-row-value strong { color: var(--teal); font-weight: 600; }
+        #s11-small { margin: 32px 0 0; padding-top: 24px; border-top: 1px solid var(--hair); font-family: var(--font-mono); font-size: 19px; letter-spacing: .01em; color: var(--ink-2); }
+      </style>
+
+      <div id="root" data-composition-id="s11-provider" data-width="1920" data-height="1080" data-duration="14.8">
+        <div id="s11-bg"></div>
+        <div id="s11-glow-main"></div>
+        <div id="s11-glow-corner"></div>
+
+        <div id="s11-camera">
+          <div id="s11-statusbar-row">
+            <div class="pd-statusbar">
+              <span class="pd-statusbar-seg">connected</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">agent present</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg is-badge" id="s11-badge">rime · mistv3 · thunder<span id="s11-underline"></span></span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">listening</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">present</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">deck_ack</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">mic live · hold space to talk</span>
+              <span class="pd-statusbar-dot"></span>
+              <span class="pd-statusbar-seg">podium-fqamkqva</span>
+              <div class="pd-level" style="--lvl: 0.5"><div class="pd-level-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="s11-card-wrap">
+          <div class="pd-card" id="s11-card">
+            <p class="pd-eyebrow">Speech provider</p>
+            <div class="s11-rows">
+              <div class="s11-row" id="s11-row-1">
+                <span class="s11-row-label">Provider</span>
+                <span class="s11-row-value">Rime · mistv3 · thunder · eng</span>
+              </div>
+              <div class="s11-row" id="s11-row-2">
+                <span class="s11-row-label">WebSocket</span>
+                <span class="s11-row-value">wss://users-ws.rime.ai/ws3 · 24 kHz PCM</span>
+              </div>
+              <div class="s11-row" id="s11-row-3">
+                <span class="s11-row-label">REST</span>
+                <span class="s11-row-value">/v1/rime-tts · WAV</span>
+              </div>
+              <div class="s11-row" id="s11-row-4">
+                <span class="s11-row-label">Room</span>
+                <span class="s11-row-value">LiveKit Cloud (India South)</span>
+              </div>
+              <div class="s11-row" id="s11-row-5">
+                <span class="s11-row-label">STT</span>
+                <span class="s11-row-value">Deepgram nova-3</span>
+              </div>
+            </div>
+            <p id="s11-small">this narration: Rime mistv3 · astra / willow / thunder</p>
+          </div>
+        </div>
+
+        <audio id="s11-n12" src="public/vo/n12.wav" data-start="0.5" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+
+        <audio id="s11-sfx-click" src="public/sfx/click.mp3" data-start="0.4" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s11-sfx-notification" src="public/sfx/notification.mp3" data-start="3.2" data-track-index="12" data-volume="0.4" data-audio-group="sfx"></audio>
+      </div>
+
+      <script>
+        const tl = gsap.timeline({ paused: true });
+        const camera = document.getElementById("s11-camera");
+        const badge = document.getElementById("s11-badge");
+        const cameraBox = camera.getBoundingClientRect();
+        const badgeBox = badge.getBoundingClientRect();
+        const bx = badgeBox.left - cameraBox.left + badgeBox.width / 2;
+        const by = badgeBox.top - cameraBox.top + badgeBox.height / 2;
+        camera.style.transformOrigin = bx + "px " + by + "px";
+
+        const glow = { p: 0 };
+        tl.to(glow, { p: Math.PI * 6, duration: 14.8, ease: "none", onUpdate: () => {
+          const wave = Math.sin(glow.p);
+          gsap.set("#s11-glow-main", { opacity: 0.66 + wave * 0.09, scale: 1 + wave * 0.018 });
+          gsap.set("#s11-glow-corner", { x: wave * 16, y: wave * 10 });
+        } }, 0);
+
+        tl.set("#s11-underline", { scaleX: 0 }, 0);
+        tl.set("#s11-card-wrap", { opacity: 0 }, 0);
+        tl.fromTo("#s11-statusbar-row", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.1);
+        tl.fromTo(camera, { x: 0, y: 0, scale: 1 }, { x: 960 - bx, y: 540 - by, scale: 4.8, duration: 0.8, ease: "power3.inOut" }, 0.4);
+        tl.to("#s11-underline", { scaleX: 1, duration: 0.38, ease: "power2.out" }, 1.3);
+        tl.to(camera, { opacity: 0, duration: 0.28, ease: "power1.in" }, 3.2);
+        tl.fromTo("#s11-card-wrap", { opacity: 0, scale: 0.88, y: 22 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "back.out(1.45)" }, 3.2);
+
+        const rowIds = ["#s11-row-1", "#s11-row-2", "#s11-row-3", "#s11-row-4", "#s11-row-5"];
+        tl.fromTo("#s11-card .pd-eyebrow", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }, 3.48);
+        rowIds.forEach((id, i) => tl.fromTo(id, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }, 3.62 + i * 0.28));
+        tl.fromTo("#s11-small", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 5.12);
+
+        window.__timelines["s11-provider"] = tl;
+      </script>
+    </template>
+  </body>
+</html>

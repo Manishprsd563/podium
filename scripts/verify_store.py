@@ -3,6 +3,9 @@
 Verifies: Store produces a valid session.json and a timeline.jsonl whose event
 names match CONTRACTS §4, and WavWriter writes a playable 24 kHz mono WAV from
 synthetic frames (including a resampled 16 kHz frame).
+
+Run: .venv/Scripts/python.exe scripts/verify_store.py
+Writes and removes a scratch sessions_test_tmp/ directory under the cwd; no env vars needed.
 """
 from __future__ import annotations
 

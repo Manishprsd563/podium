@@ -1,0 +1,803 @@
+/* =========================================================================
+   Podium pitch video — component kit
+   Faithful, class-based reproductions of web/style.css + web/dashboard.css
+   + the orb.js palette, resized for a fixed 1920x1080 canvas. Every colour
+   is a var() from tokens.css — nothing here is animated: no @keyframes, no
+   `animation:`, no `transition:`. Scenes drive motion with GSAP, tweening
+   transforms/opacity and the custom properties called out per component in
+   ui/README.md (--pct, --v, --pos, --pulse, --glow, --lvl, --orb-size, ...).
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* =========================================================================
+   Status bar — web/style.css #statusbar + web/app.js renderStatusbar()
+   Segment order: conn · agent · provider(badge) · attention · phase ·
+   stage · mic · room, exactly as narrated in SCRIPT.md.
+   ========================================================================= */
+
+.pd-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: var(--statusbar-h);
+  padding: 0 40px;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  letter-spacing: var(--ls-normal);
+  color: var(--ink-3);
+  background: linear-gradient(to top, var(--bg) 55%, transparent);
+  white-space: nowrap;
+}
+
+.pd-statusbar-seg {
+  color: var(--ink-3);
+}
+
+.pd-statusbar-seg.is-badge {
+  color: var(--teal);
+  letter-spacing: var(--ls-wide);
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 2px;
+}
+
+.pd-statusbar-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  flex: 0 0 auto;
+}
+
+.pd-level {
+  position: relative;
+  width: 96px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.pd-level-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--teal);
+  transform-origin: left center;
+  transform: scaleX(var(--lvl, 0));
+}
+
+/* =========================================================================
+   Orb — orb.js palette (STATES table), rebuilt as 3 layered CSS gradients:
+   halo (outer blurred bloom) -> core (main gradient sphere, --pulse scale)
+   -> rim (fresnel highlight, screen blend). State classes swap --orb-a/-b.
+   ========================================================================= */
+
+.pd-orb {
+  position: relative;
+  width: var(--orb-size, 220px);
+  height: var(--orb-size, 220px);
+  --pulse: 0;
+  --glow: 1;
+  --orb-a: var(--orb-idle-a);
+  --orb-b: var(--orb-idle-b);
+  --orb-a-rgb: var(--orb-idle-a-rgb);
+  --orb-b-rgb: var(--orb-idle-b-rgb);
+}
+
+.pd-orb.is-idle, .pd-orb.is-speaking {
+  --orb-a: var(--orb-idle-a);
+  --orb-b: var(--orb-idle-b);
+  --orb-a-rgb: var(--orb-idle-a-rgb);
+  --orb-b-rgb: var(--orb-idle-b-rgb);
+}
+
+.pd-orb.is-listening {
+  --orb-a: var(--orb-listen-a);
+  --orb-b: var(--orb-listen-b);
+  --orb-a-rgb: var(--orb-listen-a-rgb);
+  --orb-b-rgb: var(--orb-listen-b-rgb);
+}
+
+.pd-orb.is-mic-live {
+  --orb-a: var(--orb-mic-a);
+  --orb-b: var(--orb-mic-b);
+  --orb-a-rgb: var(--orb-mic-a-rgb);
+  --orb-b-rgb: var(--orb-mic-b-rgb);
+}
+
+.pd-orb.is-waiting {
+  --orb-a: var(--orb-wait-a);
+  --orb-b: var(--orb-wait-b);
+  --orb-a-rgb: var(--orb-wait-a-rgb);
+  --orb-b-rgb: var(--orb-wait-b-rgb);
+}
+
+.pd-orb.is-thinking {
+  --orb-a: var(--orb-think-a);
+  --orb-b: var(--orb-think-b);
+  --orb-a-rgb: var(--orb-think-a-rgb);
+  --orb-b-rgb: var(--orb-think-b-rgb);
+}
+
+.pd-orb.is-connecting {
+  --orb-a: var(--orb-connect-a);
+  --orb-b: var(--orb-connect-b);
+  --orb-a-rgb: var(--orb-connect-a-rgb);
+  --orb-b-rgb: var(--orb-connect-b-rgb);
+}
+
+.pd-orb.is-disconnected {
+  --orb-a: var(--orb-off-a);
+  --orb-b: var(--orb-off-b);
+  --orb-a-rgb: var(--orb-off-a-rgb);
+  --orb-b-rgb: var(--orb-off-b-rgb);
+}
+
+.pd-orb-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220%;
+  height: 220%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(calc(var(--orb-size, 220px) * 0.12));
+  background: radial-gradient(
+    circle,
+    rgba(var(--orb-b-rgb), calc(0.22 * var(--glow, 1))) 0%,
+    rgba(var(--orb-b-rgb), 0) 70%
+  );
+  pointer-events: none;
+}
+
+.pd-orb-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform: scale(calc(1 + var(--pulse, 0) * 0.08));
+  background: radial-gradient(
+    circle at 38% 32%,
+    rgba(var(--orb-a-rgb), 0.95) 0%,
+    rgba(var(--orb-b-rgb), 0.55) 55%,
+    rgba(var(--orb-b-rgb), 0) 78%
+  );
+  box-shadow: 0 0 calc(var(--orb-size, 220px) * 0.18) rgba(var(--orb-a-rgb), calc(0.45 * var(--glow, 1)));
+}
+
+.pd-orb-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  background: radial-gradient(
+    circle at 64% 68%,
+    rgba(var(--orb-a-rgb), 0) 55%,
+    rgba(var(--orb-a-rgb), 0.5) 82%,
+    rgba(var(--orb-a-rgb), 0) 100%
+  );
+}
+
+/* =========================================================================
+   Caption — web/style.css #caption (.partial = interim grey)
+   ========================================================================= */
+
+.pd-caption-label {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 6px;
+}
+
+.pd-caption {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.pd-caption.is-interim {
+  color: var(--ink-2);
+}
+
+.pd-caption.is-final {
+  color: var(--ink);
+}
+
+.pd-caption.is-narrator { color: var(--ink); }
+.pd-caption.is-maya { color: var(--violet); }
+.pd-caption.is-coach { color: var(--teal); }
+
+/* =========================================================================
+   Choice chips — web/style.css #choices / .choice
+   ========================================================================= */
+
+.pd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pd-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  background: rgba(var(--surface-rgb), 0.4);
+  color: var(--ink-2);
+  font-family: var(--font);
+  font-size: 20px;
+}
+
+.pd-chip.is-on {
+  border-color: var(--teal);
+  color: var(--ink);
+  background: rgba(var(--teal-rgb), 0.14);
+  box-shadow: var(--shadow-glow-teal);
+}
+
+/* =========================================================================
+   Slide card — web/style.css #view-present (#present-title/-bullets/-counter)
+   ========================================================================= */
+
+.pd-slide {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+.pd-slide-counter {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+.pd-slide-title {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.pd-slide-bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pd-slide-bullets li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.pd-slide-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.pd-slide-hint {
+  font-size: 18px;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Clock — web/style.css #present-clock
+   ========================================================================= */
+
+.pd-clock {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  letter-spacing: var(--ls-normal);
+  color: var(--ink-3);
+}
+
+.pd-clock.is-warn {
+  color: var(--amber);
+}
+
+/* =========================================================================
+   Waveform strip — container for a live-drawn canvas (S04/S06/S07)
+   ========================================================================= */
+
+.pd-wave {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.pd-wave-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================================
+   Live meter — wpm / fillers / pauses (S04)
+   ========================================================================= */
+
+.pd-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.pd-meter-label {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pd-meter-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-meter-num {
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-meter-unit {
+  font-size: 20px;
+  color: var(--ink-3);
+}
+
+.pd-meter-band {
+  align-self: flex-start;
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  font-size: 16px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.pd-meter-band.is-fast {
+  color: var(--amber);
+  border-color: rgba(var(--amber-rgb), 0.5);
+}
+
+.pd-meter-band.is-good {
+  color: var(--green);
+  border-color: rgba(var(--green-rgb), 0.5);
+}
+
+.pd-meter-band.is-slow {
+  color: var(--peri);
+  border-color: rgba(var(--peri-rgb), 0.5);
+}
+
+/* =========================================================================
+   Scorecard — web/dashboard.css .pd-bars/.pd-bar (renamed container)
+   ========================================================================= */
+
+.pd-scorecard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.pd-bar {
+  display: grid;
+  grid-template-columns: minmax(140px, 260px) 1fr auto;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.pd-bar-label {
+  font-size: 24px;
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+}
+
+.pd-bar-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--hair);
+}
+
+.pd-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--v, 0) / 5 * 100%);
+  border-radius: 3px;
+  background: var(--teal);
+  opacity: 0.9;
+}
+
+.pd-bar-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pd-bar-num {
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-bar-max {
+  font-size: 20px;
+  color: var(--ink-3);
+}
+
+.pd-bar-delta {
+  margin-left: 6px;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.pd-bar-delta.is-flat {
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Metrics strip — web/dashboard.css .pd-metrics-strip/.pd-metric
+   ========================================================================= */
+
+.pd-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+}
+
+.pd-metric {
+  color: var(--ink-2);
+}
+
+.pd-metric-sep {
+  margin: 0 10px;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Improvement card — web/dashboard.css .pd-said/.pd-stage-line/.pd-pause-glyph
+   ========================================================================= */
+
+.pd-imp {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.pd-imp-eyebrow {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pd-line {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-line-label {
+  font-size: 16px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.pd-line-body {
+  font-size: 22px;
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+.pd-line.is-you .pd-line-label,
+.pd-line.is-you .pd-line-body {
+  color: var(--pd-you);
+}
+
+.pd-line.is-say .pd-line-label,
+.pd-line.is-say .pd-line-body {
+  color: var(--pd-coach);
+}
+
+.pd-line.is-paced .pd-line-label {
+  color: var(--ink-3);
+}
+
+.pd-line.is-paced .pd-line-body {
+  color: var(--ink);
+}
+
+.pd-pause-glyph {
+  margin: 0 3px;
+  color: var(--teal);
+  font-size: 0.8em;
+  opacity: 0.9;
+}
+
+/* =========================================================================
+   Drill — word + confidence ring (S08), conic-gradient(--pct)
+   ========================================================================= */
+
+.pd-drill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.pd-drill-word {
+  margin: 0;
+  font-size: 120px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-drill-ring {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(var(--drill-color, var(--teal)) calc(var(--pct, 0) * 1%), var(--hair) 0);
+}
+
+.pd-drill-ring.is-ok { --drill-color: var(--teal); }
+.pd-drill-ring.is-warn { --drill-color: var(--amber); }
+.pd-drill-ring.is-fail { --drill-color: var(--red); }
+
+.pd-drill-ring::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.pd-drill-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* =========================================================================
+   Skill tiles — grid tile for S09 (10 skills)
+   ========================================================================= */
+
+.pd-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.pd-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 10px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  color: var(--ink-2);
+  font-size: 20px;
+  letter-spacing: 0.01em;
+}
+
+.pd-tile.is-lit {
+  border-color: var(--teal);
+  color: var(--ink);
+  background: rgba(var(--teal-rgb), 0.1);
+  box-shadow: var(--shadow-glow-teal);
+}
+
+/* =========================================================================
+   Ladder — Novice -> Speaker -> Presenter -> TEDx (S09)
+   ========================================================================= */
+
+.pd-ladder {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.pd-ladder-line {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 47px;
+  height: 1px;
+  background: var(--hair);
+  z-index: 0;
+}
+
+.pd-ladder-notch {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pd-ladder-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--hair-2);
+  border: 1px solid var(--hair-2);
+}
+
+.pd-ladder-notch.is-active .pd-ladder-dot,
+.pd-ladder-notch.is-done .pd-ladder-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.pd-ladder-label {
+  font-size: 18px;
+  color: var(--ink-3);
+}
+
+.pd-ladder-notch.is-active .pd-ladder-label {
+  color: var(--ink);
+}
+
+.pd-ladder-marker {
+  position: absolute;
+  top: 0;
+  left: calc(var(--pos, 0) / 3 * 100%);
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--teal);
+  color: var(--bg);
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   Sparkline — container for an injected SVG/canvas trend line (S10)
+   ========================================================================= */
+
+.pd-sparkline {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.pd-sparkline > svg,
+.pd-sparkline > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================================
+   Statement — large impact typography (every scene's closing line)
+   ========================================================================= */
+
+.pd-statement {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font);
+  font-size: 88px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+
+.pd-statement-sub {
+  margin: 18px 0 0;
+  font-size: 22px;
+  color: var(--ink-2);
+}
+
+/* =========================================================================
+   Evidence chip — small mono citation pill (corner of scorecard/drill/etc.)
+   ========================================================================= */
+
+.pd-evidence-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  background: rgba(var(--surface-rgb), 0.6);
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Generic card surface
+   ========================================================================= */
+
+.pd-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+/* =========================================================================
+   Shared eyebrow utility (used inside pd-imp / pd-card / pd-evidence-chip)
+   ========================================================================= */
+
+.pd-eyebrow {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}

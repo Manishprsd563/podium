@@ -30,6 +30,8 @@ _PAUSE_MARKUP_RE = re.compile(r"<\d+>")
 
 
 def _content_tokens(text: str) -> set[str]:
+    """Normalised, filler-stripped token set of `text`, for Jaccard
+    overlap in `token_overlap`."""
     tokens: set[str] = set()
     for raw in (text or "").split():
         norm = _normalize_word(raw)
@@ -40,6 +42,9 @@ def _content_tokens(text: str) -> set[str]:
 
 
 def _content_word_count(text: str) -> int:
+    """Count of `text`'s words after dropping filler/crutch tokens -- the
+    "3 or more content words" gate `looks_like_attempt` uses to rule out
+    one-word interjections."""
     count = 0
     for raw in (text or "").split():
         norm = _normalize_word(raw)
@@ -95,6 +100,8 @@ def _text_phrase_matches(norm_tokens: list[str], raw_tokens: list[str], phrase_s
 
 
 def _fillers_from_text(text: str) -> dict:
+    """Filler/crutch count and phrases found in plain (untimed) `text`,
+    used when no word timestamps arrived for the attempt."""
     raw = (text or "").split()
     norm = [_normalize_word(t) for t in raw]
     vocal = _text_phrase_matches(norm, raw, VOCAL_FILLERS)
@@ -104,6 +111,8 @@ def _fillers_from_text(text: str) -> dict:
 
 
 def _fillers_from_words(words: list[dict]) -> dict:
+    """Filler/crutch count and phrases found in timestamped `words`, the
+    preferred source over `_fillers_from_text` when available."""
     ws = sorted(words, key=lambda w: w["start"])
     vocal = _scan_phrases(ws, VOCAL_FILLERS)
     crutch = _scan_phrases(ws, VERBAL_CRUTCHES)
@@ -112,6 +121,11 @@ def _fillers_from_words(words: list[dict]) -> dict:
 
 
 def _pauses_from_words(words: list[dict]) -> dict:
+    """Pause stats for one practice attempt: gaps >= PAUSE_MIN_S (0.35 s)
+    between consecutive words, `longest_s` the largest of them, and
+    `landed` true once that longest gap reaches 0.4 s -- CONTRACTS.md §7's
+    threshold for "the pause actually landed" (deliberately stricter than
+    the 0.35 s floor that counts a gap as a pause at all)."""
     if not words:
         return {"count": 0, "longest_s": 0.0, "landed": False}
     ws = sorted(words, key=lambda w: w["start"])
@@ -123,6 +137,8 @@ def _pauses_from_words(words: list[dict]) -> dict:
 
 
 def _word_count(text: str, words: list[dict]) -> int:
+    """Word count for the verdict: timestamped `words` when available,
+    else a plain whitespace split of `text`."""
     if words:
         return len(words)
     return len((text or "").split())

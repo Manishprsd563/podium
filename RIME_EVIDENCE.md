@@ -285,6 +285,33 @@ and the worst single trial did not improve reliably (baseline 2432 ms; tuned 140
 This is a real, currently-missed target, reported as such rather than hidden or rounded away —
 it is the evidence gap named at the top of this project.
 
+**Config shipped after this measurement (2026-09-09), and why.** The live agent no longer runs
+the `tuned_interruption` row verbatim: `interruption.min_duration` is now `0.3`,
+`false_interruption_timeout` is `None`, `discard_audio_if_uninterruptible` is `False`, and
+`aec_warmup_duration` is `0.0`. The numbers above therefore describe the configuration as
+measured, not as shipped, and are left unedited rather than re-attributed. Three reasons, each
+a defect this pass fixed:
+
+- **`false_interruption_timeout=None`.** With the pause/resume recovery armed, livekit-agents
+  1.8.0 pauses playout on a sub-threshold burst and, at resume, discards up to ~200 ms of
+  already-queued audio (`voice/room_io/_output.py` clears `_playback_enabled` and drops the next
+  forwarded frame) before picking up mid-word. That splice is audible as a harsh discontinuity
+  mid-sentence, and it is the same behaviour this section's own
+  `latency_decomposition.reliable: false` note describes as resumed speech the harness had
+  already counted as interrupted.
+- **`aec_warmup_duration=0.0`.** The SDK default (3 s) re-arms on agent speech and feeds
+  *silence* to STT for that window, so an answer given in the first three seconds after a
+  question is never transcribed. Measured directly on 2026-09-09: "Beginner, please." spoken
+  1.3 s into the coach's level question produced `user_speech_start`/`user_speech_end` with no
+  transcript at all, and the setup flow then timed out and defaulted. The browser publishes
+  with `echoCancellation` on, and push-to-talk keeps the microphone muted unless the user is
+  deliberately holding the floor, so the warmup no longer earns its cost.
+- **`min_duration` 0.12 → 0.3 and `discard_audio_if_uninterruptible=False`.** Push-to-talk
+  makes a stray in-speech noise rare, so the extra barge-in latency is cheap; keeping the STT
+  path fed matters more than shaving it, because a lost answer is a worse failure than a slow
+  stop. Re-measuring `evidence/e2_live_room.py` against the shipped config is the honest next
+  step and has not been run.
+
 **Why the numbers aren't a clean per-trial latency measurement.** Both runs' own
 `latency_decomposition.reliable` fields are `false`, with the exact reason recorded:
 *"23 agent-side 'interrupt' events were logged for only 12 successful trials (ratio 1.92x),

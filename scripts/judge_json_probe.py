@@ -3,6 +3,8 @@
 Podium's judge must return a parseable scorecard every time. This runs the real
 judge-shaped prompt repeatedly and reports parse rate and latency.
 Run: .venv/Scripts/python.exe scripts/judge_json_probe.py [runs]
+Writes: nothing (stdout only). Needs: LIVEKIT_API_KEY/LIVEKIT_API_SECRET
+(authenticates LiveKit Inference; see .env.example).
 """
 from __future__ import annotations
 

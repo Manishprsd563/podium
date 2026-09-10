@@ -89,6 +89,9 @@ from evidence._common import RIME_LANG, RIME_MODEL, RIME_SPEAKER, rime_rest_synt
 from livekit import rtc  # noqa: E402
 from livekit.api import AccessToken, VideoGrants  # noqa: E402
 
+_missing_livekit_env = [k for k in ("LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET") if not os.environ.get(k)]
+if _missing_livekit_env:
+    raise SystemExit(f"missing {', '.join(_missing_livekit_env)} -- copy .env.example to .env and fill it in")
 LIVEKIT_URL = os.environ["LIVEKIT_URL"]
 LIVEKIT_API_KEY = os.environ["LIVEKIT_API_KEY"]
 LIVEKIT_API_SECRET = os.environ["LIVEKIT_API_SECRET"]

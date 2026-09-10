@@ -49,26 +49,58 @@ def span_for_quote(quote: str, words: list[dict]) -> tuple[float, float] | None:
     Normalises tokens like `metrics._normalize_word` and allows at most one
     mismatched word per six words of quote (rounded down, minimum 0 for very
     short quotes). Returns (first_word.start, last_word.end) of the best
-    (fewest-mismatch) match, or None if nothing matches within tolerance.
-    """
+    (fewest-mismatch) match. If even that fails -- ordinary drift in the
+    middle of a long quote -- a final fallback matches the quote's first and
+    last 3 tokens independently and takes the longest span whose token count
+    is within +-40% of the quote's. Returns None only when nothing matches."""
     quote_tokens = [_normalize_word(t) for t in quote.split() if _normalize_word(t)]
     n = len(quote_tokens)
     if n == 0 or not words:
         return None
     word_tokens = [_normalize_word(w["w"]) for w in words]
     allowed = n // 6
-    best: tuple[int, int] | None = None  # (mismatches, start_idx)
+    best: tuple[int, int] | None = None  # (mismatches, start_idx, end_idx)
     for start in range(len(word_tokens) - n + 1):
         window = word_tokens[start:start + n]
         mismatches = sum(1 for a, b in zip(window, quote_tokens) if a != b)
         if mismatches <= allowed and (best is None or mismatches < best[0]):
-            best = (mismatches, start)
+            best = (mismatches, start, start + n - 1)
             if mismatches == 0:
                 break
     if best is None:
+        span = _anchor_span(quote_tokens, word_tokens, n)
+        if span is None:
+            return None
+        best = (0, span[0], span[1])
+    _, start, end = best
+    return float(words[start]["start"]), float(words[end]["end"])
+
+
+def _anchor_span(quote_tokens: list[str], word_tokens: list[str], n: int) -> tuple[int, int] | None:
+    """Final fallback for `span_for_quote`: match the quote's first and last 3
+    normalised tokens as independent exact anchors, then pick the longest
+    span between them whose token count stays within +-40% of the quote's --
+    ordinary STT drift in the middle of a long quote must still yield a span.
+    Pure: returns None when even the anchors do not line up."""
+    k = min(3, n)
+    head, tail = quote_tokens[:k], quote_tokens[n - k:]
+    head_starts = [i for i in range(len(word_tokens) - k + 1)
+                   if word_tokens[i:i + k] == head]
+    tail_ends = [i for i in range(k - 1, len(word_tokens))
+                 if word_tokens[i - k + 1:i + 1] == tail]
+    if not head_starts or not tail_ends:
         return None
-    _, start = best
-    return float(words[start]["start"]), float(words[start + n - 1]["end"])
+    lo, hi = round(n * 0.6), round(n * 1.4)
+    best: tuple[int, int] | None = None
+    for hs in head_starts:
+        for te in tail_ends:
+            span_n = te - hs + 1
+            if span_n >= lo and span_n <= hi and (best is None or span_n > best[1] - best[0]):
+                best = (hs, te)
+    if best is None:
+        return None
+    start, end = best
+    return start, end
 
 
 def slice_wav(src: Path, start: float, end: float, out: Path, pad_s: float = 0.25, fade_ms: int = 15) -> dict:

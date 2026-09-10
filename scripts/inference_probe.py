@@ -3,6 +3,8 @@
 The opencode-go gateway proved slow and non-deterministic (reasoning-only
 responses, intermittently empty content). Inference needs no extra credential.
 Run: .venv/Scripts/python.exe scripts/inference_probe.py
+Writes: nothing (stdout only). Needs: LIVEKIT_API_KEY/LIVEKIT_API_SECRET
+(authenticates LiveKit Inference; see .env.example).
 """
 from __future__ import annotations
 

@@ -6,6 +6,10 @@ live with the shipped Deepgram config so the word timings/confidences are
 real, not fabricated.
 
 Run: .venv/Scripts/python.exe scripts/analysis_smoke.py
+Writes scripts/_smoke_out/clips/*.wav
+Needs: DEEPGRAM_API_KEY, RIME_API_KEY, and the LiveKit Inference credentials
+(LIVEKIT_API_KEY/LIVEKIT_API_SECRET) that analysis.judge/analysis.deck call
+through -- see .env.example.
 """
 from __future__ import annotations
 
@@ -34,7 +38,9 @@ OUT_DIR = Path("scripts/_smoke_out/clips")
 def transcribe_words(wav_path: Path) -> tuple[str, list[dict]]:
     """Real Deepgram nova-3 transcript + word timings/confidences for the fixture clip,
     using the exact shipped STT config (filler_words, punctuate)."""
-    key = os.environ["DEEPGRAM_API_KEY"]
+    key = os.environ.get("DEEPGRAM_API_KEY", "")
+    if not key:
+        raise SystemExit("DEEPGRAM_API_KEY missing -- copy .env.example to .env and fill it in")
     url = (
         "https://api.deepgram.com/v1/listen?model=nova-3&language=en"
         "&punctuate=true&filler_words=true&numerals=false"
@@ -80,11 +86,14 @@ async def main() -> None:
     judgment = await judge_mod.judge(deck, deck["slides"][0], transcript_text, words, metrics)
     print(json.dumps(judgment, indent=2))
 
-    expected_top = {"scores", "summary", "improvements", "terms_to_drill"}
+    # CONTRACTS.md §3 (v2): `drill_words` alongside `terms_to_drill`, a
+    # `pronunciation` score, and `skill`/`slide` on every improvement.
+    expected_top = {"scores", "summary", "improvements", "terms_to_drill", "drill_words"}
     assert set(judgment.keys()) == expected_top, f"unexpected top-level keys: {judgment.keys()}"
-    expected_scores = {"delivery", "clarity", "structure", "slide_connection"}
+    expected_scores = {"delivery", "clarity", "structure", "slide_connection", "pronunciation"}
     assert set(judgment["scores"].keys()) == expected_scores, f"unexpected score keys: {judgment['scores'].keys()}"
-    expected_imp_keys = {"id", "quote", "span", "issue", "rubric_ref", "v2_text", "v3_markup", "alternative"}
+    expected_imp_keys = {"id", "quote", "span", "issue", "rubric_ref", "v2_text", "v3_markup",
+                         "alternative", "skill", "slide"}
     for imp in judgment["improvements"]:
         assert set(imp.keys()) == expected_imp_keys, f"unexpected improvement keys: {imp.keys()}"
         assert imp["quote"].lower() in transcript_text.lower(), f"quote not a real substring: {imp['quote']!r}"

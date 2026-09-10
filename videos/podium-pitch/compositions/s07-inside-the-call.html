@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+/* ---- ui/tokens.css, inlined: sub-composition CSS scoping can't match `:root`
+   (an ancestor of the composition root, never a descendant), so the block is
+   retargeted to `#root`, which the scoper special-cases to keep matching. ---- */
+/* =========================================================================
+   Podium pitch video — design tokens
+   Extracted from web/style.css (:root) and web/dashboard.css (.dash-root),
+   plus the orb.js STATES colour table. This file declares values only —
+   no selectors beyond :root, no layout, no animation. components.css and
+   every scene reference these custom properties instead of literal colour.
+   ========================================================================= */
+
+#root {
+  /* ---- surfaces ---------------------------------------------------- */
+  --bg: #0b0d12;               /* canvas / page background (web/style.css --bg) */
+  --bg-rgb: 11, 13, 18;
+  --surface: #11151d;          /* card / pill / slide background (web/style.css --bg-2) */
+  --surface-rgb: 17, 21, 29;
+  --surface-2: #161c27;        /* nested surface (drill ring hole, tile hover) */
+  --surface-2-rgb: 22, 28, 39;
+
+  /* ---- ink (text) ---------------------------------------------------- */
+  --ink: #f3f5f9;               /* primary text */
+  --ink-rgb: 243, 245, 249;
+  --ink-2: rgba(var(--ink-rgb), 0.66);   /* soft text (web/style.css --ink-soft) */
+  --ink-3: rgba(var(--ink-rgb), 0.52);   /* faint text (web/style.css --ink-faint) */
+
+  /* ---- hairlines ------------------------------------------------------ */
+  --hair: rgba(var(--ink-rgb), 0.10);     /* web/style.css --hairline */
+  --hair-2: rgba(var(--ink-rgb), 0.16);   /* stronger hairline for borders that need to read at a distance */
+
+  /* ---- accents (web/style.css --accent / --accent-2 / --user / etc.) - */
+  --teal: #5ee1d0;              /* --accent */
+  --teal-rgb: 94, 225, 208;
+  --peri: #7b8cff;              /* --accent-2 */
+  --peri-rgb: 123, 140, 255;
+  --violet: #8f7bff;            /* --user (Maya / listening) */
+  --violet-rgb: 143, 123, 255;
+  --amber: #f5c451;             /* --wait / --warn */
+  --amber-rgb: 245, 196, 81;
+  --red: #ff5c5c;               /* --danger */
+  --red-rgb: 255, 92, 92;
+  --green: #5ee1a0;             /* --good */
+  --green-rgb: 94, 225, 160;
+  --mic: #3ddc84;               /* orb.js STATES.micLive colorA */
+  --mic-rgb: 61, 220, 132;
+  --think: #8a94a6;             /* --think / orb.js STATES.thinking colorA */
+  --think-rgb: 138, 148, 166;
+
+  /* dashboard two-voice ink (web/dashboard.css .dash-root --pd-you / --pd-coach) */
+  --pd-you: var(--red);
+  --pd-coach: var(--green);
+
+  /* ---- orb duotone per state (orb.js STATES table, colorA -> colorB) - */
+  --orb-idle-a: #5ee1d0;    /* idle + speaking share this pair */
+  --orb-idle-a-rgb: 94, 225, 208;
+  --orb-idle-b: #7b8cff;
+  --orb-idle-b-rgb: 123, 140, 255;
+  --orb-listen-a: #8f7bff;  /* listening */
+  --orb-listen-a-rgb: 143, 123, 255;
+  --orb-listen-b: #5ee1d0;
+  --orb-listen-b-rgb: 94, 225, 208;
+  --orb-mic-a: #3ddc84;     /* micLive */
+  --orb-mic-a-rgb: 61, 220, 132;
+  --orb-mic-b: #1f9d5a;
+  --orb-mic-b-rgb: 31, 157, 90;
+  --orb-wait-a: #f5c451;    /* waiting */
+  --orb-wait-a-rgb: 245, 196, 81;
+  --orb-wait-b: #ffdf8a;
+  --orb-wait-b-rgb: 255, 223, 138;
+  --orb-think-a: #8a94a6;   /* thinking */
+  --orb-think-a-rgb: 138, 148, 166;
+  --orb-think-b: #b6c0cf;
+  --orb-think-b-rgb: 182, 192, 207;
+  --orb-connect-a: #8a94a6; /* connecting / reconnecting */
+  --orb-connect-a-rgb: 138, 148, 166;
+  --orb-connect-b: #5b6472;
+  --orb-connect-b-rgb: 91, 100, 114;
+  --orb-off-a: #ff5c5c;     /* disconnected */
+  --orb-off-a-rgb: 255, 92, 92;
+  --orb-off-b: #7a1f1f;
+  --orb-off-b-rgb: 122, 31, 31;
+
+  /* ---- type ------------------------------------------------------------ */
+  --font: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --ls-tight: -0.01em;
+  --ls-normal: 0em;
+  --ls-wide: 0.06em;
+  --ls-wider: 0.12em;
+
+  /* ---- shape / elevation ------------------------------------------------ */
+  --radius: 18px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--ink-rgb), 0.04);
+  --shadow-glow-teal: 0 0 24px rgba(var(--teal-rgb), 0.35);
+  --shadow-glow-amber: 0 0 18px rgba(var(--amber-rgb), 0.35);
+  --shadow-glow-red: 0 0 18px rgba(var(--red-rgb), 0.35);
+  --shadow-glow-green: 0 0 18px rgba(var(--green-rgb), 0.35);
+
+  /* ---- reference timing (informational — components.css never applies
+     these as `transition`/`animation`; scenes read them for GSAP eases) --- */
+  --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --dur: 260ms;
+  --dur-slow: 640ms;
+
+  /* ---- component metrics ------------------------------------------------ */
+  --statusbar-h: 56px;
+}
+
+/* ---- ui/components.css, inlined (unchanged: already class-scoped) ---- */
+/* =========================================================================
+   Podium pitch video — component kit
+   Faithful, class-based reproductions of web/style.css + web/dashboard.css
+   + the orb.js palette, resized for a fixed 1920x1080 canvas. Every colour
+   is a var() from tokens.css — nothing here is animated: no @keyframes, no
+   `animation:`, no `transition:`. Scenes drive motion with GSAP, tweening
+   transforms/opacity and the custom properties called out per component in
+   ui/README.md (--pct, --v, --pos, --pulse, --glow, --lvl, --orb-size, ...).
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* =========================================================================
+   Status bar — web/style.css #statusbar + web/app.js renderStatusbar()
+   Segment order: conn · agent · provider(badge) · attention · phase ·
+   stage · mic · room, exactly as narrated in SCRIPT.md.
+   ========================================================================= */
+
+.pd-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: var(--statusbar-h);
+  padding: 0 40px;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  letter-spacing: var(--ls-normal);
+  color: var(--ink-3);
+  background: linear-gradient(to top, var(--bg) 55%, transparent);
+  white-space: nowrap;
+}
+
+.pd-statusbar-seg {
+  color: var(--ink-3);
+}
+
+.pd-statusbar-seg.is-badge {
+  color: var(--teal);
+  letter-spacing: var(--ls-wide);
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 2px;
+}
+
+.pd-statusbar-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  flex: 0 0 auto;
+}
+
+.pd-level {
+  position: relative;
+  width: 96px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.pd-level-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--teal);
+  transform-origin: left center;
+  transform: scaleX(var(--lvl, 0));
+}
+
+/* =========================================================================
+   Orb — orb.js palette (STATES table), rebuilt as 3 layered CSS gradients:
+   halo (outer blurred bloom) -> core (main gradient sphere, --pulse scale)
+   -> rim (fresnel highlight, screen blend). State classes swap --orb-a/-b.
+   ========================================================================= */
+
+.pd-orb {
+  position: relative;
+  width: var(--orb-size, 220px);
+  height: var(--orb-size, 220px);
+  --pulse: 0;
+  --glow: 1;
+  --orb-a: var(--orb-idle-a);
+  --orb-b: var(--orb-idle-b);
+  --orb-a-rgb: var(--orb-idle-a-rgb);
+  --orb-b-rgb: var(--orb-idle-b-rgb);
+}
+
+.pd-orb.is-idle, .pd-orb.is-speaking {
+  --orb-a: var(--orb-idle-a);
+  --orb-b: var(--orb-idle-b);
+  --orb-a-rgb: var(--orb-idle-a-rgb);
+  --orb-b-rgb: var(--orb-idle-b-rgb);
+}
+
+.pd-orb.is-listening {
+  --orb-a: var(--orb-listen-a);
+  --orb-b: var(--orb-listen-b);
+  --orb-a-rgb: var(--orb-listen-a-rgb);
+  --orb-b-rgb: var(--orb-listen-b-rgb);
+}
+
+.pd-orb.is-mic-live {
+  --orb-a: var(--orb-mic-a);
+  --orb-b: var(--orb-mic-b);
+  --orb-a-rgb: var(--orb-mic-a-rgb);
+  --orb-b-rgb: var(--orb-mic-b-rgb);
+}
+
+.pd-orb.is-waiting {
+  --orb-a: var(--orb-wait-a);
+  --orb-b: var(--orb-wait-b);
+  --orb-a-rgb: var(--orb-wait-a-rgb);
+  --orb-b-rgb: var(--orb-wait-b-rgb);
+}
+
+.pd-orb.is-thinking {
+  --orb-a: var(--orb-think-a);
+  --orb-b: var(--orb-think-b);
+  --orb-a-rgb: var(--orb-think-a-rgb);
+  --orb-b-rgb: var(--orb-think-b-rgb);
+}
+
+.pd-orb.is-connecting {
+  --orb-a: var(--orb-connect-a);
+  --orb-b: var(--orb-connect-b);
+  --orb-a-rgb: var(--orb-connect-a-rgb);
+  --orb-b-rgb: var(--orb-connect-b-rgb);
+}
+
+.pd-orb.is-disconnected {
+  --orb-a: var(--orb-off-a);
+  --orb-b: var(--orb-off-b);
+  --orb-a-rgb: var(--orb-off-a-rgb);
+  --orb-b-rgb: var(--orb-off-b-rgb);
+}
+
+.pd-orb-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220%;
+  height: 220%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(calc(var(--orb-size, 220px) * 0.12));
+  background: radial-gradient(
+    circle,
+    rgba(var(--orb-b-rgb), calc(0.22 * var(--glow, 1))) 0%,
+    rgba(var(--orb-b-rgb), 0) 70%
+  );
+  pointer-events: none;
+}
+
+.pd-orb-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform: scale(calc(1 + var(--pulse, 0) * 0.08));
+  background: radial-gradient(
+    circle at 38% 32%,
+    rgba(var(--orb-a-rgb), 0.95) 0%,
+    rgba(var(--orb-b-rgb), 0.55) 55%,
+    rgba(var(--orb-b-rgb), 0) 78%
+  );
+  box-shadow: 0 0 calc(var(--orb-size, 220px) * 0.18) rgba(var(--orb-a-rgb), calc(0.45 * var(--glow, 1)));
+}
+
+.pd-orb-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  background: radial-gradient(
+    circle at 64% 68%,
+    rgba(var(--orb-a-rgb), 0) 55%,
+    rgba(var(--orb-a-rgb), 0.5) 82%,
+    rgba(var(--orb-a-rgb), 0) 100%
+  );
+}
+
+/* =========================================================================
+   Caption — web/style.css #caption (.partial = interim grey)
+   ========================================================================= */
+
+.pd-caption-label {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 6px;
+}
+
+.pd-caption {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.pd-caption.is-interim {
+  color: var(--ink-2);
+}
+
+.pd-caption.is-final {
+  color: var(--ink);
+}
+
+.pd-caption.is-narrator { color: var(--ink); }
+.pd-caption.is-maya { color: var(--violet); }
+.pd-caption.is-coach { color: var(--teal); }
+
+/* =========================================================================
+   Choice chips — web/style.css #choices / .choice
+   ========================================================================= */
+
+.pd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pd-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  background: rgba(var(--surface-rgb), 0.4);
+  color: var(--ink-2);
+  font-family: var(--font);
+  font-size: 20px;
+}
+
+.pd-chip.is-on {
+  border-color: var(--teal);
+  color: var(--ink);
+  background: rgba(var(--teal-rgb), 0.14);
+  box-shadow: var(--shadow-glow-teal);
+}
+
+/* =========================================================================
+   Slide card — web/style.css #view-present (#present-title/-bullets/-counter)
+   ========================================================================= */
+
+.pd-slide {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+.pd-slide-counter {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+.pd-slide-title {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.pd-slide-bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pd-slide-bullets li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.pd-slide-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.pd-slide-hint {
+  font-size: 18px;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Clock — web/style.css #present-clock
+   ========================================================================= */
+
+.pd-clock {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  letter-spacing: var(--ls-normal);
+  color: var(--ink-3);
+}
+
+.pd-clock.is-warn {
+  color: var(--amber);
+}
+
+/* =========================================================================
+   Waveform strip — container for a live-drawn canvas (S04/S06/S07)
+   ========================================================================= */
+
+.pd-wave {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.pd-wave-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================================
+   Live meter — wpm / fillers / pauses (S04)
+   ========================================================================= */
+
+.pd-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.pd-meter-label {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pd-meter-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-meter-num {
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-meter-unit {
+  font-size: 20px;
+  color: var(--ink-3);
+}
+
+.pd-meter-band {
+  align-self: flex-start;
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  font-size: 16px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.pd-meter-band.is-fast {
+  color: var(--amber);
+  border-color: rgba(var(--amber-rgb), 0.5);
+}
+
+.pd-meter-band.is-good {
+  color: var(--green);
+  border-color: rgba(var(--green-rgb), 0.5);
+}
+
+.pd-meter-band.is-slow {
+  color: var(--peri);
+  border-color: rgba(var(--peri-rgb), 0.5);
+}
+
+/* =========================================================================
+   Scorecard — web/dashboard.css .pd-bars/.pd-bar (renamed container)
+   ========================================================================= */
+
+.pd-scorecard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.pd-bar {
+  display: grid;
+  grid-template-columns: minmax(140px, 260px) 1fr auto;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.pd-bar-label {
+  font-size: 24px;
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+}
+
+.pd-bar-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--hair);
+}
+
+.pd-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--v, 0) / 5 * 100%);
+  border-radius: 3px;
+  background: var(--teal);
+  opacity: 0.9;
+}
+
+.pd-bar-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pd-bar-num {
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-bar-max {
+  font-size: 20px;
+  color: var(--ink-3);
+}
+
+.pd-bar-delta {
+  margin-left: 6px;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.pd-bar-delta.is-flat {
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Metrics strip — web/dashboard.css .pd-metrics-strip/.pd-metric
+   ========================================================================= */
+
+.pd-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+}
+
+.pd-metric {
+  color: var(--ink-2);
+}
+
+.pd-metric-sep {
+  margin: 0 10px;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Improvement card — web/dashboard.css .pd-said/.pd-stage-line/.pd-pause-glyph
+   ========================================================================= */
+
+.pd-imp {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.pd-imp-eyebrow {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pd-line {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-line-label {
+  font-size: 16px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.pd-line-body {
+  font-size: 22px;
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+.pd-line.is-you .pd-line-label,
+.pd-line.is-you .pd-line-body {
+  color: var(--pd-you);
+}
+
+.pd-line.is-say .pd-line-label,
+.pd-line.is-say .pd-line-body {
+  color: var(--pd-coach);
+}
+
+.pd-line.is-paced .pd-line-label {
+  color: var(--ink-3);
+}
+
+.pd-line.is-paced .pd-line-body {
+  color: var(--ink);
+}
+
+.pd-pause-glyph {
+  margin: 0 3px;
+  color: var(--teal);
+  font-size: 0.8em;
+  opacity: 0.9;
+}
+
+/* =========================================================================
+   Drill — word + confidence ring (S08), conic-gradient(--pct)
+   ========================================================================= */
+
+.pd-drill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.pd-drill-word {
+  margin: 0;
+  font-size: 120px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-drill-ring {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(var(--drill-color, var(--teal)) calc(var(--pct, 0) * 1%), var(--hair) 0);
+}
+
+.pd-drill-ring.is-ok { --drill-color: var(--teal); }
+.pd-drill-ring.is-warn { --drill-color: var(--amber); }
+.pd-drill-ring.is-fail { --drill-color: var(--red); }
+
+.pd-drill-ring::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.pd-drill-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* =========================================================================
+   Skill tiles — grid tile for S09 (10 skills)
+   ========================================================================= */
+
+.pd-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.pd-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 10px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  color: var(--ink-2);
+  font-size: 20px;
+  letter-spacing: 0.01em;
+}
+
+.pd-tile.is-lit {
+  border-color: var(--teal);
+  color: var(--ink);
+  background: rgba(var(--teal-rgb), 0.1);
+  box-shadow: var(--shadow-glow-teal);
+}
+
+/* =========================================================================
+   Ladder — Novice -> Speaker -> Presenter -> TEDx (S09)
+   ========================================================================= */
+
+.pd-ladder {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.pd-ladder-line {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 47px;
+  height: 1px;
+  background: var(--hair);
+  z-index: 0;
+}
+
+.pd-ladder-notch {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pd-ladder-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--hair-2);
+  border: 1px solid var(--hair-2);
+}
+
+.pd-ladder-notch.is-active .pd-ladder-dot,
+.pd-ladder-notch.is-done .pd-ladder-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.pd-ladder-label {
+  font-size: 18px;
+  color: var(--ink-3);
+}
+
+.pd-ladder-notch.is-active .pd-ladder-label {
+  color: var(--ink);
+}
+
+.pd-ladder-marker {
+  position: absolute;
+  top: 0;
+  left: calc(var(--pos, 0) / 3 * 100%);
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--teal);
+  color: var(--bg);
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   Sparkline — container for an injected SVG/canvas trend line (S10)
+   ========================================================================= */
+
+.pd-sparkline {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.pd-sparkline > svg,
+.pd-sparkline > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================================
+   Statement — large impact typography (every scene's closing line)
+   ========================================================================= */
+
+.pd-statement {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font);
+  font-size: 88px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+
+.pd-statement-sub {
+  margin: 18px 0 0;
+  font-size: 22px;
+  color: var(--ink-2);
+}
+
+/* =========================================================================
+   Evidence chip — small mono citation pill (corner of scorecard/drill/etc.)
+   ========================================================================= */
+
+.pd-evidence-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hair-2);
+  background: rgba(var(--surface-rgb), 0.6);
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+}
+
+/* =========================================================================
+   Generic card surface
+   ========================================================================= */
+
+.pd-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+/* =========================================================================
+   Shared eyebrow utility (used inside pd-imp / pd-card / pd-evidence-chip)
+   ========================================================================= */
+
+.pd-eyebrow {
+  font-size: 17px;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+</style>
+      <style>
+        #root {
+          position: relative;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          font-family: var(--font);
+          color: var(--ink);
+        }
+        #s07-bg {
+          position: absolute;
+          inset: 0;
+          background: var(--bg);
+        }
+        /* single soft radial glow — replaces the old dotted/gridded "AI" background */
+        #s07-bg-glow {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(1100px 620px at 960px 520px, rgba(var(--teal-rgb), 0.05), transparent 70%);
+          opacity: 0;
+        }
+
+        /* ---- Beat A: the actual Podium statusbar (real screenshot), staged in
+           podium-launch's footage-frame chrome, then it expands to become the
+           signal architecture underneath ---- */
+        #s07-status-frame {
+          position: absolute;
+          left: 110px;
+          top: 310px;
+          width: 1700px;
+          height: 240px;
+          opacity: 0;
+        }
+        #s07-status-frame-chrome {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          border-radius: 16px;
+          border: 1px solid var(--hair-2);
+          box-shadow: var(--shadow-card);
+          background: rgba(var(--bg-rgb), 0.82);
+        }
+        #s07-status-zoom {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transform-origin: 50% 50%;
+        }
+        #s07-status-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+        }
+        #s07-status-highlight {
+          position: absolute;
+          left: 245px;
+          top: 90px;
+          width: 220px;
+          height: 62px;
+          border-bottom: 2px solid var(--teal);
+          background: linear-gradient(180deg, rgba(var(--teal-rgb), 0), rgba(var(--teal-rgb), 0.12));
+          box-shadow: 0 12px 30px rgba(var(--teal-rgb), 0.14);
+          transform-origin: left center;
+          pointer-events: none;
+          opacity: 0;
+        }
+
+        /* ---- header: eyebrow + statement + sub, persists once revealed ---- */
+        #s07-header {
+          position: absolute;
+          left: 120px;
+          top: 104px;
+          width: 900px;
+          opacity: 0;
+        }
+        #s07-header .pd-eyebrow {
+          margin: 0 0 12px;
+        }
+        #s07-header .s07-statement {
+          width: 460px;
+          margin: 0;
+          font-size: 56px;
+          line-height: 1.1;
+          max-width: none;
+        }
+        #s07-header .s07-header-sub {
+          margin: 14px 0 0;
+          font-family: var(--font-mono);
+          font-size: 17px;
+          letter-spacing: var(--ls-wide);
+          color: var(--ink-3);
+          white-space: nowrap;
+        }
+
+        /* ---- diagram nodes: icon + name + mono detail, no bordered boxes ---- */
+        .s07-node {
+          position: absolute;
+          width: 290px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        .s07-icon {
+          display: block;
+          width: 56px;
+          height: 56px;
+          margin-bottom: 24px;
+          color: var(--ink-2);
+          overflow: visible;
+        }
+        .s07-icon path,
+        .s07-icon line,
+        .s07-icon circle,
+        .s07-icon rect {
+          stroke: currentColor;
+          stroke-width: 1.6;
+          fill: none;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        .s07-node.is-rime .s07-icon {
+          color: var(--teal);
+        }
+        .s07-node-name {
+          margin: 0 0 10px;
+          font-size: 28px;
+          font-weight: 500;
+          line-height: 1.2;
+          color: var(--ink);
+          white-space: nowrap;
+          opacity: 0;
+        }
+        .s07-node-detail {
+          margin: 0;
+          font-family: var(--font-mono);
+          font-size: 15px;
+          line-height: 1.35;
+          letter-spacing: var(--ls-wide);
+          color: var(--ink-3);
+          white-space: pre-line;
+          opacity: 0;
+        }
+
+        /* restrained secondary lane: REST node reads quieter, never competing
+           with the live duplex path above it */
+        .s07-node.is-secondary .s07-icon {
+          width: 44px;
+          height: 44px;
+          margin-bottom: 20px;
+          color: var(--ink-3);
+        }
+        .s07-node.is-secondary .s07-node-name {
+          font-size: 24px;
+          color: var(--ink-2);
+          margin-bottom: 8px;
+        }
+        .s07-node.is-secondary .s07-node-detail {
+          font-size: 14px;
+        }
+
+        /* ---- connectors: hairlines only, no arrowheads, no boxes ---- */
+        .s07-connector {
+          position: absolute;
+          background: var(--hair-2);
+          transform: scaleX(0);
+          transform-origin: left center;
+        }
+        .s07-connector.is-h {
+          height: 1px;
+        }
+        .s07-connector.is-v {
+          width: 1px;
+          transform: scaleY(0);
+          transform-origin: top center;
+        }
+        .s07-connector.is-dim {
+          background: var(--hair);
+        }
+        #s07-rest-junction {
+          position: absolute;
+          left: 1110px;
+          top: 614px;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: var(--teal);
+          opacity: 0;
+        }
+
+        .s07-packet {
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          margin-left: -3px;
+          margin-top: -3px;
+          border-radius: 50%;
+          background: var(--teal);
+          box-shadow: 0 0 10px rgba(var(--teal-rgb), 0.85);
+          opacity: 0;
+        }
+
+        /* ---- WebSocket lane: the Rime -> speaker connector doubles as a tiny
+           streaming waveform instead of a duplicated packet dot ---- */
+        #s07-ws-wave {
+          position: absolute;
+          left: 1508px;
+          top: 460px;
+          width: 120px;
+          height: 20px;
+          opacity: 0;
+        }
+
+        /* ---- narrator caption: beat-synced phrases, plain text, no card nesting ---- */
+        #s07-caption-wrap {
+          position: absolute;
+          left: 120px;
+          top: 850px;
+          width: 960px;
+          opacity: 0;
+        }
+        #s07-caption-wrap .pd-caption {
+          font-size: 32px;
+          max-width: none;
+        }
+      </style>
+
+      <div id="root" data-composition-id="s07-inside-the-call" data-width="1920" data-height="1080" data-duration="20.0">
+        <div id="s07-bg"></div>
+        <div id="s07-bg-glow"></div>
+
+        <!-- Beat A: the actual statusbar, a real screenshot, staged in the
+             launch-style browser frame before it expands into the schematic -->
+        <div id="s07-status-frame">
+          <div id="s07-status-frame-chrome">
+            <div id="s07-status-zoom">
+              <img id="s07-status-img" src="public/clips/still_statusbar.png" alt="">
+              <div id="s07-status-highlight" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="s07-header">
+          <p class="pd-eyebrow">INSIDE THE CALL</p>
+          <p class="pd-statement s07-statement">One duplex call. Two Rime roles.</p>
+          <p class="s07-header-sub">live coach voice over WebSocket · contrast clips over REST</p>
+        </div>
+
+        <!-- main duplex lane: 6 nodes on one baseline, icon center y=470, pitch 304px -->
+        <div class="s07-connector is-h" id="s07-conn-0" style="left:228px; top:470px; width:248px"></div>
+        <div class="s07-connector is-h" id="s07-conn-1" style="left:532px; top:470px; width:248px"></div>
+        <div class="s07-connector is-h" id="s07-conn-2" style="left:836px; top:470px; width:248px"></div>
+        <div class="s07-connector is-h" id="s07-conn-3" style="left:1140px; top:470px; width:248px"></div>
+        <div class="s07-connector is-h" id="s07-conn-4" style="left:1444px; top:470px; width:248px"></div>
+
+        <!-- restrained secondary lane: SessionGraph also renders clips over REST -->
+        <div id="s07-rest-junction"></div>
+        <div class="s07-connector is-v is-dim" id="s07-conn-rest" style="left:1112px; top:616px; height:52px"></div>
+
+        <div class="s07-packet" id="s07-packet-0"></div>
+        <div class="s07-packet" id="s07-packet-1"></div>
+        <div class="s07-packet" id="s07-packet-2"></div>
+        <div class="s07-packet" id="s07-packet-3"></div>
+
+        <svg id="s07-ws-wave" viewBox="0 0 120 20" preserveAspectRatio="none"></svg>
+
+        <div class="s07-node" id="s07-node-mic" style="left:55px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <rect x="18" y="6" width="12" height="22" rx="6"/>
+            <path d="M13,22 v3 a11,11 0 0 0 22,0 v-3"/>
+            <line x1="24" y1="36" x2="24" y2="42"/>
+            <line x1="16" y1="42" x2="32" y2="42"/>
+          </svg>
+          <p class="s07-node-name">mic</p>
+          <p class="s07-node-detail">your microphone</p>
+        </div>
+
+        <div class="s07-node" id="s07-node-livekit" style="left:359px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <path d="M16,34 C10.5,34 6,29.7 6,24.4 C6,19.5 9.7,15.5 14.5,15 C16,9.6 21,6 27,6 C33.2,6 38.3,10.4 39.4,16.2 C43.6,16.9 47,20.6 47,25.1 C47,29.9 43,34 38.2,34 Z"/>
+          </svg>
+          <p class="s07-node-name">LiveKit Cloud</p>
+          <p class="s07-node-detail">India South · WebRTC</p>
+        </div>
+
+        <div class="s07-node" id="s07-node-deepgram" style="left:663px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <line x1="6" y1="14" x2="30" y2="14"/>
+            <line x1="6" y1="22" x2="26" y2="22"/>
+            <line x1="6" y1="30" x2="22" y2="30"/>
+            <circle cx="38" cy="22" r="7"/>
+            <line x1="38" y1="22" x2="38" y2="18"/>
+            <line x1="38" y1="22" x2="41" y2="24"/>
+          </svg>
+          <p class="s07-node-name">Deepgram nova-3</p>
+          <p class="s07-node-detail">STT · word timestamps</p>
+        </div>
+
+        <div class="s07-node" id="s07-node-sessiongraph" style="left:967px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <circle cx="9" cy="36" r="4"/>
+            <circle cx="24" cy="9" r="4"/>
+            <circle cx="39" cy="36" r="4"/>
+            <line x1="12" y1="33" x2="21" y2="12"/>
+            <line x1="27" y1="12" x2="36" y2="33"/>
+          </svg>
+          <p class="s07-node-name">SessionGraph</p>
+          <p class="s07-node-detail">turn-gated · gemma-4-31b-it
+gpt-5.4-mini</p>
+        </div>
+
+        <div class="s07-node is-rime" id="s07-node-rime" style="left:1271px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <circle cx="8" cy="24" r="3"/>
+            <path d="M15,17 a8,8 0 0 1 0,14"/>
+            <path d="M22,10 a17,17 0 0 1 0,28"/>
+            <path d="M29,4 a24,24 0 0 1 0,40"/>
+          </svg>
+          <p class="s07-node-name">Rime mistv3 · thunder</p>
+          <p class="s07-node-detail">wss://users-ws.rime.ai/ws3
+24 kHz PCM</p>
+        </div>
+
+        <div class="s07-node" id="s07-node-speaker" style="left:1575px; top:442px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <path d="M6,18 L6,30 L14,30 L24,38 L24,10 L14,18 Z"/>
+            <path d="M30,17 a10,10 0 0 1 0,14"/>
+            <path d="M35,11 a17,17 0 0 1 0,26"/>
+          </svg>
+          <p class="s07-node-name">speaker</p>
+          <p class="s07-node-detail">live coach voice</p>
+        </div>
+
+        <div class="s07-node is-secondary" id="s07-node-rest" style="left:967px; top:668px">
+          <svg class="s07-icon" viewBox="0 0 48 48">
+            <path d="M14,4 L28,4 L36,12 L36,44 L14,44 Z"/>
+            <path d="M28,4 L28,12 L36,12"/>
+            <line x1="19" y1="21" x2="31" y2="21"/>
+            <line x1="19" y1="28" x2="31" y2="28"/>
+            <line x1="19" y1="35" x2="27" y2="35"/>
+          </svg>
+          <p class="s07-node-name">Rime REST</p>
+          <p class="s07-node-detail">/v1/rime-tts · WAV · V1/V2/V3</p>
+        </div>
+
+        <div id="s07-caption-wrap">
+          <p class="pd-caption is-narrator" id="s07-caption">Under the hood it is one duplex call.</p>
+        </div>
+
+        <audio id="s07-n08" src="public/vo/n08.wav" data-start="0.5" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+
+        <audio id="s07-sfx-reveal" src="public/sfx/whoosh-cinematic.mp3" data-start="0.3" data-track-index="12" data-volume="0.4" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-0" src="public/sfx/ping.mp3" data-start="0.6" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-1" src="public/sfx/ping.mp3" data-start="2.0" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-2" src="public/sfx/ping.mp3" data-start="3.6" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-3" src="public/sfx/ping.mp3" data-start="5.4" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-4" src="public/sfx/ping.mp3" data-start="7.4" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-5" src="public/sfx/ping.mp3" data-start="7.6" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-ping-6" src="public/sfx/ping.mp3" data-start="9.2" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+
+        <audio id="s07-sfx-type-1" src="public/sfx/typing.mp3" data-start="3.6" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-type-2" src="public/sfx/typing.mp3" data-start="5.4" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-type-3" src="public/sfx/typing.mp3" data-start="7.4" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s07-sfx-type-4" src="public/sfx/typing.mp3" data-start="7.6" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+      </div>
+
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+
+          // ================= Beat A: the actual statusbar, then it expands =================
+          tl.fromTo(
+            "#s07-status-frame",
+            { opacity: 0, scale: 0.94 },
+            { opacity: 1, scale: 1, duration: 0.2, ease: "power3.out" },
+            0,
+          );
+          tl.fromTo(
+            "#s07-status-highlight",
+            { opacity: 0, scaleX: 0.2 },
+            { opacity: 1, scaleX: 1, duration: 0.14, ease: "power3.out" },
+            0.1,
+          );
+          tl.to("#s07-status-zoom", { scale: 1.05, duration: 0.5, ease: "none" }, 0);
+          // the whoosh-cinematic sfx (data-start 0.3) is the expand beat: the real
+          // statusbar frame blooms outward and dissolves as the schematic takes over
+          tl.to(
+            "#s07-status-frame",
+            { scale: 1.7, opacity: 0, duration: 0.38, ease: "power2.in" },
+            0.3,
+          );
+          tl.fromTo("#s07-bg-glow", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power1.out" }, 0.28);
+
+          // ================= header: persists once revealed =================
+          tl.fromTo("#s07-header", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
+
+          // ================= narration caption: swaps at the word landmarks =================
+          const captionEl = document.getElementById("s07-caption");
+          const CAPTIONS = [
+            { at: 0.5, text: "Under the hood it is one duplex call." },
+            { at: 3.0, text: "Your microphone streams through LiveKit into Deepgram for words and timestamps." },
+            { at: 8.6, text: "A turn-gated session graph decides when the coach may speak." },
+            { at: 11.6, text: "Rime speaks it live over a WebSocket at 24 kHz \u2014 and renders the contrast clips over REST." },
+          ];
+          CAPTIONS.forEach((c, i) => {
+            if (i === 0) {
+              tl.set(captionEl, { textContent: c.text }, c.at);
+              tl.fromTo("#s07-caption-wrap", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, c.at);
+            } else {
+              tl.to("#s07-caption-wrap", { opacity: 0, duration: 0.25, ease: "power1.in" }, c.at - 0.05);
+              tl.set(captionEl, { textContent: c.text }, c.at);
+              tl.fromTo("#s07-caption-wrap", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, c.at);
+            }
+          });
+          tl.to("#s07-caption-wrap", { opacity: 0, duration: 0.4, ease: "power1.in" }, 18.4);
+
+          // ================= diagram: draw-on icons, hairline connectors, packets =================
+          // pre-measure every icon stroke once so it can be "drawn on"
+          const iconShapeSel = "path, line, circle, rect";
+          function primeIcon(nodeSel) {
+            const svg = document.querySelector(nodeSel + " .s07-icon");
+            const shapes = svg.querySelectorAll(iconShapeSel);
+            const lens = [];
+            shapes.forEach((el) => {
+              const len = el.getTotalLength();
+              el.style.strokeDasharray = String(len);
+              el.style.strokeDashoffset = String(len);
+              lens.push(len);
+            });
+            return shapes;
+          }
+
+          function revealNode(nodeSel, t) {
+            const shapes = primeIcon(nodeSel);
+            tl.to(shapes, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, t);
+            tl.fromTo(
+              nodeSel + " .s07-node-name, " + nodeSel + " .s07-node-detail",
+              { autoAlpha: 0, y: 12 },
+              { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" },
+              t,
+            );
+          }
+
+          function revealConnector(sel, t, dur) {
+            tl.to(sel, { scaleX: 1, duration: dur || 0.35, ease: "power2.out" }, t);
+          }
+          function revealConnectorV(sel, t, dur) {
+            tl.to(sel, { scaleY: 1, duration: dur || 0.35, ease: "power2.out" }, t);
+          }
+
+          // Finite repeats: an infinite repeat gives the timeline an unbounded
+          // duration, which stalls HyperFrames' page load. Cover the scene (20 s).
+          function startPacket(dotSel, connLeft, distance, t, dur) {
+            const dot = document.querySelector(dotSel);
+            tl.set(dot, { left: connLeft + "px", top: "470px", opacity: 1, x: 0 }, t);
+            tl.to(dot, { x: distance, duration: dur, ease: "none", repeat: Math.ceil((20 - t) / dur) }, t);
+          }
+
+          // ---- word-landmark reveal schedule (mic 2.85, LiveKit 3.95, Deepgram 4.85,
+          // SessionGraph 8.45, Rime 11.45, speaker 13.3, REST 17.45 — each ~0.15s
+          // ahead of the narrated word so the icon lands as the word is spoken) ----
+          revealNode("#s07-node-mic", 2.85);
+
+          revealConnector("#s07-conn-0", 3.6);
+          revealNode("#s07-node-livekit", 3.95);
+          startPacket("#s07-packet-0", 228, 248, 3.95, 1.1);
+
+          revealConnector("#s07-conn-1", 4.5);
+          revealNode("#s07-node-deepgram", 4.85);
+          startPacket("#s07-packet-1", 532, 248, 4.85, 1.1);
+
+          revealConnector("#s07-conn-2", 8.1);
+          revealNode("#s07-node-sessiongraph", 8.45);
+          startPacket("#s07-packet-2", 836, 248, 8.45, 1.1);
+
+          revealConnector("#s07-conn-3", 11.1);
+          revealNode("#s07-node-rime", 11.45);
+          startPacket("#s07-packet-3", 1140, 248, 11.45, 1.1);
+
+          // Rime -> speaker: the connector still draws on, but it carries the live
+          // waveform instead of a duplicated packet dot (one signal, one indicator)
+          revealConnector("#s07-conn-4", 12.95);
+          revealNode("#s07-node-speaker", 13.3);
+
+          // ---- restrained secondary lane: SessionGraph also renders clips over REST ----
+          tl.to("#s07-rest-junction", { opacity: 1, duration: 0.2, ease: "power1.out" }, 17.1);
+          revealConnectorV("#s07-conn-rest", 17.1, 0.35);
+          revealNode("#s07-node-rest", 17.45);
+
+          // ---- WebSocket lane: 24-bar live waveform, deterministic function of time ----
+          const NB = 24;
+          const waveSvg = document.getElementById("s07-ws-wave");
+          const bars = [];
+          for (let i = 0; i < NB; i++) {
+            const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            const bw = 120 / NB - 1.4;
+            bar.setAttribute("x", String(i * (120 / NB) + 0.7));
+            bar.setAttribute("width", String(bw));
+            bar.setAttribute("y", "9");
+            bar.setAttribute("height", "2");
+            bar.setAttribute("rx", "0.8");
+            bar.setAttribute("fill", "var(--teal)");
+            waveSvg.appendChild(bar);
+            bars.push(bar);
+          }
+          function mulberry32(seed) {
+            return function () {
+              seed |= 0;
+              seed = (seed + 0x6d2b79f5) | 0;
+              let x = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+              x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+              return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+            };
+          }
+          const noise = (function () {
+            const rnd = mulberry32(11);
+            const out = [];
+            for (let i = 0; i < NB; i++) out.push(rnd());
+            return out;
+          })();
+          function drawWave(tSec) {
+            for (let i = 0; i < NB; i++) {
+              const s = Math.sin(i * 0.55 + tSec * 5.2) * 0.5 + 0.5;
+              const amp = 0.15 + s * 0.6 + noise[i] * 0.25;
+              const h = Math.max(1.5, Math.min(18, amp * 18));
+              bars[i].setAttribute("y", String(10 - h / 2));
+              bars[i].setAttribute("height", String(h));
+            }
+          }
+          drawWave(0);
+          tl.to("#s07-ws-wave", { opacity: 1, duration: 0.3, ease: "power1.out" }, 13.3);
+          const waveProxy = { t: 0 };
+          tl.to(
+            waveProxy,
+            { t: 20.0 - 13.3, duration: 20.0 - 13.3, ease: "none", onUpdate: () => drawWave(waveProxy.t) },
+            13.3,
+          );
+
+          window.__timelines["s07-inside-the-call"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

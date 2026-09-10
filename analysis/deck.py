@@ -33,6 +33,9 @@ class DeckError(RuntimeError):
 
 
 def _parse(raw: str) -> dict | None:
+    """Best-effort JSON parse of an LLM response: strips ``` fences, then
+    falls back to the first {...} span if the whole string doesn't parse
+    as-is. None if nothing usable is found."""
     text = re.sub(r"^```(?:json)?|```$", "", raw.strip(), flags=re.MULTILINE).strip()
     try:
         return json.loads(text)
@@ -47,6 +50,8 @@ def _parse(raw: str) -> dict | None:
 
 
 async def _call_llm(system: str, user: str) -> str:
+    """Stream one deck-generation completion via
+    `agent.llm_config.judge_llm()` and return the concatenated text."""
     from agent.llm_config import judge_llm
     from livekit.agents.llm import ChatContext
 

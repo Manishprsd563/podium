@@ -14,7 +14,7 @@ Reproduce with: `.venv/Scripts/python.exe scripts/rime_probe.py`,
 | STT | Deepgram **`nova-3`**, `filler_words=true`, `punctuate=true` | Returns "um"/"uh" with word timestamps and 0.998 confidence on a Rime-rendered filler clip; Whisper-class STT would strip them and blind the core metric. |
 | Coach LLM | LiveKit Inference **`google/gemma-4-31b-it`** | 0.67 s to first token, 0.95 s total on a coach-shaped turn. |
 | Judge LLM | LiveKit Inference **`openai/gpt-5.4-mini`** | 3/3 valid scorecard JSON, avg 3.19 s, max 3.59 s. |
-| Transport | LiveKit Cloud, region **India South** | Worker registered against `wss://dataforge-rime-xfm9z5sh.livekit.cloud`; no self-hosting needed. |
+| Transport | LiveKit Cloud, region **India South** | Worker registered against `wss://your-project.livekit.cloud` (redacted; see `.env.example`); no self-hosting needed. |
 
 ## E1 — pause markup is real, measured, and never spoken
 

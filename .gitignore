@@ -15,3 +15,20 @@ evidence/smoke/
 # Organizer material and internal ideation, not part of the submitted product
 Rime PS.pdf
 RIME_HACKATHON_RESEARCH.md
+
+# Packaged submission artefacts (built by scripts/make_submission.py)
+submission/
+submission.zip
+
+# Local-only demo recordings staged for the submission package. Anchored: the
+# README's committed video lives in docs/demo/ and must not be ignored too.
+/demo/
+
+# HyperFrames video build output: rendered videos, capture frames, and
+# fetched/generated media, all regenerable from videos/*/tools + compositions
+videos/*/out/
+videos/*/snapshots/
+videos/*/public/clips/
+videos/*/public/vo/
+videos/*/public/music/
+videos/*/public/sfx/

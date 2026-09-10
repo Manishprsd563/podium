@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- head is metadata for the source file only; the runtime ignores it -->
+  </head>
+  <body>
+    <template>
+      <style>
+      /* =========================================================================
+         Podium pitch video — design tokens
+         Extracted from web/style.css (:root) and web/dashboard.css (.dash-root),
+         plus the orb.js STATES colour table. This file declares values only —
+         no selectors beyond :root, no layout, no animation. components.css and
+         every scene reference these custom properties instead of literal colour.
+         ========================================================================= */
+
+      #root {
+        /* ---- surfaces ---------------------------------------------------- */
+        --bg: #0b0d12;               /* canvas / page background (web/style.css --bg) */
+        --bg-rgb: 11, 13, 18;
+        --surface: #11151d;          /* card / pill / slide background (web/style.css --bg-2) */
+        --surface-rgb: 17, 21, 29;
+        --surface-2: #161c27;        /* nested surface (drill ring hole, tile hover) */
+        --surface-2-rgb: 22, 28, 39;
+
+        /* ---- ink (text) ---------------------------------------------------- */
+        --ink: #f3f5f9;               /* primary text */
+        --ink-rgb: 243, 245, 249;
+        --ink-2: rgba(var(--ink-rgb), 0.66);   /* soft text (web/style.css --ink-soft) */
+        --ink-3: rgba(var(--ink-rgb), 0.52);   /* faint text (web/style.css --ink-faint) */
+
+        /* ---- hairlines ------------------------------------------------------ */
+        --hair: rgba(var(--ink-rgb), 0.10);     /* web/style.css --hairline */
+        --hair-2: rgba(var(--ink-rgb), 0.16);   /* stronger hairline for borders that need to read at a distance */
+
+        /* ---- accents (web/style.css --accent / --accent-2 / --user / etc.) - */
+        --teal: #5ee1d0;              /* --accent */
+        --teal-rgb: 94, 225, 208;
+        --peri: #7b8cff;              /* --accent-2 */
+        --peri-rgb: 123, 140, 255;
+        --violet: #8f7bff;            /* --user (Maya / listening) */
+        --violet-rgb: 143, 123, 255;
+        --amber: #f5c451;             /* --wait / --warn */
+        --amber-rgb: 245, 196, 81;
+        --red: #ff5c5c;               /* --danger */
+        --red-rgb: 255, 92, 92;
+        --green: #5ee1a0;             /* --good */
+        --green-rgb: 94, 225, 160;
+        --mic: #3ddc84;               /* orb.js STATES.micLive colorA */
+        --mic-rgb: 61, 220, 132;
+        --think: #8a94a6;             /* --think / orb.js STATES.thinking colorA */
+        --think-rgb: 138, 148, 166;
+
+        /* dashboard two-voice ink (web/dashboard.css .dash-root --pd-you / --pd-coach) */
+        --pd-you: var(--red);
+        --pd-coach: var(--green);
+
+        /* ---- orb duotone per state (orb.js STATES table, colorA -> colorB) - */
+        --orb-idle-a: #5ee1d0;    /* idle + speaking share this pair */
+        --orb-idle-a-rgb: 94, 225, 208;
+        --orb-idle-b: #7b8cff;
+        --orb-idle-b-rgb: 123, 140, 255;
+        --orb-listen-a: #8f7bff;  /* listening */
+        --orb-listen-a-rgb: 143, 123, 255;
+        --orb-listen-b: #5ee1d0;
+        --orb-listen-b-rgb: 94, 225, 208;
+        --orb-mic-a: #3ddc84;     /* micLive */
+        --orb-mic-a-rgb: 61, 220, 132;
+        --orb-mic-b: #1f9d5a;
+        --orb-mic-b-rgb: 31, 157, 90;
+        --orb-wait-a: #f5c451;    /* waiting */
+        --orb-wait-a-rgb: 245, 196, 81;
+        --orb-wait-b: #ffdf8a;
+        --orb-wait-b-rgb: 255, 223, 138;
+        --orb-think-a: #8a94a6;   /* thinking */
+        --orb-think-a-rgb: 138, 148, 166;
+        --orb-think-b: #b6c0cf;
+        --orb-think-b-rgb: 182, 192, 207;
+        --orb-connect-a: #8a94a6; /* connecting / reconnecting */
+        --orb-connect-a-rgb: 138, 148, 166;
+        --orb-connect-b: #5b6472;
+        --orb-connect-b-rgb: 91, 100, 114;
+        --orb-off-a: #ff5c5c;     /* disconnected */
+        --orb-off-a-rgb: 255, 92, 92;
+        --orb-off-b: #7a1f1f;
+        --orb-off-b-rgb: 122, 31, 31;
+
+        /* ---- type ------------------------------------------------------------ */
+        --font: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+        --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+        --ls-tight: -0.01em;
+        --ls-normal: 0em;
+        --ls-wide: 0.06em;
+        --ls-wider: 0.12em;
+
+        /* ---- shape / elevation ------------------------------------------------ */
+        --radius: 18px;
+        --radius-sm: 10px;
+        --radius-pill: 999px;
+        --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--ink-rgb), 0.04);
+        --shadow-glow-teal: 0 0 24px rgba(var(--teal-rgb), 0.35);
+        --shadow-glow-amber: 0 0 18px rgba(var(--amber-rgb), 0.35);
+        --shadow-glow-red: 0 0 18px rgba(var(--red-rgb), 0.35);
+        --shadow-glow-green: 0 0 18px rgba(var(--green-rgb), 0.35);
+
+        /* ---- reference timing (informational — components.css never applies
+           these as `transition`/`animation`; scenes read them for GSAP eases) --- */
+        --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+        --dur: 260ms;
+        --dur-slow: 640ms;
+
+        /* ---- component metrics ------------------------------------------------ */
+        --statusbar-h: 56px;
+      }
+
+      /* =========================================================================
+         Podium pitch video — component kit
+         Faithful, class-based reproductions of web/style.css + web/dashboard.css
+         + the orb.js palette, resized for a fixed 1920x1080 canvas. Every colour
+         is a var() from tokens.css — nothing here is animated: no @keyframes, no
+         `animation:`, no `transition:`. Scenes drive motion with GSAP, tweening
+         transforms/opacity and the custom properties called out per component in
+         ui/README.md (--pct, --v, --pos, --pulse, --glow, --lvl, --orb-size, ...).
+         ========================================================================= */
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      /* =========================================================================
+         Status bar — web/style.css #statusbar + web/app.js renderStatusbar()
+         Segment order: conn · agent · provider(badge) · attention · phase ·
+         stage · mic · room, exactly as narrated in SCRIPT.md.
+         ========================================================================= */
+
+      .pd-statusbar {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        height: var(--statusbar-h);
+        padding: 0 40px;
+        font-family: var(--font-mono);
+        font-size: 20px;
+        letter-spacing: var(--ls-normal);
+        color: var(--ink-3);
+        background: linear-gradient(to top, var(--bg) 55%, transparent);
+        white-space: nowrap;
+      }
+
+      .pd-statusbar-seg {
+        color: var(--ink-3);
+      }
+
+      .pd-statusbar-seg.is-badge {
+        color: var(--teal);
+        letter-spacing: var(--ls-wide);
+        border-bottom: 2px solid var(--teal);
+        padding-bottom: 2px;
+      }
+
+      .pd-statusbar-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--ink-3);
+        flex: 0 0 auto;
+      }
+
+      .pd-level {
+        position: relative;
+        width: 96px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--hair);
+        overflow: hidden;
+      }
+
+      .pd-level-fill {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--teal);
+        transform-origin: left center;
+        transform: scaleX(var(--lvl, 0));
+      }
+
+      /* =========================================================================
+         Orb — orb.js palette (STATES table), rebuilt as 3 layered CSS gradients:
+         halo (outer blurred bloom) -> core (main gradient sphere, --pulse scale)
+         -> rim (fresnel highlight, screen blend). State classes swap --orb-a/-b.
+         ========================================================================= */
+
+      .pd-orb {
+        position: relative;
+        width: var(--orb-size, 220px);
+        height: var(--orb-size, 220px);
+        --pulse: 0;
+        --glow: 1;
+        --orb-a: var(--orb-idle-a);
+        --orb-b: var(--orb-idle-b);
+        --orb-a-rgb: var(--orb-idle-a-rgb);
+        --orb-b-rgb: var(--orb-idle-b-rgb);
+      }
+
+      .pd-orb.is-idle, .pd-orb.is-speaking {
+        --orb-a: var(--orb-idle-a);
+        --orb-b: var(--orb-idle-b);
+        --orb-a-rgb: var(--orb-idle-a-rgb);
+        --orb-b-rgb: var(--orb-idle-b-rgb);
+      }
+
+      .pd-orb.is-listening {
+        --orb-a: var(--orb-listen-a);
+        --orb-b: var(--orb-listen-b);
+        --orb-a-rgb: var(--orb-listen-a-rgb);
+        --orb-b-rgb: var(--orb-listen-b-rgb);
+      }
+
+      .pd-orb.is-mic-live {
+        --orb-a: var(--orb-mic-a);
+        --orb-b: var(--orb-mic-b);
+        --orb-a-rgb: var(--orb-mic-a-rgb);
+        --orb-b-rgb: var(--orb-mic-b-rgb);
+      }
+
+      .pd-orb.is-waiting {
+        --orb-a: var(--orb-wait-a);
+        --orb-b: var(--orb-wait-b);
+        --orb-a-rgb: var(--orb-wait-a-rgb);
+        --orb-b-rgb: var(--orb-wait-b-rgb);
+      }
+
+      .pd-orb.is-thinking {
+        --orb-a: var(--orb-think-a);
+        --orb-b: var(--orb-think-b);
+        --orb-a-rgb: var(--orb-think-a-rgb);
+        --orb-b-rgb: var(--orb-think-b-rgb);
+      }
+
+      .pd-orb.is-connecting {
+        --orb-a: var(--orb-connect-a);
+        --orb-b: var(--orb-connect-b);
+        --orb-a-rgb: var(--orb-connect-a-rgb);
+        --orb-b-rgb: var(--orb-connect-b-rgb);
+      }
+
+      .pd-orb.is-disconnected {
+        --orb-a: var(--orb-off-a);
+        --orb-b: var(--orb-off-b);
+        --orb-a-rgb: var(--orb-off-a-rgb);
+        --orb-b-rgb: var(--orb-off-b-rgb);
+      }
+
+      .pd-orb-halo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 220%;
+        height: 220%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        filter: blur(calc(var(--orb-size, 220px) * 0.12));
+        background: radial-gradient(
+          circle,
+          rgba(var(--orb-b-rgb), calc(0.22 * var(--glow, 1))) 0%,
+          rgba(var(--orb-b-rgb), 0) 70%
+        );
+        pointer-events: none;
+      }
+
+      .pd-orb-core {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        transform: scale(calc(1 + var(--pulse, 0) * 0.08));
+        background: radial-gradient(
+          circle at 38% 32%,
+          rgba(var(--orb-a-rgb), 0.95) 0%,
+          rgba(var(--orb-b-rgb), 0.55) 55%,
+          rgba(var(--orb-b-rgb), 0) 78%
+        );
+        box-shadow: 0 0 calc(var(--orb-size, 220px) * 0.18) rgba(var(--orb-a-rgb), calc(0.45 * var(--glow, 1)));
+      }
+
+      .pd-orb-rim {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        mix-blend-mode: screen;
+        opacity: 0.9;
+        background: radial-gradient(
+          circle at 64% 68%,
+          rgba(var(--orb-a-rgb), 0) 55%,
+          rgba(var(--orb-a-rgb), 0.5) 82%,
+          rgba(var(--orb-a-rgb), 0) 100%
+        );
+      }
+
+      /* =========================================================================
+         Caption — web/style.css #caption (.partial = interim grey)
+         ========================================================================= */
+
+      .pd-caption-label {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin: 0 0 6px;
+      }
+
+      .pd-caption {
+        margin: 0;
+        font-family: var(--font);
+        font-size: 44px;
+        font-weight: 500;
+        line-height: 1.15;
+        color: var(--ink);
+      }
+
+      .pd-caption.is-interim {
+        color: var(--ink-2);
+      }
+
+      .pd-caption.is-final {
+        color: var(--ink);
+      }
+
+      .pd-caption.is-narrator { color: var(--ink); }
+      .pd-caption.is-maya { color: var(--violet); }
+      .pd-caption.is-coach { color: var(--teal); }
+
+      /* =========================================================================
+         Choice chips — web/style.css #choices / .choice
+         ========================================================================= */
+
+      .pd-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .pd-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 22px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        background: rgba(var(--surface-rgb), 0.4);
+        color: var(--ink-2);
+        font-family: var(--font);
+        font-size: 20px;
+      }
+
+      .pd-chip.is-on {
+        border-color: var(--teal);
+        color: var(--ink);
+        background: rgba(var(--teal-rgb), 0.14);
+        box-shadow: var(--shadow-glow-teal);
+      }
+
+      /* =========================================================================
+         Slide card — web/style.css #view-present (#present-title/-bullets/-counter)
+         ========================================================================= */
+
+      .pd-slide {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        color: var(--ink);
+      }
+
+      .pd-slide-counter {
+        position: absolute;
+        top: 28px;
+        right: 32px;
+        font-family: var(--font-mono);
+        font-size: 18px;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-3);
+      }
+
+      .pd-slide-title {
+        margin: 0;
+        font-family: var(--font);
+        font-size: 40px;
+        font-weight: 600;
+        line-height: 1.1;
+        color: var(--ink);
+      }
+
+      .pd-slide-bullets {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .pd-slide-bullets li {
+        position: relative;
+        padding-left: 26px;
+        font-size: 22px;
+        line-height: 1.4;
+        color: var(--ink-2);
+      }
+
+      .pd-slide-bullets li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.6em;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--teal);
+      }
+
+      .pd-slide-hint {
+        font-size: 18px;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Clock — web/style.css #present-clock
+         ========================================================================= */
+
+      .pd-clock {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        font-size: 22px;
+        letter-spacing: var(--ls-normal);
+        color: var(--ink-3);
+      }
+
+      .pd-clock.is-warn {
+        color: var(--amber);
+      }
+
+      /* =========================================================================
+         Waveform strip — container for a live-drawn canvas (S04/S06/S07)
+         ========================================================================= */
+
+      .pd-wave {
+        position: relative;
+        width: 100%;
+        height: 96px;
+        border-bottom: 1px solid var(--hair);
+      }
+
+      .pd-wave-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* =========================================================================
+         Live meter — wpm / fillers / pauses (S04)
+         ========================================================================= */
+
+      .pd-meter {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 160px;
+      }
+
+      .pd-meter-label {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .pd-meter-value {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .pd-meter-num {
+        font-size: 44px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-meter-unit {
+        font-size: 20px;
+        color: var(--ink-3);
+      }
+
+      .pd-meter-band {
+        align-self: flex-start;
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        font-size: 16px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-2);
+      }
+
+      .pd-meter-band.is-fast {
+        color: var(--amber);
+        border-color: rgba(var(--amber-rgb), 0.5);
+      }
+
+      .pd-meter-band.is-good {
+        color: var(--green);
+        border-color: rgba(var(--green-rgb), 0.5);
+      }
+
+      .pd-meter-band.is-slow {
+        color: var(--peri);
+        border-color: rgba(var(--peri-rgb), 0.5);
+      }
+
+      /* =========================================================================
+         Scorecard — web/dashboard.css .pd-bars/.pd-bar (renamed container)
+         ========================================================================= */
+
+      .pd-scorecard {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 100%;
+      }
+
+      .pd-bar {
+        display: grid;
+        grid-template-columns: minmax(140px, 260px) 1fr auto;
+        align-items: center;
+        gap: 28px;
+        width: 100%;
+      }
+
+      .pd-bar-label {
+        font-size: 24px;
+        letter-spacing: 0.01em;
+        color: var(--ink-2);
+      }
+
+      .pd-bar-track {
+        position: relative;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--hair);
+      }
+
+      .pd-bar-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: calc(var(--v, 0) / 5 * 100%);
+        border-radius: 3px;
+        background: var(--teal);
+        opacity: 0.9;
+      }
+
+      .pd-bar-value {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .pd-bar-num {
+        font-size: 48px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-bar-max {
+        font-size: 20px;
+        color: var(--ink-3);
+      }
+
+      .pd-bar-delta {
+        margin-left: 6px;
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--teal);
+      }
+
+      .pd-bar-delta.is-flat {
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Metrics strip — web/dashboard.css .pd-metrics-strip/.pd-metric
+         ========================================================================= */
+
+      .pd-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        font-size: 19px;
+        letter-spacing: 0.01em;
+        color: var(--ink-3);
+      }
+
+      .pd-metric {
+        color: var(--ink-2);
+      }
+
+      .pd-metric-sep {
+        margin: 0 10px;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Improvement card — web/dashboard.css .pd-said/.pd-stage-line/.pd-pause-glyph
+         ========================================================================= */
+
+      .pd-imp {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        width: 100%;
+      }
+
+      .pd-imp-eyebrow {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .pd-line {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .pd-line-label {
+        font-size: 16px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+
+      .pd-line-body {
+        font-size: 22px;
+        line-height: 1.5;
+        max-width: 34ch;
+      }
+
+      .pd-line.is-you .pd-line-label,
+      .pd-line.is-you .pd-line-body {
+        color: var(--pd-you);
+      }
+
+      .pd-line.is-say .pd-line-label,
+      .pd-line.is-say .pd-line-body {
+        color: var(--pd-coach);
+      }
+
+      .pd-line.is-paced .pd-line-label {
+        color: var(--ink-3);
+      }
+
+      .pd-line.is-paced .pd-line-body {
+        color: var(--ink);
+      }
+
+      .pd-pause-glyph {
+        margin: 0 3px;
+        color: var(--teal);
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+
+      /* =========================================================================
+         Drill — word + confidence ring (S08), conic-gradient(--pct)
+         ========================================================================= */
+
+      .pd-drill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .pd-drill-word {
+        margin: 0;
+        font-size: 120px;
+        font-weight: 300;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .pd-drill-ring {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: conic-gradient(var(--drill-color, var(--teal)) calc(var(--pct, 0) * 1%), var(--hair) 0);
+      }
+
+      .pd-drill-ring.is-ok { --drill-color: var(--teal); }
+      .pd-drill-ring.is-warn { --drill-color: var(--amber); }
+      .pd-drill-ring.is-fail { --drill-color: var(--red); }
+
+      .pd-drill-ring::before {
+        content: "";
+        position: absolute;
+        inset: 16px;
+        border-radius: 50%;
+        background: var(--bg);
+      }
+
+      .pd-drill-pct {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      /* =========================================================================
+         Skill tiles — grid tile for S09 (10 skills)
+         ========================================================================= */
+
+      .pd-tiles {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        width: 100%;
+      }
+
+      .pd-tile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 10px;
+        text-align: center;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius-sm);
+        color: var(--ink-2);
+        font-size: 20px;
+        letter-spacing: 0.01em;
+      }
+
+      .pd-tile.is-lit {
+        border-color: var(--teal);
+        color: var(--ink);
+        background: rgba(var(--teal-rgb), 0.1);
+        box-shadow: var(--shadow-glow-teal);
+      }
+
+      /* =========================================================================
+         Ladder — Novice -> Speaker -> Presenter -> TEDx (S09)
+         ========================================================================= */
+
+      .pd-ladder {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        padding-top: 40px;
+      }
+
+      .pd-ladder-line {
+        position: absolute;
+        left: 7px;
+        right: 7px;
+        top: 47px;
+        height: 1px;
+        background: var(--hair);
+        z-index: 0;
+      }
+
+      .pd-ladder-notch {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pd-ladder-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--hair-2);
+        border: 1px solid var(--hair-2);
+      }
+
+      .pd-ladder-notch.is-active .pd-ladder-dot,
+      .pd-ladder-notch.is-done .pd-ladder-dot {
+        background: var(--teal);
+        border-color: var(--teal);
+      }
+
+      .pd-ladder-label {
+        font-size: 18px;
+        color: var(--ink-3);
+      }
+
+      .pd-ladder-notch.is-active .pd-ladder-label {
+        color: var(--ink);
+      }
+
+      .pd-ladder-marker {
+        position: absolute;
+        top: 0;
+        left: calc(var(--pos, 0) / 3 * 100%);
+        transform: translateX(-50%);
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        background: var(--teal);
+        color: var(--bg);
+        font-size: 16px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* =========================================================================
+         Sparkline — container for an injected SVG/canvas trend line (S10)
+         ========================================================================= */
+
+      .pd-sparkline {
+        position: relative;
+        width: 100%;
+        height: 96px;
+        border-bottom: 1px solid var(--hair);
+      }
+
+      .pd-sparkline > svg,
+      .pd-sparkline > canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* =========================================================================
+         Statement — large impact typography (every scene's closing line)
+         ========================================================================= */
+
+      .pd-statement {
+        margin: 0;
+        max-width: 20ch;
+        font-family: var(--font);
+        font-size: 88px;
+        font-weight: 600;
+        line-height: 1.05;
+        letter-spacing: var(--ls-tight);
+        color: var(--ink);
+      }
+
+      .pd-statement-sub {
+        margin: 18px 0 0;
+        font-size: 22px;
+        color: var(--ink-2);
+      }
+
+      /* =========================================================================
+         Evidence chip — small mono citation pill (corner of scorecard/drill/etc.)
+         ========================================================================= */
+
+      .pd-evidence-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--hair-2);
+        background: rgba(var(--surface-rgb), 0.6);
+        font-family: var(--font-mono);
+        font-size: 17px;
+        letter-spacing: 0.01em;
+        color: var(--ink-3);
+      }
+
+      /* =========================================================================
+         Generic card surface
+         ========================================================================= */
+
+      .pd-card {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--radius);
+        padding: 40px;
+        box-shadow: var(--shadow-card);
+        color: var(--ink);
+      }
+
+      /* =========================================================================
+         Shared eyebrow utility (used inside pd-imp / pd-card / pd-evidence-chip)
+         ========================================================================= */
+
+      .pd-eyebrow {
+        font-size: 17px;
+        letter-spacing: var(--ls-wide);
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+      </style>
+      <style>
+        #root {
+          position: relative;
+          width: 1920px;
+          height: 1080px;
+          overflow: hidden;
+          background: var(--bg);
+          font-family: var(--font);
+        }
+
+        #s01-bg {
+          position: absolute;
+          inset: 0;
+          background: var(--bg);
+          z-index: 0;
+        }
+
+        #s01-glow {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 1400px;
+          height: 1400px;
+          border-radius: 50%;
+          background:
+            radial-gradient(circle, rgba(var(--teal-rgb), 0.075), transparent 33%),
+            radial-gradient(circle, rgba(var(--peri-rgb), 0.055), transparent 46%);
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        #s01-hairline {
+          position: absolute;
+          left: 620px;
+          top: 660px;
+          width: 680px;
+          height: 1px;
+          background: var(--hair-2);
+          transform-origin: 50% 50%;
+          z-index: 3;
+        }
+
+        #s01-orb-wrap {
+          position: absolute;
+          left: 50%;
+          top: 430px;
+          width: 560px;
+          height: 560px;
+          margin-left: -280px;
+          margin-top: -280px;
+          z-index: 1;
+          opacity: 0;
+        }
+
+        #s01-orb-canvas {
+          display: block;
+          width: 560px;
+          height: 560px;
+        }
+
+        #s01-orb-state {
+          position: absolute;
+          left: 600px;
+          top: 270px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font: 500 18px/1 var(--font-mono);
+          letter-spacing: var(--ls-wider);
+          text-transform: uppercase;
+          color: var(--ink-3);
+          white-space: nowrap;
+          opacity: 0;
+        }
+
+        #s01-orb-state-dot {
+          width: 7px;
+          height: 7px;
+          flex: 0 0 auto;
+          border-radius: 50%;
+          background: var(--teal);
+          box-shadow: 0 0 16px rgba(var(--teal-rgb), 0.8);
+        }
+
+        .s01-beat {
+          position: absolute;
+          inset: 660px 0 0 0;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          padding: 0 200px;
+          text-align: center;
+        }
+
+        .s01-beat .s01-word {
+          display: inline-block;
+          opacity: 0;
+          margin: 0 14px;
+          font-weight: 600;
+          letter-spacing: var(--ls-tight);
+          line-height: 1.05;
+          color: var(--ink);
+          font-size: 92px;
+        }
+
+        #s01-beat2 .s01-word { font-size: 72px; }
+
+        #s01-problem-copy {
+          position: absolute;
+          inset: 660px 0 0 0;
+          z-index: 3;
+          display: grid;
+          place-items: center;
+          padding: 0 180px;
+          text-align: center;
+          pointer-events: none;
+        }
+
+        .s01-problem-line {
+          position: absolute;
+          max-width: 1200px;
+          font-size: 64px;
+          font-weight: 520;
+          line-height: 1.08;
+          letter-spacing: var(--ls-tight);
+          color: var(--ink);
+          opacity: 0;
+        }
+
+        #s01-problem-2,
+        #s01-problem-3 {
+          font-size: 82px;
+          font-weight: 600;
+        }
+
+        .s01-problem-accent { color: var(--teal); }
+
+        #s01-wordmark-wrap {
+          position: absolute;
+          inset: 640px 0 0 0;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+        }
+
+        #s01-wordmark {
+          display: flex;
+          justify-content: center;
+          font-size: 196px;
+          font-weight: 600;
+          color: var(--ink);
+          opacity: 0;
+        }
+
+        #s01-wordmark .s01-letter { display: inline-block; }
+
+        #s01-tagline {
+          margin-top: 28px;
+          font-size: 30px;
+          font-weight: 400;
+          color: var(--ink-2);
+          opacity: 0;
+          letter-spacing: var(--ls-normal);
+        }
+
+        #s01-listens {
+          margin-top: 18px;
+          font: 500 19px/1 var(--font-mono);
+          letter-spacing: var(--ls-wider);
+          text-transform: uppercase;
+          color: var(--teal);
+          opacity: 0;
+        }
+      </style>
+
+      <div id="root" data-composition-id="s01-cold-open" data-width="1920" data-height="1080" data-duration="12.8">
+        <div id="s01-bg"></div>
+        <div id="s01-glow"></div>
+        <div id="s01-hairline"></div>
+
+        <div id="s01-orb-wrap">
+          <canvas id="s01-orb-canvas" width="1120" height="1120"></canvas>
+          <div id="s01-orb-state">
+            <span id="s01-orb-state-dot"></span>
+            <span id="s01-orb-state-text">connecting</span>
+          </div>
+        </div>
+
+        <div class="s01-beat" id="s01-beat1">
+          <span class="s01-word" id="s01-b1-w1">Every</span>
+          <span class="s01-word" id="s01-b1-w2">great</span>
+          <span class="s01-word" id="s01-b1-w3">talk</span>
+        </div>
+
+        <div class="s01-beat" id="s01-beat2">
+          <span class="s01-word" id="s01-b2-w1">started</span>
+          <span class="s01-word" id="s01-b2-w2">as</span>
+          <span class="s01-word" id="s01-b2-w3">a</span>
+          <span class="s01-word" id="s01-b2-w4">nervous</span>
+          <span class="s01-word" id="s01-b2-w5">first</span>
+          <span class="s01-word" id="s01-b2-w6">draft.</span>
+        </div>
+
+        <div id="s01-problem-copy">
+          <p class="s01-problem-line" id="s01-problem-1">Most people rehearse that draft <span class="s01-problem-accent">alone, in silence.</span></p>
+          <p class="s01-problem-line" id="s01-problem-2">Nobody listens.</p>
+          <p class="s01-problem-line" id="s01-problem-3">Nobody tells them what to fix.</p>
+        </div>
+
+        <div id="s01-wordmark-wrap">
+          <div id="s01-wordmark"><span class="s01-letter">P</span><span class="s01-letter">O</span><span class="s01-letter">D</span><span class="s01-letter">I</span><span class="s01-letter">U</span><span class="s01-letter">M</span></div>
+          <div id="s01-tagline">the presentation coach that listens</div>
+          <div id="s01-listens">Podium listens.</div>
+        </div>
+
+        <audio id="s01-n01" src="public/vo/n01.wav" data-start="0.5" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+        <audio id="s01-n02" src="public/vo/n02.wav" data-start="10.57" data-track-index="11" data-volume="1" data-audio-group="voice"></audio>
+
+        <audio id="s01-sfx-1" src="public/sfx/riser.mp3" data-start="0" data-track-index="12" data-volume="0.45" data-audio-group="sfx"></audio>
+        <audio id="s01-sfx-2" src="public/sfx/click-soft.mp3" data-start="0.5" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s01-sfx-3" src="public/sfx/click-soft.mp3" data-start="1.46" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s01-sfx-4" src="public/sfx/click-soft.mp3" data-start="3.38" data-track-index="12" data-volume="0.35" data-audio-group="sfx"></audio>
+        <audio id="s01-sfx-5" src="public/sfx/impact-bass-1.mp3" data-start="10.57" data-track-index="12" data-volume="0.6" data-audio-group="sfx"></audio>
+      </div>
+
+      <script>
+
+        const tl = gsap.timeline({ paused: true });
+        const F = 1 / 60;
+        const DURATION = 12.8;
+
+        const orbCanvas = document.getElementById("s01-orb-canvas");
+        const orb = window.PodiumOrb.mount(orbCanvas, {
+          width: 1120,
+          height: 1120,
+          pulses: [0.5, 1.46, 3.38, 10.57],
+        });
+
+        // A deterministic syllable-rate VO envelope: harmonics provide vocal
+        // texture, explicit media windows gate it to the two unchanged Rime clips.
+        function speechLevel(time) {
+          const inN01 = time >= 0.5 && time <= 10.17;
+          const inN02 = time >= 10.57 && time <= 11.8;
+          if (!inN01 && !inN02) return 0;
+          const local = inN02 ? time - 10.57 : time - 0.5;
+          const gateIn = Math.min(1, local / 0.12);
+          const end = inN02 ? 1.231 : 9.67;
+          const gateOut = Math.min(1, Math.max(0, (end - local) / 0.16));
+          const syllables =
+            0.18 +
+            0.3 * (0.5 + 0.5 * Math.sin(local * 13.1)) +
+            0.22 * (0.5 + 0.5 * Math.sin(local * 21.7 + 0.8));
+          return Math.min(1, syllables * gateIn * gateOut);
+        }
+
+        function orbState(time) {
+          if (time < 4.1) return "connecting";
+          if (time < 5.2) return "listening";
+          if (time < 6.3) return "thinking";
+          if (time < 7.7) return "speaking";
+          return "idle";
+        }
+
+        // Full-duration proxy makes every HyperFrames timeline seek repaint the
+        // WebGL surface from absolute time; the orb has no RAF/ticker of its own.
+        const orbClock = { t: 0 };
+        tl.to(orbClock, {
+          t: DURATION,
+          duration: DURATION,
+          ease: "none",
+          onUpdate: () => {
+            const t = orbClock.t;
+            const state = orbState(t);
+            orb.render(t, state, state === "speaking" ? speechLevel(t) : 0);
+          },
+        }, 0);
+        orb.render(0, "connecting", 0);
+
+        tl.fromTo("#s01-hairline", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 0);
+        tl.to("#s01-glow", { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.1);
+        tl.fromTo("#s01-orb-wrap", { opacity: 0, scale: 0.72 }, { opacity: 0.75, scale: 0.86, duration: 0.6, ease: "power2.out" }, 0.1);
+        tl.to("#s01-orb-wrap", { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, 9.9);
+
+        function waterfallIn(ids, t0) {
+          let t = t0;
+          ids.forEach((id, i) => {
+            const isFirst = i === 0;
+            const isLast = i === ids.length - 1;
+            const y = isFirst ? 60 : isLast ? 34 : 38;
+            const dur = isFirst ? 0.16 : isLast ? 0.12 : 0.14;
+            tl.set(id, { opacity: 1, y }, t);
+            tl.to(id, { y: 0, duration: dur, ease: "power4.out" }, t);
+            t = isFirst ? t + dur + 2 * F : t + dur - F;
+          });
+        }
+
+        waterfallIn(["#s01-b1-w1", "#s01-b1-w2", "#s01-b1-w3"], 0.5);
+        tl.set("#s01-beat1", { opacity: 0 }, 1.46);
+        waterfallIn(["#s01-b2-w1", "#s01-b2-w2", "#s01-b2-w3", "#s01-b2-w4", "#s01-b2-w5", "#s01-b2-w6"], 1.46);
+        tl.set("#s01-beat2", { opacity: 0 }, 3.38);
+
+        // Every remaining n01 concept stays visible rather than playing over an
+        // empty hold. Hard swaps preserve the cold-open's editorial cadence.
+        tl.fromTo("#s01-problem-1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.24, ease: "power3.out" }, 3.45);
+        tl.to("#s01-problem-1", { autoAlpha: 0, y: -20, duration: 0.18, ease: "power2.in" }, 6.85);
+        tl.fromTo("#s01-problem-2", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.2, ease: "power4.out" }, 7.06);
+        tl.to("#s01-problem-2", { autoAlpha: 0, y: -18, duration: 0.16, ease: "power2.in" }, 8.2);
+        tl.fromTo("#s01-problem-3", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.2, ease: "power4.out" }, 8.42);
+        tl.to("#s01-problem-3", { autoAlpha: 0, y: -18, duration: 0.18, ease: "power2.in" }, 9.86);
+
+        // Transient state labels quietly expose the actual orb state machine.
+        const stateText = document.getElementById("s01-orb-state-text");
+        const stateDot = document.getElementById("s01-orb-state-dot");
+        [
+          [3.6, "connecting", "#8a94a6"],
+          [4.1, "listening", "#8f7bff"],
+          [5.2, "thinking", "#8a94a6"],
+          [6.3, "speaking", "#5ee1d0"],
+          [7.7, "idle", "#5ee1d0"],
+        ].forEach(([at, text, color], i) => {
+          if (i > 0) tl.to("#s01-orb-state", { opacity: 0, duration: 0.1 }, at - 0.1);
+          tl.set(stateText, { textContent: text }, at);
+          tl.set(stateDot, { backgroundColor: color, boxShadow: `0 0 16px ${color}` }, at);
+          tl.to("#s01-orb-state", { opacity: 0.72, duration: 0.16 }, at);
+        });
+        tl.to("#s01-orb-state", { opacity: 0, duration: 0.18 }, 9.4);
+
+        tl.fromTo("#s01-wordmark", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 10.57);
+        const wordmarkLetters = document.querySelectorAll("#s01-wordmark .s01-letter");
+        const letterCenter = (wordmarkLetters.length - 1) / 2;
+        wordmarkLetters.forEach((el, i) => {
+          const startX = (i - letterCenter) * 54;
+          tl.fromTo(el, { x: startX }, { x: 0, duration: 0.65, ease: "power3.out" }, 10.57);
+        });
+        tl.fromTo("#s01-tagline", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 11.12);
+        tl.fromTo("#s01-listens", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 11.45);
+
+        // Last 0.5s overlaps S02 in root/index.html. Move this orb into S02's
+        // actual browser slot while the wordmark recedes: shared-element handoff.
+        tl.to("#s01-wordmark-wrap", { opacity: 0, scale: 0.96, duration: 0.45, ease: "power2.inOut" }, 12.3);
+        tl.to("#s01-hairline", { opacity: 0, scaleX: 0.65, duration: 0.38, ease: "power2.in" }, 12.3);
+        tl.to("#s01-orb-wrap", { x: -452, y: 95, scale: 0.64, duration: 0.5, ease: "power3.inOut" }, 12.3);
+
+        window.__timelines["s01-cold-open"] = tl;
+      </script>
+    </template>
+  </body>
+</html>

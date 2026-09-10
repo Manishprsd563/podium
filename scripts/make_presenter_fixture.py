@@ -4,6 +4,10 @@ Rendered with Rime so the content is known exactly, with deliberate 2.5 s
 thinking pauses spliced in - those are what break a default VAD turn policy.
 Written at 48 kHz mono because Chrome's --use-file-for-fake-audio-capture
 expects that rate.
+
+Run: .venv/Scripts/python.exe scripts/make_presenter_fixture.py
+Writes evidence/smoke/presenter_48k.wav
+Needs: RIME_API_KEY (see .env.example)
 """
 from __future__ import annotations
 
@@ -17,7 +21,9 @@ import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()
-KEY = os.environ["RIME_API_KEY"]
+KEY = os.environ.get("RIME_API_KEY", "")
+if not KEY:
+    raise SystemExit("RIME_API_KEY missing -- copy .env.example to .env and fill it in")
 OUT = Path("evidence/smoke")
 OUT.mkdir(parents=True, exist_ok=True)
 

@@ -37,8 +37,13 @@ def _normalize_word(w: str) -> str:
 
 
 def _api_key() -> str:
+    """The Deepgram REST key, with a message that names the fix rather than a
+    bare KeyError from inside a post-take transcription."""
     load_dotenv()
-    return os.environ["DEEPGRAM_API_KEY"]
+    key = os.environ.get("DEEPGRAM_API_KEY")
+    if not key:
+        raise RuntimeError("DEEPGRAM_API_KEY missing -- copy .env.example to .env and fill it in")
+    return key
 
 
 def transcribe_rest(wav_path: str | Path, *, timeout_s: int = 60) -> list[dict]:

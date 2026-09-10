@@ -1,0 +1,546 @@
+/* Podium dashboard — cinematic post-presentation views.
+   Uses the design tokens (--ink, --accent, --good, --warn, --wait, --hairline, --dur,
+   --ease, ...) declared in style.css's :root; CONTRACTS.md governs data shapes only and
+   has no section for visual tokens.
+   No cards, no borders except hairlines; big type; left-aligned column. */
+
+.dash-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 1px;
+  font-family: var(--font);
+  color: var(--ink);
+  /* Two-voice ink: red for the presenter's own recorded clip, green for the
+     coach's line -- reuses the existing danger/good tokens as plain ink,
+     never as error/success chrome (no backgrounds, no badges). */
+  --pd-you: var(--danger);
+  --pd-coach: var(--good);
+}
+
+.pd-view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4vh 5vw;
+}
+
+/* margin:auto centres the column when it fits and lets it scroll from the
+   top when it does not (align-items:center would clip the top instead). */
+.pd-col {
+  width: 100%;
+  max-width: min(92vw, 1100px);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 30px;
+}
+
+/* ------------------------------------------------------------------ */
+/* shared: score bars (scores view + wrap compact)                     */
+/* ------------------------------------------------------------------ */
+
+.pd-bars {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3vh, 34px);
+  width: 100%;
+}
+
+.pd-bar {
+  display: grid;
+  grid-template-columns: minmax(140px, 260px) 1fr auto;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  transform-origin: left center;
+}
+
+.pd-bar-label {
+  font-size: clamp(18px, 1.8vw, 26px);
+  color: var(--ink-soft);
+  letter-spacing: 0.01em;
+}
+
+.pd-bar-track {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hairline);
+}
+
+.pd-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+.pd-bar-ghost {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 0%;
+  width: 2px;
+  background: var(--ink-faint);
+  opacity: 0;
+}
+
+.pd-bar-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pd-bar-num {
+  font-size: clamp(30px, 3.4vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.pd-bar-max {
+  font-size: clamp(14px, 1.2vw, 18px);
+  color: var(--ink-faint);
+}
+
+.pd-bar-delta {
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.pd-bar-spark {
+  display: flex;
+  align-items: center;
+}
+
+.pd-bars--compact .pd-bar {
+  grid-template-columns: minmax(90px, 160px) 1fr auto auto;
+  gap: 16px;
+}
+
+.pd-bars--compact .pd-bar-num {
+  font-size: clamp(15px, 1.5vw, 20px);
+}
+
+.pd-bars--compact .pd-bar-label {
+  font-size: 13px;
+}
+
+/* Narrow screens: the three-column bar row leaves the track no width, so the
+   label and value share the first line and the track spans the full width. */
+@media (max-width: 720px) {
+  .pd-bar {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "label value" "track track";
+    gap: 8px 12px;
+  }
+  .pd-bar-label { grid-area: label; }
+  .pd-bar-value { grid-area: value; }
+  .pd-bar-track { grid-area: track; }
+  .pd-bars--compact .pd-bar {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: "label value spark" "track track track";
+  }
+  .pd-bar-spark { grid-area: spark; }
+}
+
+/* ------------------------------------------------------------------ */
+/* scores view                                                         */
+/* ------------------------------------------------------------------ */
+
+.pd-metrics-strip {
+  font-size: clamp(13px, 1.2vw, 16px);
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+.pd-metric {
+  color: var(--ink-soft);
+  transition: color var(--dur) var(--ease);
+}
+
+.pd-metric-sep {
+  margin: 0 8px;
+  color: var(--ink-faint);
+}
+
+/* ------------------------------------------------------------------ */
+/* improvement view                                                     */
+/* ------------------------------------------------------------------ */
+
+.pd-eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.pd-quote-wrap {
+  --wait-glow: 0;
+  position: relative;
+  padding-bottom: 14px;
+  width: 100%;
+}
+
+.pd-quote-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--wait);
+  opacity: calc(var(--wait-glow) * 0.9);
+  transform-origin: left center;
+  transform: scaleX(calc(0.3 + var(--wait-glow) * 0.7));
+  transition: none;
+}
+
+.pd-quote {
+  margin: 0;
+  font-size: clamp(28px, 3.2vw, 46px);
+  font-weight: 500;
+  line-height: 1.25;
+  max-width: 28ch;
+  color: var(--ink);
+}
+
+.pd-rail {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 3vw, 40px);
+  width: 100%;
+  padding-top: 4px;
+}
+
+.pd-rail-line {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 5px;
+  height: 1px;
+  background: var(--hairline);
+  z-index: 0;
+}
+
+.pd-rail-node {
+  --glow: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.35;
+  transform-origin: center;
+}
+
+.pd-rail-node.pd-glow-static {
+  box-shadow: 0 0 10px 0 var(--accent);
+  border-radius: 50%;
+}
+
+.pd-rail-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  box-shadow: 0 0 calc(var(--glow) * 16px) 0 var(--accent);
+  transition: background var(--dur) var(--ease);
+}
+
+.pd-rail-node.is-active .pd-rail-dot,
+.pd-rail-node.is-done .pd-rail-dot {
+  background: var(--accent);
+}
+
+.pd-rail-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.pd-rail-node.is-active .pd-rail-label {
+  color: var(--ink);
+}
+
+.pd-stage-body {
+  width: 100%;
+  min-height: 2.6em;
+}
+
+.pd-stage-line {
+  font-size: clamp(16px, 1.6vw, 21px);
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 34ch;
+}
+
+.pd-pause-glyph {
+  color: var(--accent);
+  font-size: 0.8em;
+  margin: 0 2px;
+  opacity: 0.85;
+}
+
+.pd-stage-line--prompt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--wait);
+}
+
+.pd-listen-pulse {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.pd-listen-pulse span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wait);
+  animation: pd-listen-bounce 1.1s ease-in-out infinite;
+}
+
+.pd-listen-pulse span:nth-child(2) { animation-delay: 0.15s; }
+.pd-listen-pulse span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes pd-listen-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+
+.pd-verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pd-verdict-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 3vw, 44px);
+}
+
+.pd-fact {
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.pd-onpoint {
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--accent);
+}
+
+.pd-wins {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.pd-verdict-ghost {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.pd-clip-indicator {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+}
+
+.pd-clip-indicator span {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0.7;
+  transform-origin: bottom;
+}
+
+.pd-said {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-said-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.pd-said-body {
+  font-size: clamp(16px, 1.6vw, 21px);
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+.pd-said--you { color: var(--pd-you); }
+
+.pd-said--coach { color: var(--pd-coach); }
+
+.pd-said--missing .pd-said-body {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 15px;
+}
+
+/* A word present in the coached line but absent from the original quote --
+   hairline underline only, no background, ink follows the parent's voice. */
+.pd-added {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* drill view                                                           */
+/* ------------------------------------------------------------------ */
+
+.pd-view--drill {
+  --wait-glow: 0;
+}
+
+.pd-drill-col {
+  align-items: center;
+  text-align: center;
+}
+
+.pd-drill-word {
+  font-size: clamp(64px, 12vw, 180px);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.pd-drill-stage {
+  font-size: clamp(14px, 1.6vw, 20px);
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  transition: color var(--dur) var(--ease);
+}
+
+.pd-view--drill.is-waiting .pd-drill-stage {
+  color: var(--wait);
+  opacity: calc(0.65 + var(--wait-glow) * 0.35);
+}
+
+/* Same you-vs-coach ink as the improvement view's transcript; "prompt" keeps
+   the amber wait-glow above since that beat is the user's turn, not a
+   playback, and "verdict" is a before/after number, not a voice. */
+.pd-drill-stage--you { color: var(--pd-you); }
+
+.pd-drill-stage--model { color: var(--pd-coach); }
+
+.pd-drill-verdict {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: clamp(24px, 3vw, 40px);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.pd-drill-verdict.is-visible {
+  opacity: 1;
+  height: auto;
+  overflow: visible;
+}
+
+.pd-drill-before {
+  color: var(--ink-faint);
+  font-weight: 300;
+}
+
+.pd-drill-arrow {
+  color: var(--ink-faint);
+}
+
+.pd-drill-after {
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+/* wrap view                                                            */
+/* ------------------------------------------------------------------ */
+
+.pd-wrap-progress {
+  font-size: clamp(16px, 1.6vw, 20px);
+  color: var(--ink-soft);
+}
+
+.pd-wrap-skills {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 40px;
+  width: 100%;
+}
+
+.pd-skill-tick {
+  flex: 1 1 0;
+  max-width: 20px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: var(--hairline);
+  border-radius: 2px;
+}
+
+.pd-skill-tick-fill {
+  width: 100%;
+  height: 100%;
+  transform-origin: bottom;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.pd-wrap-options {
+  font-size: 13px;
+  color: var(--ink-faint);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.pd-wrap-options.is-visible {
+  opacity: 1;
+}
+
+.pd-spark-svg {
+  display: block;
+}
+
+/* ------------------------------------------------------------------ */
+/* reduced motion                                                       */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-listen-pulse span {
+    animation: none;
+  }
+}

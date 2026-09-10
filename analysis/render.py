@@ -39,8 +39,15 @@ SLOWER_ACCEPTABLE_RANGE = (1.15, 1.45)
 
 
 def _rime_key() -> str:
+    """The Rime REST key, with a message that names the fix.
+
+    A bare KeyError here surfaces deep inside a render call, where it reads as
+    an internal fault rather than "you have not filled in .env"."""
     load_dotenv()
-    return os.environ["RIME_API_KEY"]
+    key = os.environ.get("RIME_API_KEY")
+    if not key:
+        raise RuntimeError("RIME_API_KEY missing -- copy .env.example to .env and fill it in")
+    return key
 
 
 def _chunk_text(text: str, limit: int = MAX_CHARS) -> list[str]:
@@ -68,6 +75,12 @@ def _chunk_text(text: str, limit: int = MAX_CHARS) -> list[str]:
 
 
 def _http_synth(text: str, model: str, speaker: str, sampling_rate: int, time_scale: float | None) -> bytes:
+    """One Rime TTS REST call, returns raw WAV bytes. `pauseBetweenBrackets`
+    tells Rime to treat a `<NNN>` marker in `text` as a millisecond pause
+    instruction rather than literal text -- this is what stops "<400>" from
+    being spoken aloud as digits. `time_scale`, when given, is Rime's
+    `timeScaleFactor` (see `_calibrated_slower_render` for why it is
+    calibrated rather than used as-is)."""
     body: dict[str, object] = {
         "text": text,
         "speaker": speaker,
@@ -185,34 +198,54 @@ def _calibrated_slower_render(text: str, model: str, speaker: str, sampling_rate
     return samples, sr, factor
 
 
-async def render_variants(improvement: dict, out_dir: Path, *, slower: bool = False, model: str = "mistv3", speaker: str = "summit") -> dict[str, dict]:
+async def render_variants(improvement: dict, out_dir: Path, *, slower: bool = False, model: str = "mistv3", speaker: str = "summit",
+                           variants: tuple[str, ...] = ("v1", "v2", "v3")) -> dict[str, dict]:
     """CONTRACTS.md §1 clips/. `improvement` needs "id", "quote", "v2_text",
-    "v3_markup" (CONTRACTS §3 shape); optional "pauses" for V1 reinsertion."""
+    "v3_markup" (CONTRACTS §3 shape); optional "pauses" for V1 reinsertion.
+
+    `variants` selects which clips to synthesize. The live session asks for
+    ("v2", "v3") only: V1 is the user's own verbatim words re-spoken in the
+    coach's voice, and the coaching flow plays the user's OWN recording (V0)
+    for that beat instead -- rendering V1 there would only cost Rime calls and
+    publish a clip URL that must never be played. E3 (evidence/
+    e3_delivery_listening.py) measures V1's filler audibility, so it stays
+    available through the default."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     imp_id = improvement["id"]
     v1_text = _insert_pauses(improvement["quote"], improvement.get("pauses") or [])
     v2_text = improvement["v2_text"]
     v3_text = improvement["v3_markup"]
+    texts = {"v1": v1_text, "v2": v2_text, "v3": v3_text}
+    wanted = [v for v in ("v1", "v2", "v3") if v in variants]
+    if not wanted:
+        raise ValueError("render_variants needs at least one variant")
 
     def _do() -> dict[str, dict]:
+        # The slower re-render calibrates its time-scale factor on the first
+        # requested variant, so the factor is measured on audio that is
+        # actually played back.
+        first = wanted[0]
         if slower:
-            v1_samples, sr, factor = _calibrated_slower_render(v1_text, model, speaker, RATE)
-            v2_samples, _ = _synth_pcm(v2_text, model, speaker, RATE, time_scale=factor)
-            v3_samples, _ = _synth_pcm(v3_text, model, speaker, RATE, time_scale=factor)
+            samples, sr, factor = _calibrated_slower_render(texts[first], model, speaker, RATE)
+            rendered = {first: samples}
+            for tag in wanted[1:]:
+                rendered[tag], _ = _synth_pcm(texts[tag], model, speaker, RATE, time_scale=factor)
         else:
-            v1_samples, sr = _synth_pcm(v1_text, model, speaker, RATE)
-            v2_samples, _ = _synth_pcm(v2_text, model, speaker, RATE)
-            v3_samples, _ = _synth_pcm(v3_text, model, speaker, RATE)
+            samples, sr = _synth_pcm(texts[first], model, speaker, RATE)
+            rendered = {first: samples}
+            for tag in wanted[1:]:
+                rendered[tag], _ = _synth_pcm(texts[tag], model, speaker, RATE)
 
         results: dict[str, dict] = {}
-        for tag, samples, text in (("v1", v1_samples, v1_text), ("v2", v2_samples, v2_text), ("v3", v3_samples, v3_text)):
+        for tag in wanted:
+            samples = rendered[tag]
             path = out_dir / f"{imp_id}_{tag}_{VARIANT_NAMES[tag]}.wav"
             _write_wav(path, samples, sr)
             results[tag] = {
                 "path": str(path),
                 "duration_s": round(len(samples) / sr, 3) if sr else 0.0,
-                "text": text,
+                "text": texts[tag],
                 "gaps": gaps(path.read_bytes()),
             }
         return results

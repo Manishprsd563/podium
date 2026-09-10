@@ -1,0 +1,106 @@
+/* =========================================================================
+   Podium pitch video — design tokens
+   Extracted from web/style.css (:root) and web/dashboard.css (.dash-root),
+   plus the orb.js STATES colour table. This file declares values only —
+   no selectors beyond :root, no layout, no animation. components.css and
+   every scene reference these custom properties instead of literal colour.
+   ========================================================================= */
+
+#root {
+  /* ---- surfaces ---------------------------------------------------- */
+  --bg: #0b0d12;               /* canvas / page background (web/style.css --bg) */
+  --bg-rgb: 11, 13, 18;
+  --surface: #11151d;          /* card / pill / slide background (web/style.css --bg-2) */
+  --surface-rgb: 17, 21, 29;
+  --surface-2: #161c27;        /* nested surface (drill ring hole, tile hover) */
+  --surface-2-rgb: 22, 28, 39;
+
+  /* ---- ink (text) ---------------------------------------------------- */
+  --ink: #f3f5f9;               /* primary text */
+  --ink-rgb: 243, 245, 249;
+  --ink-2: rgba(var(--ink-rgb), 0.66);   /* soft text (web/style.css --ink-soft) */
+  --ink-3: rgba(var(--ink-rgb), 0.52);   /* faint text (web/style.css --ink-faint) */
+
+  /* ---- hairlines ------------------------------------------------------ */
+  --hair: rgba(var(--ink-rgb), 0.10);     /* web/style.css --hairline */
+  --hair-2: rgba(var(--ink-rgb), 0.16);   /* stronger hairline for borders that need to read at a distance */
+
+  /* ---- accents (web/style.css --accent / --accent-2 / --user / etc.) - */
+  --teal: #5ee1d0;              /* --accent */
+  --teal-rgb: 94, 225, 208;
+  --peri: #7b8cff;              /* --accent-2 */
+  --peri-rgb: 123, 140, 255;
+  --violet: #8f7bff;            /* --user (Maya / listening) */
+  --violet-rgb: 143, 123, 255;
+  --amber: #f5c451;             /* --wait / --warn */
+  --amber-rgb: 245, 196, 81;
+  --red: #ff5c5c;               /* --danger */
+  --red-rgb: 255, 92, 92;
+  --green: #5ee1a0;             /* --good */
+  --green-rgb: 94, 225, 160;
+  --mic: #3ddc84;               /* orb.js STATES.micLive colorA */
+  --mic-rgb: 61, 220, 132;
+  --think: #8a94a6;             /* --think / orb.js STATES.thinking colorA */
+  --think-rgb: 138, 148, 166;
+
+  /* dashboard two-voice ink (web/dashboard.css .dash-root --pd-you / --pd-coach) */
+  --pd-you: var(--red);
+  --pd-coach: var(--green);
+
+  /* ---- orb duotone per state (orb.js STATES table, colorA -> colorB) - */
+  --orb-idle-a: #5ee1d0;    /* idle + speaking share this pair */
+  --orb-idle-a-rgb: 94, 225, 208;
+  --orb-idle-b: #7b8cff;
+  --orb-idle-b-rgb: 123, 140, 255;
+  --orb-listen-a: #8f7bff;  /* listening */
+  --orb-listen-a-rgb: 143, 123, 255;
+  --orb-listen-b: #5ee1d0;
+  --orb-listen-b-rgb: 94, 225, 208;
+  --orb-mic-a: #3ddc84;     /* micLive */
+  --orb-mic-a-rgb: 61, 220, 132;
+  --orb-mic-b: #1f9d5a;
+  --orb-mic-b-rgb: 31, 157, 90;
+  --orb-wait-a: #f5c451;    /* waiting */
+  --orb-wait-a-rgb: 245, 196, 81;
+  --orb-wait-b: #ffdf8a;
+  --orb-wait-b-rgb: 255, 223, 138;
+  --orb-think-a: #8a94a6;   /* thinking */
+  --orb-think-a-rgb: 138, 148, 166;
+  --orb-think-b: #b6c0cf;
+  --orb-think-b-rgb: 182, 192, 207;
+  --orb-connect-a: #8a94a6; /* connecting / reconnecting */
+  --orb-connect-a-rgb: 138, 148, 166;
+  --orb-connect-b: #5b6472;
+  --orb-connect-b-rgb: 91, 100, 114;
+  --orb-off-a: #ff5c5c;     /* disconnected */
+  --orb-off-a-rgb: 255, 92, 92;
+  --orb-off-b: #7a1f1f;
+  --orb-off-b-rgb: 122, 31, 31;
+
+  /* ---- type ------------------------------------------------------------ */
+  --font: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --ls-tight: -0.01em;
+  --ls-normal: 0em;
+  --ls-wide: 0.06em;
+  --ls-wider: 0.12em;
+
+  /* ---- shape / elevation ------------------------------------------------ */
+  --radius: 18px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--ink-rgb), 0.04);
+  --shadow-glow-teal: 0 0 24px rgba(var(--teal-rgb), 0.35);
+  --shadow-glow-amber: 0 0 18px rgba(var(--amber-rgb), 0.35);
+  --shadow-glow-red: 0 0 18px rgba(var(--red-rgb), 0.35);
+  --shadow-glow-green: 0 0 18px rgba(var(--green-rgb), 0.35);
+
+  /* ---- reference timing (informational — components.css never applies
+     these as `transition`/`animation`; scenes read them for GSAP eases) --- */
+  --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --dur: 260ms;
+  --dur-slow: 640ms;
+
+  /* ---- component metrics ------------------------------------------------ */
+  --statusbar-h: 56px;
+}

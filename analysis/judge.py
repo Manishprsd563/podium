@@ -39,6 +39,8 @@ _ANY_TAG = re.compile(r"<[^>]*>")
 
 
 def _skill_ids() -> list[str]:
+    """Valid `improvement.skill` ids: the curriculum's own file stems when
+    `skills/curriculum/*.md` exists, else CONTRACTS.md §9's fixed ladder."""
     if CURRICULUM_DIR.is_dir():
         ids = sorted(p.stem for p in CURRICULUM_DIR.glob("*.md"))
         if ids:
@@ -47,11 +49,15 @@ def _skill_ids() -> list[str]:
 
 
 def _category_from_rubric_ref(ref: str) -> str:
+    """"delivery.md#pace-bands-wpm" -> "delivery" -- the rubric file's stem,
+    used to look up a fallback skill when the LLM's own `skill` is invalid."""
     file_part = ref.split("#", 1)[0]
     return file_part[:-3] if file_part.endswith(".md") else file_part
 
 
 def _schema_instructions() -> str:
+    """Builds the strict-JSON response-shape instructions appended to the
+    judge system prompt, including the currently valid `skill` id list."""
     skill_list = ", ".join(_skill_ids())
     return (
         "Return exactly this JSON shape and nothing else:\n"
@@ -78,21 +84,36 @@ class JudgeError(RuntimeError):
 
 
 def _load_rubric(name: str) -> str:
+    """Read and cache one `skills/judge/*.md` rubric file by name.
+
+    `name` may originate from the judge LLM's `rubric_ref`, so it is matched
+    against `RUBRIC_FILES` rather than joined onto `SKILLS_DIR` directly: a
+    model reply of `../../.env#x` must not turn into a file read whose contents
+    are then spoken to the user and fed back into the coach prompt."""
+    if name not in RUBRIC_FILES:
+        raise KeyError(f"unknown rubric file: {name!r}")
     if name not in _RUBRIC_CACHE:
         _RUBRIC_CACHE[name] = (SKILLS_DIR / name).read_text(encoding="utf-8")
     return _RUBRIC_CACHE[name]
 
 
 def _full_rubric() -> str:
+    """Concatenate every CONTRACTS.md §3 rubric file, each under a
+    `# <name>` heading, for the judge system prompt."""
     return "\n\n".join(f"# {name}\n{_load_rubric(name)}" for name in RUBRIC_FILES)
 
 
 def _slugify(heading: str) -> str:
+    """Markdown heading text -> the anchor form used in `rubric_ref`
+    (lowercase, non-alphanumerics collapsed to single hyphens)."""
     s = re.sub(r"[^a-z0-9\s-]", "", heading.strip().lower())
     return re.sub(r"\s+", "-", s).strip("-")
 
 
 def _extract_section(markdown: str, anchor: str) -> str | None:
+    """Return the text of the `markdown` heading whose slugified title
+    equals `anchor`, up to (not including) the next heading at the same or
+    a shallower level. None if no heading matches."""
     lines = markdown.splitlines()
     headings = [(i, line, len(line) - len(line.lstrip("#"))) for i, line in enumerate(lines) if line.lstrip().startswith("#")]
     for idx, (line_no, line, level) in enumerate(headings):
@@ -110,11 +131,16 @@ def _extract_section(markdown: str, anchor: str) -> str | None:
 def rubric_text(ref: str) -> str:
     """Resolve a `rubric_ref` like "delivery.md#filler-rate" to its section text.
 
-    Used by the agent's `explain_rubric` tool. Missing/whole-file refs fall
-    back to the entire file.
+    Used by the agent's `explain_rubric` tool. A missing anchor, an anchor that
+    matches no heading, or a `ref` naming something other than one of the six
+    rubric files all fall back to text the user can safely hear -- never to a
+    file read outside `skills/judge/`.
     """
     name, _, anchor = ref.partition("#")
-    text = _load_rubric(name)
+    try:
+        text = _load_rubric(name)
+    except (KeyError, OSError):
+        return ""
     if not anchor:
         return text
     return _extract_section(text, anchor) or text
@@ -142,6 +168,9 @@ def _build_prompt(deck: dict, slide: dict | None, transcript_text: str, metrics:
 
 
 def _parse(raw: str) -> dict | None:
+    """Best-effort JSON parse of an LLM response: strips ``` fences, then
+    falls back to the first {...} span if the whole string doesn't parse
+    as-is. None if nothing usable is found."""
     text = re.sub(r"^```(?:json)?|```$", "", raw.strip(), flags=re.MULTILINE).strip()
     try:
         return json.loads(text)
@@ -156,6 +185,9 @@ def _parse(raw: str) -> dict | None:
 
 
 async def _call_llm(system: str, user: str, model: str | None) -> str:
+    """Stream one judge completion and return the concatenated text. `model`
+    overrides the configured judge model (e.g. for evidence scripts
+    comparing models); omitted, it uses `agent.llm_config.judge_llm()`."""
     from livekit.agents.llm import ChatContext
 
     if model:
@@ -181,6 +213,8 @@ async def _call_llm(system: str, user: str, model: str | None) -> str:
 
 
 def _clamp_score(v: object) -> int:
+    """Coerce a rubric score to an int in [1, 5]; unparseable input
+    defaults to 3 rather than failing the whole judgment."""
     try:
         n = int(round(float(v)))  # type: ignore[arg-type]
     except (TypeError, ValueError):
@@ -233,6 +267,11 @@ def _relocate_markers(text: str) -> str:
 
 
 def _sanitize_v3_markup(text: str) -> str:
+    """Make `v3_markup` safe to send to Rime: strip any angle-bracket tag
+    that isn't a valid `<NNN>` pause marker (no SSML gets through), keep
+    only the first 3 markers (CONTRACTS.md §3 cap), then relocate the
+    survivors next to punctuation via `_relocate_markers` so they actually
+    render as silence instead of being spoken."""
     cleaned = _ANY_TAG.sub(lambda m: m.group(0) if _VALID_PAUSE.fullmatch(m.group(0)) else "", text)
     count = 0
 
@@ -247,10 +286,19 @@ def _sanitize_v3_markup(text: str) -> str:
 
 
 def _strip_markup(text: str) -> str:
+    """Remove all angle-bracket markup for `v2_text`, which CONTRACTS.md
+    §3 requires to be plain words with no pause syntax."""
     return re.sub(r"\s{2,}", " ", _ANY_TAG.sub("", text)).strip()
 
 
 def _validate(obj: dict, transcript_text: str, words: list[dict], metrics: dict, deck_terms: list[str]) -> dict:
+    """Turn the judge LLM's raw (untrusted) JSON into the CONTRACTS.md §3
+    shape: clamps scores, drops any improvement whose `quote` isn't a
+    verbatim substring of the transcript, re-derives `span` from `words`
+    via `span_for_quote` (never trusts the LLM's own span), falls `skill`
+    back to a rubric-category default when the LLM's choice isn't a valid
+    curriculum id, sanitizes `v2_text`/`v3_markup` markup, and fills
+    `drill_words` from the already-computed pronunciation block."""
     scores_in = obj.get("scores") or {}
     scores = {
         k: _clamp_score(scores_in.get(k, 3))
