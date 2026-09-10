@@ -34,8 +34,8 @@ https://github.com/user-attachments/assets/b9dc5196-367d-4328-a915-690f68c6672e
   deck generated from your topic or an uploaded PDF.
 - **Measured delivery.** Pace, filler rate, pause taxonomy, loudness variance and
   intelligibility are computed in code from your speech, never estimated by an LLM.
-- **Judged content.** A judge LLM scores the talk against six rubric skills — opening and structure, clarity, connection
-  to the slide on screen, and how the measured numbers sit against the pace and pause bands — and
+- **Judged content.** A judge LLM scores the talk against six rubric skills: opening and structure, clarity, connection
+  to the slide on screen, and how the measured numbers sit against the pace and pause bands; and
   ties each improvement to fine-tuned curriculum skills.
 - **Hear the before and after.** Every improvement plays your original line next to a cleaned,
   Rime-voiced rewrite, so you hear the difference instead of reading about it.
