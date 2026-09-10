@@ -18,10 +18,16 @@ back, then a cleaned version, then the cleaned version with a deliberate pause, 
 Rime voice, so the only thing that changes between clips is delivery, not wording. Built for the
 DataForge x Rime hackathon.
 
-<video src="https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4" poster="docs/demo/podium-poster.png" controls muted playsinline width="100%"></video>
+## Demo
 
-If your Markdown renderer strips the player above:
-[watch the 4-minute demo](https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4).
+<!-- GitHub's Markdown sanitiser drops <video>, and it serves raw .mp4 as a
+     download rather than a stream, so the poster below links to the file
+     instead of embedding a player. -->
+
+[![Podium demo film](docs/demo/podium-poster.png)](https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4)
+
+**[Watch the demo film](https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4)** — 4 minutes 18 seconds, 1600x900, 12 MB
+([`docs/demo/podium-demo.mp4`](docs/demo/podium-demo.mp4)).
 
 The film is a directed product pitch built on the real Podium browser UI (the actual Three.js
 orb from `web/orb.js`, captured live), voiced by three Rime `mistv3` speakers, and grounded in
