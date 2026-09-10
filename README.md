@@ -29,8 +29,6 @@ With 10+ coaching skills, slide-aware feedback and a session-graph architecture
 that tracks each attempt, Podium helps you turn a first rehearsal into a clearer, more
 confident, stage-ready presentation.
 
-## Demo
-
 https://github.com/user-attachments/assets/47fd7337-74b1-4757-b2fa-c5318033535d
 
 ## Highlights
