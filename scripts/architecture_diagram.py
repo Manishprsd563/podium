@@ -20,6 +20,8 @@ MINT = "#7dd3c0"  # LiveKit Cloud, LiveKit Inference, Deepgram
 CORAL = "#f5a997"  # Rime
 GOLD = "#f3d17c"  # analysis/*, pure Python
 INK = "#f5f5f7"
+BG = "#000000"
+PANEL = "#0b0b0d"  # opaque fills that sit on the background (pills, cylinder cap)
 SANS = "'Poppins','Century Gothic','Futura',Avenir,'Segoe UI',ui-sans-serif,system-ui,sans-serif"
 UI = "'Segoe UI',ui-sans-serif,system-ui,sans-serif"
 MONO = "'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace"
@@ -54,6 +56,7 @@ def rgba(hex_color: str, a: float) -> str:
 class Svg:
     def __init__(self) -> None:
         self.parts: list[str] = []
+        self.headers: list[str] = []  # group titles, emitted last so edges pass behind them
 
     def add(self, s: str) -> None:
         self.parts.append(s)
@@ -64,14 +67,19 @@ class Svg:
             f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="{color}" fill-opacity="0.035" '
             f'stroke="{color}" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>'
         )
-        self.add(
+        halo = f'paint-order="stroke" stroke="{BG}" stroke-width="7" stroke-linejoin="round"'
+        self.headers.append(
             f'<text x="{x + 20}" y="{y + 28}" font-family="{UI}" font-size="12" font-weight="600" '
-            f'letter-spacing="3.5" fill="{color}">{esc(title)}</text>'
+            f'letter-spacing="3.5" fill="{color}" {halo}>{esc(title)}</text>'
         )
-        self.add(
+        self.headers.append(
             f'<text x="{x + 20}" y="{y + 46}" font-family="{MONO}" font-size="11.5" '
-            f'fill="{INK}" fill-opacity="0.55">{esc(sub)}</text>'
+            f'fill="{INK}" fill-opacity="0.6" {halo}>{esc(sub)}</text>'
         )
+
+    def flush_headers(self) -> None:
+        self.parts.extend(self.headers)
+        self.headers.clear()
 
     # ---- nodes --------------------------------------------------------------------
     def node(self, x: int, y: int, w: int, h: int, color: str, icon: str, title: str, lines: list[str], mono_title: bool = True) -> None:
@@ -111,7 +119,7 @@ class Svg:
             f'<path d="M{x} {top + ry} v{h - 2 * ry} a{w / 2} {ry} 0 0 0 {w} 0 v-{h - 2 * ry}" '
             f'fill="{color}" fill-opacity="0.09" stroke="{color}" stroke-width="1.5" filter="url(#node-shadow)"/>'
         )
-        self.add(f'<ellipse cx="{cx}" cy="{top + ry}" rx="{w / 2}" ry="{ry}" fill="#151d31" stroke="{color}" stroke-width="1.5"/>')
+        self.add(f'<ellipse cx="{cx}" cy="{top + ry}" rx="{w / 2}" ry="{ry}" fill="{PANEL}" stroke="{color}" stroke-width="1.5"/>')
         self.add(f'<text x="{cx}" y="{top + h / 2 + 4}" text-anchor="middle" font-family="{SANS}" font-size="16" font-weight="700" fill="{INK}">{esc(title)}</text>')
         self.add(f'<text x="{cx}" y="{top + h / 2 + 22}" text-anchor="middle" font-family="{UI}" font-size="11.5" fill="{INK}" fill-opacity="0.65">{esc(sub)}</text>')
 
@@ -127,9 +135,9 @@ class Svg:
             self.pill(*(at or ((pts[0][0] + pts[-1][0]) / 2, (pts[0][1] + pts[-1][1]) / 2)), label, color)
 
     def pill(self, lx: float, ly: float, label: str, color: str) -> None:
-        pw = len(label) * 6.7 + 16
+        pw = len(label) * 7 + 20
         self.add(
-            f'<rect x="{lx - pw / 2:.1f}" y="{ly - 9}" width="{pw:.1f}" height="18" rx="9" fill="#111827" '
+            f'<rect x="{lx - pw / 2:.1f}" y="{ly - 9}" width="{pw:.1f}" height="18" rx="9" fill="{PANEL}" '
             f'stroke="{color}" stroke-opacity="0.55" stroke-width="1"/>'
         )
         self.add(
@@ -153,18 +161,15 @@ def build() -> str:
         )
     s.add(
         "<defs>"
-        '<linearGradient id="bg-depth" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#12192c"/><stop offset="55%" stop-color="#111827"/><stop offset="100%" stop-color="#0d1320"/>'
-        "</linearGradient>"
-        f'<radialGradient id="glow-lavender" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{LAVENDER}" stop-opacity="0.16"/><stop offset="100%" stop-color="{LAVENDER}" stop-opacity="0"/></radialGradient>'
-        f'<radialGradient id="glow-mint" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{MINT}" stop-opacity="0.12"/><stop offset="100%" stop-color="{MINT}" stop-opacity="0"/></radialGradient>'
-        f'<radialGradient id="glow-coral" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{CORAL}" stop-opacity="0.10"/><stop offset="100%" stop-color="{CORAL}" stop-opacity="0"/></radialGradient>'
+        f'<radialGradient id="glow-lavender" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{LAVENDER}" stop-opacity="0.09"/><stop offset="100%" stop-color="{LAVENDER}" stop-opacity="0"/></radialGradient>'
+        f'<radialGradient id="glow-mint" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{MINT}" stop-opacity="0.07"/><stop offset="100%" stop-color="{MINT}" stop-opacity="0"/></radialGradient>'
+        f'<radialGradient id="glow-coral" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{CORAL}" stop-opacity="0.06"/><stop offset="100%" stop-color="{CORAL}" stop-opacity="0"/></radialGradient>'
         '<filter id="soft-blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter>'
-        '<filter id="node-shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.35"/></filter>'
+        '<filter id="node-shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.6"/></filter>'
         + "".join(markers)
         + "</defs>"
     )
-    s.add(f'<rect width="{W}" height="{H}" fill="url(#bg-depth)"/>')
+    s.add(f'<rect width="{W}" height="{H}" fill="{BG}"/>')
     s.add(
         '<g filter="url(#soft-blur)">'
         '<ellipse cx="260" cy="440" rx="320" ry="300" fill="url(#glow-lavender)"/>'
@@ -194,17 +199,17 @@ def build() -> str:
     s.cylinder(495, 320, 120, 100, MINT, "Room", "WebRTC SFU")
     # Agent process
     s.hub(650, 200, 220, 230, LAVENDER, "PodiumOrchestrator", ["phases, turn policy,", "revision fence"])
-    s.node(635, 470, 205, 90, CORAL, "speaker", "Rime mistv3/thunder", ["WebSocket /ws3,", "live speech"], mono_title=False)
-    s.node(990, 130, 240, 75, MINT, "wave", "Deepgram nova-3", ["STT: words + timestamps"], mono_title=False)
-    s.node(990, 240, 240, 75, MINT, "chip", "LiveKit Inference", ["coach: gemma-4-31b-it"], mono_title=False)
-    s.node(990, 355, 240, 90, CORAL, "speaker-clock", "Rime mistv3/thunder", ["REST, pre-synthesizes each", "line ahead of its UI message"], mono_title=False)
-    s.node(990, 540, 240, 75, MINT, "chip", "LiveKit Inference", ["judge: gpt-5.4-mini"], mono_title=False)
+    s.node(635, 470, 215, 90, CORAL, "speaker", "Rime mistv3/thunder", ["WebSocket /ws3,", "live speech"], mono_title=False)
+    s.node(990, 130, 250, 75, MINT, "wave", "Deepgram nova-3", ["STT: words + timestamps"], mono_title=False)
+    s.node(990, 240, 250, 75, MINT, "chip", "LiveKit Inference", ["coach: gemma-4-31b-it"], mono_title=False)
+    s.node(990, 355, 250, 90, CORAL, "speaker-clock", "Rime mistv3/thunder", ["REST, pre-synthesizes each", "line ahead of its UI message"], mono_title=False)
+    s.node(990, 540, 250, 75, MINT, "chip", "LiveKit Inference", ["judge: gpt-5.4-mini"], mono_title=False)
     # Analysis
     s.node(760, 740, 160, 100, GOLD, "gauge", "metrics.py", ["wpm, pauses,", "fillers, loudness"])
     s.node(960, 740, 200, 100, GOLD, "scale", "judge.py", ["+ skills/judge/*.md"])
-    s.node(1200, 740, 150, 100, GOLD, "film", "render.py", ["V1 / V2 / V3 clips"])
+    s.node(1195, 740, 170, 100, GOLD, "film", "render.py", ["V1 / V2 / V3 clips"])
     # Standalone Rime REST
-    s.node(1420, 740, 210, 100, CORAL, "doc-speaker", "Rime mistv3/thunder", ["REST /v1/rime-tts,", "offline clips"], mono_title=False)
+    s.node(1405, 740, 225, 100, CORAL, "doc-speaker", "Rime mistv3/thunder", ["REST /v1/rime-tts,", "offline clips"], mono_title=False)
 
     # ---- edges -----------------------------------------------------------------------
     # Browser internals
@@ -232,33 +237,29 @@ def build() -> str:
     s.edge([(1050, 740), (1050, 615)], MINT)
     s.edge([(1100, 615), (1100, 740)], MINT)
     # Judge -->|v3_markup| Render --> TTS_REST
-    s.edge([(1160, 790), (1200, 790)], GOLD, label="v3_markup", at=(1180, 815))
-    s.edge([(1350, 790), (1420, 790)], CORAL)
+    s.edge([(1160, 790), (1195, 790)], GOLD, label="v3_markup", at=(1178, 815))
+    s.edge([(1365, 790), (1405, 790)], CORAL)
     # Render -->|clip paths| Orch   (loops over the top, into the orchestrator)
     s.edge([(1290, 740), (1290, 68), (850, 68), (850, 200)], GOLD, label="clip paths", at=(1070, 68))
     # TTS_REST -.pre-rendered clips.-> Orch
-    s.edge([(1525, 740), (1525, 45), (820, 45), (820, 200)], CORAL, dashed=True, label="pre-rendered clips", at=(1200, 45))
+    s.edge([(1517, 740), (1517, 45), (820, 45), (820, 200)], CORAL, dashed=True, label="pre-rendered clips", at=(1200, 45))
+    s.flush_headers()
 
-    # ---- legend ----------------------------------------------------------------------
+    # ---- legend (centred) ------------------------------------------------------------
     ly = 912
-    x = 48
-    for i, c in enumerate((LAVENDER, MINT, CORAL, INK)):
-        s.add(f'<rect x="{x + i * 18}" y="{ly - 6}" width="11" height="11" rx="2.5" fill="{c}" opacity="0.85"/>')
-    x = 150
-    for c, txt in ((LAVENDER, "Podium code"), (MINT, "LiveKit  ·  Deepgram"), (CORAL, "Rime"), (GOLD, "analysis, offline")):
-        s.add(f'<rect x="{x}" y="{ly - 7}" width="14" height="14" rx="4" fill="{c}" fill-opacity="0.18" stroke="{c}" stroke-width="1.4"/>')
-        s.add(f'<text x="{x + 22}" y="{ly + 4}" font-family="{UI}" font-size="12" fill="{INK}" fill-opacity="0.78">{esc(txt)}</text>')
-        x += 40 + len(txt) * 7
-    x += 30
-    s.add(f'<path d="M{x} {ly}h36" stroke="{INK}" stroke-width="1.8" stroke-opacity="0.8" marker-end="url(#arrow-f5f5f7)"/>')
-    s.add(f'<text x="{x + 46}" y="{ly + 4}" font-family="{UI}" font-size="12" fill="{INK}" fill-opacity="0.78">live call path</text>')
-    x += 150
-    s.add(f'<path d="M{x} {ly}h36" stroke="{INK}" stroke-width="1.8" stroke-opacity="0.8" stroke-dasharray="7 6" marker-end="url(#arrow-f5f5f7)"/>')
-    s.add(f'<text x="{x + 46}" y="{ly + 4}" font-family="{UI}" font-size="12" fill="{INK}" fill-opacity="0.78">offline, ahead of the call</text>')
-    s.add(
-        f'<text x="1632" y="{ly + 4}" text-anchor="end" font-family="{UI}" font-size="12" font-weight="600" '
-        f'letter-spacing="4" fill="{LAVENDER}" opacity="0.85">PODIUM  ·  MODULE WIRING</text>'
-    )
+    items = [(LAVENDER, "Podium code"), (MINT, "LiveKit  ·  Deepgram"), (CORAL, "Rime"), (GOLD, "analysis, offline")]
+    lines = [("live call path", False), ("offline, ahead of the call", True)]
+    widths = [22 + len(t) * 6.6 + 34 for _, t in items] + [46 + len(t) * 6.6 + 34 for t, _ in lines]
+    x = (W - sum(widths) + 34) / 2
+    for (c, txt), w in zip(items, widths):
+        s.add(f'<rect x="{x:.1f}" y="{ly - 7}" width="14" height="14" rx="4" fill="{c}" fill-opacity="0.18" stroke="{c}" stroke-width="1.4"/>')
+        s.add(f'<text x="{x + 22:.1f}" y="{ly + 4}" font-family="{UI}" font-size="12" fill="{INK}" fill-opacity="0.78">{esc(txt)}</text>')
+        x += w
+    for (txt, dashed), w in zip(lines, widths[len(items):]):
+        dash = ' stroke-dasharray="7 6"' if dashed else ""
+        s.add(f'<path d="M{x:.1f} {ly}h36" stroke="{INK}" stroke-width="1.8" stroke-opacity="0.8"{dash} marker-end="url(#arrow-f5f5f7)"/>')
+        s.add(f'<text x="{x + 46:.1f}" y="{ly + 4}" font-family="{UI}" font-size="12" fill="{INK}" fill-opacity="0.78">{esc(txt)}</text>')
+        x += w
 
     body = "\n  ".join(s.parts)
     return (
