@@ -48,7 +48,7 @@ https://github.com/user-attachments/assets/b9dc5196-367d-4328-a915-690f68c6672e
 
 **Prerequisites**
 
-- Python 3.12.
+- Python 3.12
 - A modern Chromium- or Firefox-based browser with microphone access.
 - Accounts for [LiveKit Cloud](https://cloud.livekit.io), [Rime](https://rime.ai), and
   [Deepgram](https://console.deepgram.com).
