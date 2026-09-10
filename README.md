@@ -85,7 +85,7 @@ Add your provider credentials to `.env`:
 | `RIME_API_KEY` | [rime.ai](https://rime.ai) → dashboard → API keys. |
 | `DEEPGRAM_API_KEY` | [console.deepgram.com](https://console.deepgram.com) → API Keys. |
 
-**Run** (two terminals)
+**Run** (in two terminals)
 
 ```powershell
 # Terminal 1 -- agent worker (Windows path shown; macOS/Linux: .venv/bin/python)
