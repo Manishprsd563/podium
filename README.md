@@ -20,14 +20,17 @@ DataForge x Rime hackathon.
 
 ## Demo
 
-<!-- GitHub's Markdown sanitiser drops <video>, and it serves raw .mp4 as a
-     download rather than a stream, so the poster below links to the file
-     instead of embedding a player. -->
+<!-- Autoplaying animated WebP: GitHub's Markdown sanitiser strips <video> for
+     every host except its own attachment CDN, and it serves a raw .mp4 as a
+     download rather than a stream. An animated image is the only preview that
+     actually plays on a repository front page. -->
 
-[![Podium demo film](docs/demo/podium-poster.png)](https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4)
+[![Podium demo — six moments from the film](docs/demo/podium-preview.webp)](https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4)
 
-**[Watch the demo film](https://github.com/Manishprsd563/podium/raw/master/docs/demo/podium-demo.mp4)** — 4 minutes 18 seconds, 1600x900, 12 MB
-([`docs/demo/podium-demo.mp4`](docs/demo/podium-demo.mp4)).
+**[Watch the full film with sound](https://github.com/Manishprsd563/podium/releases/download/v1.0.0/podium-demo.mp4)** — 4 minutes 18 seconds,
+1600x900, 12 MB. Also in the repository at
+[`docs/demo/podium-demo.mp4`](docs/demo/podium-demo.mp4), and attached to
+[release v1.0.0](https://github.com/Manishprsd563/podium/releases/tag/v1.0.0).
 
 The film is a directed product pitch built on the real Podium browser UI (the actual Three.js
 orb from `web/orb.js`, captured live), voiced by three Rime `mistv3` speakers, and grounded in
