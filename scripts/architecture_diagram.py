@@ -62,7 +62,7 @@ class Svg:
         self.parts.append(s)
 
     # ---- containers ---------------------------------------------------------------
-    def group(self, x: int, y: int, w: int, h: int, color: str, title: str, sub: str) -> None:
+    def group(self, x: int, y: int, w: int, h: int, color: str, title: str, sub: str | None = None) -> None:
         self.add(
             f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="{color}" fill-opacity="0.035" '
             f'stroke="{color}" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="6 5"/>'
@@ -72,10 +72,11 @@ class Svg:
             f'<text x="{x + 20}" y="{y + 28}" font-family="{UI}" font-size="12" font-weight="600" '
             f'letter-spacing="3.5" fill="{color}" {halo}>{esc(title)}</text>'
         )
-        self.headers.append(
-            f'<text x="{x + 20}" y="{y + 46}" font-family="{MONO}" font-size="11.5" '
-            f'fill="{INK}" fill-opacity="0.6" {halo}>{esc(sub)}</text>'
-        )
+        if sub:
+            self.headers.append(
+                f'<text x="{x + 20}" y="{y + 46}" font-family="{MONO}" font-size="11.5" '
+                f'fill="{INK}" fill-opacity="0.6" {halo}>{esc(sub)}</text>'
+            )
 
     def flush_headers(self) -> None:
         self.parts.extend(self.headers)
@@ -177,17 +178,11 @@ def build() -> str:
         '<ellipse cx="1420" cy="720" rx="360" ry="220" fill="url(#glow-coral)"/>'
         "</g>"
     )
-    # stage crop marks + workspace dots, as in the banner
-    s.add(
-        f'<g stroke="{INK}" stroke-width="1.5" opacity="0.22" fill="none">'
-        '<path d="M40 64V40h24M1640 64V40h-24M40 896v24h24M1640 896v24h-24"/></g>'
-    )
-
     # ---- groups ----------------------------------------------------------------------
     s.group(40, 120, 280, 660, LAVENDER, "BROWSER", "web/  ·  no build step")
     s.group(390, 255, 210, 220, MINT, "LIVEKIT CLOUD", "India South")
     s.group(620, 100, 640, 560, INK, "AGENT PROCESS", "agent/session_agent.py")
-    s.group(730, 690, 660, 170, GOLD, "ANALYSIS", "analysis/*  ·  pure Python, no LiveKit")
+    s.group(730, 690, 660, 170, GOLD, "ANALYSIS")
 
     # ---- nodes -----------------------------------------------------------------------
     # Browser
