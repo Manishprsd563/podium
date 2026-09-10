@@ -14,11 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="#demo">Demo</a> ·
   <a href="#highlights">Highlights</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#architecture">Architecture</a> ·
-  <a href="#engineering-docs">Docs</a>
+  <a href="docs/README.md">Docs</a>
 </p>
 
 Podium is a voice-native presentation coach built for the DataForge x Rime hackathon. You
@@ -29,7 +28,7 @@ With 10+ coaching skills, slide-aware feedback and a session-graph architecture
 that tracks each attempt, Podium helps you turn a first rehearsal into a clearer, more
 confident, stage-ready presentation.
 
-https://github.com/user-attachments/assets/47fd7337-74b1-4757-b2fa-c5318033535d
+https://github.com/user-attachments/assets/b9dc5196-367d-4328-a915-690f68c6672e
 
 ## Highlights
 
@@ -115,13 +114,16 @@ outside a live room. Exact module wiring and frozen data shapes are in
 
 ## Engineering docs
 
+For the full session walkthrough, configuration reference, architecture and troubleshooting,
+read the [complete guide](docs/README.md).
+
 - [`RIME_EVIDENCE.md`](RIME_EVIDENCE.md) — the four preregistered claims, acceptance tests, and
   measured results, reproducible with `python evidence/run_all.py`.
 - [`GATE0.md`](GATE0.md) — measured configuration decisions and rejected alternatives.
 - [`CONTRACTS.md`](CONTRACTS.md) — frozen cross-module data shapes and exact module wiring.
 
-One measured limitation: interruption stop latency currently misses its target — P95 1400 ms
-against a 300 ms goal. See `RIME_EVIDENCE.md` claim 4 for the full numbers.
+Recorded interruption tests missed the 300 ms stop-latency target: the reported tuned run
+had a P95 of 1400 ms. See `RIME_EVIDENCE.md` claim 4 for the setup and results.
 
 ## License
 
